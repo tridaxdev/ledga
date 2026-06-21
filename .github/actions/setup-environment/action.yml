@@ -1,0 +1,18 @@
+name: 'Setup Ledga Environment'
+description: 'Setup a Node.js environment and install dependencies for the Ledga application'
+
+runs:
+  using: 'composite'
+  steps: 
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24.11.0'
+        cache: 'npm'
+        cache-dependency-path: 'ledga-desktop/package-lock.json'
+    
+    - name: Install dependencies
+      working-directory: ledga-desktop
+      run: npm ci
+      shell: bash
+    

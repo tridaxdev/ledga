@@ -1,0 +1,97 @@
+{
+    "appId": "com.ledga.app",
+    "productName": "Ledga",
+    "directories": {
+        "output": "release",
+        "buildResources": "build"
+    },
+    "files": [
+        "dist",
+        "assets/**/*",
+        "build/icons/**/*",
+        "package.json",
+        "!dist/renderer-bundle-analysis.html",
+        "!dist/**/*.map",
+        "!dist/**/*.test.*",
+        "!dist/**/*.spec.*",
+        "!**/test/**",
+        "!**/*.test.*",
+        "!**/*.spec.*",
+        "!**/*.md",
+        "!**/README*",
+        "!**/LICENSE*",
+        "!**/CHANGELOG*"
+    ],
+    "extraResources": [".env"],
+    "asarUnpack": [
+        "**/node_modules/**/*.node"
+    ],
+    "afterSign": "build/notarize.cjs",
+    "mac": {
+        "category": "public.app-category.developer-tools",
+        "icon": "build/icons/icon.icns",
+        "minimumSystemVersion": "12.0",
+        "notarize": false,
+        "identity": "Tridax Development Solutions (72MCSVN5B5)",
+        "target": [
+            {
+                "target": "dmg",
+                "arch": ["arm64"]
+            },
+            {
+                "target": "zip",
+                "arch": ["arm64"]
+            }
+        ],
+        "hardenedRuntime": true,
+        "entitlements": "build/entitlements.mac.plist",
+        "entitlementsInherit": "build/entitlements.mac.plist",
+        "gatekeeperAssess": false
+    },
+    "win": {
+        "icon": "build/icons/icon.ico",
+        "target": [
+            {
+                "target": "nsis",
+                "arch": ["x64"]
+            },
+            {
+                "target": "zip",
+                "arch": ["x64"]
+            }
+        ],
+        "signtoolOptions": {
+            "sign": "build/gcp-kms-signer.cjs"
+        }
+    },
+    "nsis": {
+        "oneClick": false,
+        "perMachine": false,
+        "allowElevation": true,
+        "selectPerMachineByDefault": true,
+        "allowToChangeInstallationDirectory": false,
+        "include": "build/installer.nsh",
+        "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "publish": [
+        {
+            "provider": "generic",
+            "url": "https://releases.ledga.com/releases",
+            "publishAutoUpdate": true
+        },
+        {
+            "provider": "github",
+            "releaseType": "draft",
+            "publishAutoUpdate": false
+        }
+    ],
+    "releaseInfo": {
+        "releaseNotes": "New Build System"
+    },
+    "protocols": [
+        {
+            "name": "Ledga Protocol",
+            "schemes": ["ledga"]
+        }
+    ]
+}

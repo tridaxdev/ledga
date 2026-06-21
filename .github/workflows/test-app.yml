@@ -1,0 +1,45 @@
+on:
+  workflow_dispatch:
+  push:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  lint:
+    name: Test Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Environment
+        uses: ./.github/actions/setup-environment
+      - name: Lint Code
+        working-directory: ledga-desktop
+        run: npm run lint
+      - name: Validate translation keys
+        working-directory: ledga-desktop
+        run: npm run analyze:i18n
+      - name: Check translation file formatting
+        working-directory: ledga-desktop
+        run: |
+          npm run fix:i18n
+          if ! git diff --exit-code src/renderer/translations/; then
+            echo "❌ Translation files are not properly formatted"
+            echo "Please run 'npm run fix:i18n' locally and commit the changes"
+            exit 1
+          fi
+
+          echo "✅ Translation files are properly formatted"
+      - name: Test Code
+        id: tests
+        working-directory: ledga-desktop
+        run: npm run test -- --reporter=json --outputFile=test-results.json
+      - name: Upload test results
+        if: always() && steps.tests.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with: 
+          name: test-results
+          path: ph-app/test-results.json
+          retention-days: 1
