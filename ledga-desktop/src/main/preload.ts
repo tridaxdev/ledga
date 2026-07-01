@@ -30,6 +30,19 @@ const ledgaAPI: LedgaAPI = {
             ipcRenderer.on(AllowedChannelIpc.ConnectionsOAuthCompleted, listener)
             return () => ipcRenderer.removeListener(AllowedChannelIpc.ConnectionsOAuthCompleted, listener)
         }
+    },
+    emails: {
+        getProcessingCounts: () => ipcRenderer.invoke(AllowedChannelIpc.EmailsGetProcessingCounts),
+        onProcessingUpdate: (callback: (counts: { processing: number; failed: number }) => void) => {
+            const listener = (_: Electron.IpcRendererEvent, counts: { processing: number; failed: number }) => callback(counts)
+            ipcRenderer.on(AllowedChannelIpc.EmailsProcessingUpdate, listener)
+            return () => ipcRenderer.removeListener(AllowedChannelIpc.EmailsProcessingUpdate, listener)
+        },
+        onPulled: (callback: (event: { connectionId: string; newCount: number }) => void) => {
+            const listener = (_: Electron.IpcRendererEvent, event: { connectionId: string; newCount: number }) => callback(event)
+            ipcRenderer.on(AllowedChannelIpc.EmailsPulled, listener)
+            return () => ipcRenderer.removeListener(AllowedChannelIpc.EmailsPulled, listener)
+        }
     }
 }
 

@@ -10,33 +10,89 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SettingsIndexRouteImport } from './routes/settings/index'
+import { Route as LedgerIndexRouteImport } from './routes/ledger/index'
+import { Route as LedgerCategoryIdRouteImport } from './routes/ledger/$categoryId'
+import { Route as AssistantChatIdRouteImport } from './routes/assistant/$chatId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LedgerIndexRoute = LedgerIndexRouteImport.update({
+  id: '/ledger/',
+  path: '/ledger/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LedgerCategoryIdRoute = LedgerCategoryIdRouteImport.update({
+  id: '/ledger/$categoryId',
+  path: '/ledger/$categoryId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssistantChatIdRoute = AssistantChatIdRouteImport.update({
+  id: '/assistant/$chatId',
+  path: '/assistant/$chatId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/assistant/$chatId': typeof AssistantChatIdRoute
+  '/ledger/$categoryId': typeof LedgerCategoryIdRoute
+  '/ledger/': typeof LedgerIndexRoute
+  '/settings/': typeof SettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/assistant/$chatId': typeof AssistantChatIdRoute
+  '/ledger/$categoryId': typeof LedgerCategoryIdRoute
+  '/ledger': typeof LedgerIndexRoute
+  '/settings': typeof SettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/assistant/$chatId': typeof AssistantChatIdRoute
+  '/ledger/$categoryId': typeof LedgerCategoryIdRoute
+  '/ledger/': typeof LedgerIndexRoute
+  '/settings/': typeof SettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/assistant/$chatId'
+    | '/ledger/$categoryId'
+    | '/ledger/'
+    | '/settings/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/assistant/$chatId'
+    | '/ledger/$categoryId'
+    | '/ledger'
+    | '/settings'
+  id:
+    | '__root__'
+    | '/'
+    | '/assistant/$chatId'
+    | '/ledger/$categoryId'
+    | '/ledger/'
+    | '/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AssistantChatIdRoute: typeof AssistantChatIdRoute
+  LedgerCategoryIdRoute: typeof LedgerCategoryIdRoute
+  LedgerIndexRoute: typeof LedgerIndexRoute
+  SettingsIndexRoute: typeof SettingsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +104,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings/': {
+      id: '/settings/'
+      path: '/settings'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ledger/': {
+      id: '/ledger/'
+      path: '/ledger'
+      fullPath: '/ledger/'
+      preLoaderRoute: typeof LedgerIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ledger/$categoryId': {
+      id: '/ledger/$categoryId'
+      path: '/ledger/$categoryId'
+      fullPath: '/ledger/$categoryId'
+      preLoaderRoute: typeof LedgerCategoryIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/assistant/$chatId': {
+      id: '/assistant/$chatId'
+      path: '/assistant/$chatId'
+      fullPath: '/assistant/$chatId'
+      preLoaderRoute: typeof AssistantChatIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AssistantChatIdRoute: AssistantChatIdRoute,
+  LedgerCategoryIdRoute: LedgerCategoryIdRoute,
+  LedgerIndexRoute: LedgerIndexRoute,
+  SettingsIndexRoute: SettingsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

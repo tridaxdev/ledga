@@ -4,7 +4,7 @@ import { useConnections } from '../../hooks/useConnections'
 import { ConnectGmailModal } from '../../components/ConnectGmailModal'
 import type { Connection } from '@/common/types/Connection'
 
-export const Route = createFileRoute('/settings')({ component: SettingsScreen })
+export const Route = createFileRoute('/settings/')({ component: SettingsScreen })
 
 function SettingsScreen() {
     const { connections, isLoading, disconnect } = useConnections()

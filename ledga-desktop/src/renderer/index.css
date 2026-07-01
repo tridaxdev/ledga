@@ -15,6 +15,10 @@
 @font-face { font-family: "Crimson Text"; font-style: normal; font-weight: 600; font-display: swap; src: url('./assets/fonts/CrimsonText-SemiBold.ttf') format('truetype'); }
 @font-face { font-family: "Crimson Text"; font-style: normal; font-weight: 700; font-display: swap; src: url('./assets/fonts/CrimsonText-Bold.ttf') format('truetype'); }
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 @theme {
   --color-ledga-bg: #fcf9f1;
   --color-ledga-sidebar: #f7f3ea;
