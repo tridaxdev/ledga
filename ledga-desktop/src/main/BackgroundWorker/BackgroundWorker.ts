@@ -2,9 +2,13 @@ import { parentPort, workerData } from "worker_threads"
 import { CANCELLED_EXIT_CODE, type DbQueryTaskPayload, type MainToWorkerMessage } from "../../common/types/WorkerTypes"
 import { WorkerLogger } from "../logging/WorkerLogger"
 import { WorkerDatabaseManager } from "../Database/WorkerDatabaseManager"
+import { FileProcessorRegistry } from "../FileProcessing/FileProcessorRegistry"
+import type { FileProcessingResultMessage, FileProcessingTaskPayload } from "@/common/types/FileProcessingTypes"
+import { OrphanedFilesCleanupProcessor } from "../AssetManagement/OrphanedFilesCleanupProcessor"
+import { BackgroundWorkerAIService } from "./BackgroundWorkerAIService"
 
 const logger = new WorkerLogger()
-const { dbPath } = workerData as { dbPath: string; appStorageDir: string }
+const { dbPath, appStorageDir } = workerData as { dbPath: string; appStorageDir: string }
 const workerDb = new WorkerDatabaseManager(dbPath)
 
 if (!parentPort) {
@@ -38,6 +42,7 @@ function handleUnhandledRejection(reason: unknown): void {
     process.exit(0)
 }
 
+const workerAIService = new BackgroundWorkerAIService(logger)
 let activeAbortController: AbortController | null = null
 
 async function handleTaskMessage(message: MainToWorkerMessage): Promise<void> {
@@ -49,6 +54,30 @@ async function handleTaskMessage(message: MainToWorkerMessage): Promise<void> {
 
     try {
         switch (message.taskType) {
+            case "file_processing": {
+                const { fileId, originalPath, fileName, appStorageDir, config } = message.payload as FileProcessingTaskPayload
+                const processor = await FileProcessorRegistry.createProcessor(originalPath, logger, config, workerAIService)
+                const result = await processor.processFileComplete(fileId, originalPath, appStorageDir, fileName)
+                const response: FileProcessingResultMessage = {
+                    type: "RESULT",
+                    taskId: message.taskId,
+                    success: result.success,
+                    result: result,
+                    error: result.error
+                }
+                if (result.extractedText) {
+                    const encoded = new TextEncoder().encode(result.extractedText)
+                    const transferableResponse = {
+                        ...response,
+                        result: { ...result, extractedText: undefined, extractedTextBuffer: encoded.buffer }
+                    }
+                    parentPort?.postMessage(transferableResponse, [encoded.buffer])
+                } else {
+                    parentPort?.postMessage(response)
+                }
+                break
+            }
+
             case "db_query": {
                 const { sql, params } = message.payload as DbQueryTaskPayload
                 const results = workerDb.executeQuery(sql, params)
@@ -57,6 +86,18 @@ async function handleTaskMessage(message: MainToWorkerMessage): Promise<void> {
                     taskId: message.taskId,
                     success: true,
                     result: results
+                })
+                break
+            }
+
+            case "cleanup_orphaned_files": {
+                const processor = new OrphanedFilesCleanupProcessor(logger, workerDb, appStorageDir)
+                const result = await processor.process()
+                parentPort?.postMessage({
+                    type: "RESULT",
+                    taskId: message.taskId,
+                    success: true,
+                    result
                 })
                 break
             }
