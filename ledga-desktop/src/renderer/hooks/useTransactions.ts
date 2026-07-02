@@ -25,6 +25,13 @@ export function useTransactions(params: TransactionQueryParams) {
         refetch()
     }, [refetch])
 
+    // A rule being created/updated/deleted can retroactively change category/merchant on any
+    // transaction, so any open Ledger/Category-Review view needs to re-query rather than rely on
+    // its own optimistic patches.
+    useEffect(() => {
+        return getLedgaAPI().transactions.onInvalidated(refetch)
+    }, [refetch])
+
     const updateCategory = useCallback(async (id: string, categoryId: string | null) => {
         const result = await getLedgaAPI().transactions.updateCategory(id, categoryId)
         if (result.kind === 'success') {

@@ -24,6 +24,7 @@ import { EmailService } from "./email/emailService"
 import { setupIpcHandlersForEmail } from "./email/setupIpcHandlersForEmail"
 import { setupIpcHandlersForTransactions } from "./transactions/setupIpcHandlersForTransactions"
 import { setupIpcHandlersForCategories } from "./categories/setupIpcHandlersForCategories"
+import { setupIpcHandlersForRules } from "./rules/setupIpcHandlersForRules"
 
 const loggerPath = path.join(app.getPath("userData"), "logs")
 const logger = new FileLogger(loggerPath, "debug")
@@ -81,7 +82,7 @@ if(!isSingleInstance) {
             const emailRepository = new EmailRepository(databaseManager, logger)
             const transactionRepository = new TransactionRepository(databaseManager, logger)
             const categoryRepository = new CategoryRepository(databaseManager, logger)
-            const rulesService = new RulesService(databaseManager, logger)
+            const rulesService = new RulesService(databaseManager, categoryRepository, transactionRepository, logger)
             const billPaymentService = new BillPaymentService()
             const emailService = new EmailService(
                 connectionRepository,
@@ -112,8 +113,9 @@ if(!isSingleInstance) {
             )
 
             setupIpcHandlersForEmail(emailService, logger)
-            setupIpcHandlersForTransactions(transactionRepository)
+            setupIpcHandlersForTransactions(transactionRepository, categoryRepository)
             setupIpcHandlersForCategories(categoryRepository)
+            setupIpcHandlersForRules(rulesService, notificationService)
 
             windowManager.showMainWindow(app.getName())
 
