@@ -28,6 +28,9 @@ import { setupIpcHandlersForRules } from "./rules/setupIpcHandlersForRules"
 import { CsvImportService } from "./csvImport/CsvImportService"
 import { setupIpcHandlersForCsvImport } from "./csvImport/setupIpcHandlersForCsvImport"
 import { setupIpcHandlersForSettings } from "./settings/setupIpcHandlersForSettings"
+import { ChatRepository } from "./chat/ChatRepository"
+import { AssistantService } from "./chat/AssistantService"
+import { setupIpcHandlersForChat } from "./chat/setupIpcHandlersForChat"
 
 const loggerPath = path.join(app.getPath("userData"), "logs")
 const logger = new FileLogger(loggerPath, "debug")
@@ -133,6 +136,10 @@ if(!isSingleInstance) {
             setupIpcHandlersForCsvImport(csvImportService)
 
             setupIpcHandlersForSettings(databaseManager, transactionRepository, categoryRepository, dbPath, logger)
+
+            const chatRepository = new ChatRepository(databaseManager, logger)
+            const assistantService = new AssistantService(chatRepository, transactionRepository, categoryRepository, notificationService, logger)
+            setupIpcHandlersForChat(chatRepository, assistantService, logger)
 
             windowManager.showMainWindow(app.getName())
 

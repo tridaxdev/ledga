@@ -6,6 +6,7 @@ import type { CategoryAggregate, CategoryQueryParams, FlaggedTransaction, Transa
 import type { Category } from "./Category"
 import type { Rule, RuleInput } from "./Rule"
 import type { CsvImportProgressEvent } from "./CsvImportTypes"
+import type { Chat, ChatMessage, AssistantStreamChunkEvent, AssistantStreamDoneEvent, AssistantStreamErrorEvent } from "./ChatTypes"
 import type { Conversation, ConversationCreatedEvent, ConversationDeletedEvent, ConversationReferencesUpdatedEvent, ConversationStreamEvent, ConversationUpdatedEvent, ConversationWithMessages, CreateConversationRequest, CreateMessageRequest, DeleteConversationRequest, EditUserMessageRequest, GetConversationRequest, GetConversationsByProjectRequest, Message, RetryFromMessageRequest, StopConversationStreamRequest, ToolApprovalDecision, UpdateConversationRequest } from "./BaseTypes"
 import type { GetFileRequest, GetFilesByFolderRequest, GetFilesByProjectRequest, GetFilesByConversationRequest, ImportFilesRequest, RetryImportRequest, OpenFileRequest, RetryFileProcessingRequest, DeleteAssetsRequest } from "./FileImportTypes"
 import type { PyleHoundAsset, PyleHoundFile, AssetUpsertedEvent, AssetDeletedEvent } from "./ProjectTypes"
@@ -121,5 +122,18 @@ export interface LedgaAPI {
         readonly getDbPath: () => Promise<Result<string, Error>>
         readonly exportCsv: () => Promise<Result<string | null, Error>>
         readonly clearData: () => Promise<Result<void, Error>>
+    }
+    readonly chats: {
+        readonly getAll: () => Promise<Result<Chat[], Error>>
+        readonly create: () => Promise<Result<Chat, Error>>
+        readonly getMessages: (chatId: string) => Promise<Result<ChatMessage[], Error>>
+        readonly onUpdated: (callback: () => void) => () => void
+    }
+    readonly assistant: {
+        readonly send: (chatId: string, text: string) => Promise<Result<void, Error>>
+        readonly stop: (chatId: string) => Promise<Result<void, Error>>
+        readonly onStreamChunk: (callback: (event: AssistantStreamChunkEvent) => void) => () => void
+        readonly onStreamDone: (callback: (event: AssistantStreamDoneEvent) => void) => () => void
+        readonly onStreamError: (callback: (event: AssistantStreamErrorEvent) => void) => () => void
     }
 }

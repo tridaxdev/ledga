@@ -3,6 +3,8 @@ import { createRootRoute, Outlet, useNavigate, useRouterState } from "@tanstack/
 import { ActivityTray } from "../components/ActivityTray"
 import { useEmailActivity } from "../hooks/useEmailActivity"
 import { onOpenActivityTray } from "../utils/activityTrayBus"
+import { useChats } from "../hooks/useChats"
+import { formatRelativeTime } from "../utils/formatCurrency"
 
 export const Route = createRootRoute({
     component: RootLayout
@@ -23,6 +25,15 @@ function RootLayout() {
 
     const isLedgerActive = pathname === "/ledger" || pathname.startsWith("/ledger/")
     const isSettingsActive = pathname === "/settings"
+
+    const { chats, createChat } = useChats()
+
+    async function handleNewChat() {
+        const result = await createChat()
+        if (result.kind === "success") {
+            navigate({ to: "/assistant/$chatId", params: { chatId: result.value.id } })
+        }
+    }
 
     const { processing, failed } = useEmailActivity()
     const isActive = processing > 0
@@ -237,6 +248,8 @@ function RootLayout() {
                             Chats
                         </span>
                         <button
+                            onClick={handleNewChat}
+                            title="New chat"
                             style={{
                                 width: 22,
                                 height: 22,
@@ -257,9 +270,36 @@ function RootLayout() {
                         </button>
                     </div>
 
-                    {/* Chat list — placeholder until chats data is wired up */}
+                    {/* Chat list */}
                     <div style={{ display: "flex", flexDirection: "column", gap: 2, flex: 1, minHeight: 0, overflowY: "auto" }}>
-                        <div />
+                        {chats.map(chat => {
+                            const isChatActive = pathname === `/assistant/${chat.id}`
+                            return (
+                                <button
+                                    key={chat.id}
+                                    onClick={() => navigate({ to: "/assistant/$chatId", params: { chatId: chat.id } })}
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 8,
+                                        padding: "7px 8px",
+                                        borderRadius: 8,
+                                        border: "none",
+                                        background: isChatActive ? "#ebe3d0" : "transparent",
+                                        color: "#1f1b16",
+                                        cursor: "pointer",
+                                        textAlign: "left",
+                                        fontSize: 13,
+                                    }}
+                                >
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, opacity: 0.7 }}>
+                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                    </svg>
+                                    <span style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{chat.title}</span>
+                                    <span style={{ fontSize: 11, color: "#a89c87", flexShrink: 0 }}>{formatRelativeTime(chat.updated_at)}</span>
+                                </button>
+                            )
+                        })}
                     </div>
 
                     {/* User profile */}
