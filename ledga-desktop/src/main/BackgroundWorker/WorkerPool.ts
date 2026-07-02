@@ -9,7 +9,7 @@ import {
     type WorkerLogMessage,
 } from "../../common/types/WorkerTypes"
 
-export interface BackgroundTask<TPayload, TResult> {
+export interface BackgroundTask<TPayload, TResult, TProgress = unknown> {
     id: string
     type: WorkerTaskType
     priority: ProcessingPriority
@@ -18,6 +18,7 @@ export interface BackgroundTask<TPayload, TResult> {
     resolve: (result: TResult) => void
     reject: (error: Error) => void
     enqueuedAt: number
+    onProgress?: (progress: TProgress) => void
 }
 
 export interface PoolStats {
@@ -38,9 +39,9 @@ export class WorkerPool {
         private readonly workerFactory: () => Worker
     ) {}
 
-    async execute<TPayload, TResult>(task: BackgroundTask<TPayload, TResult>): Promise<TResult> {
+    async execute<TPayload, TResult, TProgress = unknown>(task: BackgroundTask<TPayload, TResult, TProgress>): Promise<TResult> {
         return new Promise<TResult>((resolve, reject) => {
-            const taskWithCallbacks: BackgroundTask<TPayload, TResult> = {
+            const taskWithCallbacks: BackgroundTask<TPayload, TResult, TProgress> = {
                 ...task,
                 resolve,
                 reject,
@@ -53,8 +54,8 @@ export class WorkerPool {
         })
     }
 
-    private enqueue<TPayload, TResult>(task: BackgroundTask<TPayload, TResult>): void {
-        this.taskQueue.push(task as BackgroundTask<unknown, unknown>)
+    private enqueue<TPayload, TResult, TProgress>(task: BackgroundTask<TPayload, TResult, TProgress>): void {
+        this.taskQueue.push(task as BackgroundTask<unknown, unknown, unknown>)
         this.taskQueue.sort((a, b) => {
             if (a.priority !== b.priority) {
                 return b.priority - a.priority
@@ -193,6 +194,8 @@ export class WorkerPool {
                 try {
                     if (msg.type === "LOG") {
                         this.handleWorkerLog(msg)
+                    } else if (msg.type === "PROGRESS") {
+                        if (msg.taskId === task.id) task.onProgress?.(msg.progress)
                     } else if (msg.type === "RESULT") {
                         if (!msg.success) {
                             complete(undefined, new Error(msg.error ?? "Worker task failed"))

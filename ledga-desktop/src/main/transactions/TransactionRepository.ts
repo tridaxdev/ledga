@@ -192,6 +192,14 @@ export class TransactionRepository {
         return list[0] ?? null
     }
 
+    existsByBankReference(bankReference: string): boolean {
+        const rows = this.db.executeQuery(
+            "SELECT 1 FROM transactions WHERE bank_reference = ? LIMIT 1",
+            [bankReference]
+        ) as unknown
+        return Array.isArray(rows) && rows.length > 0
+    }
+
     updateMerchant(id: string, merchant: string): void {
         this.db.executeQuery(
             "UPDATE transactions SET merchant = ? WHERE id = ?",

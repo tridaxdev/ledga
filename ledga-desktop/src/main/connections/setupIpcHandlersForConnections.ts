@@ -7,12 +7,16 @@ import type { TokenStorageService } from '../encryption/TokenStorageService'
 import type { MainWindowNotificationService } from '../windowManagement/MainWindowNotification'
 import type { Logger } from '../logging/FileLogger'
 import { registerIpcHandler } from '../ipc/registerIpcHandler'
+import type { EmailService } from '../email/emailService'
+
+const SYNC_NOW_LOOKBACK_DAYS = 30
 
 export function setupIpcHandlersForConnections(
     connectionRepository: ConnectionRepository,
     tokenStorage: TokenStorageService,
     oauthService: GoogleOAuthService,
     notificationService: MainWindowNotificationService,
+    emailService: EmailService,
     logger: Logger
 ): void {
     // Holds completed OAuth results that haven't been persisted yet — the connection
@@ -77,5 +81,25 @@ export function setupIpcHandlersForConnections(
         notificationService.notifyMainWindow(AllowedChannelIpc.ConnectionsOAuthCompleted, updated)
 
         return ResultFactory.success(updated)
+    })
+
+    registerIpcHandler(AllowedChannelIpc.ConnectionsSyncNow, async (_, ...args) => {
+        const connectionId = args[0] as string
+        try {
+            const endDate = new Date()
+            const startDate = new Date(endDate.getTime() - SYNC_NOW_LOOKBACK_DAYS * 24 * 60 * 60 * 1000)
+            const result = await emailService.fetchAndStoreEmails(connectionId, startDate, endDate)
+            return ResultFactory.success(result)
+        } catch (error) {
+            logger.error('Manual sync failed', { connectionId, error })
+            return ResultFactory.error(error instanceof Error ? error : new Error(String(error)))
+        }
+    })
+
+    registerIpcHandler(AllowedChannelIpc.ConnectionsUpdate, (_, ...args) => {
+        const id = args[0] as string
+        const patch = args[1] as { auto_sync?: boolean }
+        connectionRepository.update(id, patch)
+        return ResultFactory.success(connectionRepository.findById(id))
     })
 }

@@ -3,9 +3,11 @@ import type { LedgaAPI } from "@/common/types/LedgaAPI";
 import type { Connection } from "@/common/types/Connection";
 import type { CategoryQueryParams, TransactionQueryParams } from "@/common/types/Transaction";
 import type { RuleInput } from "@/common/types/Rule";
-import { contextBridge, ipcRenderer } from "electron";
+import type { CsvImportProgressEvent } from "@/common/types/CsvImportTypes";
+import { contextBridge, ipcRenderer, webUtils } from "electron";
 
 const ledgaAPI: LedgaAPI = {
+    getPathForFile: (file: File) => webUtils.getPathForFile(file),
     app: {
         getLanguage: async () => {
             return ipcRenderer.invoke(AllowedChannelIpc.AppGetLanguage)
@@ -31,7 +33,9 @@ const ledgaAPI: LedgaAPI = {
             const listener = (_: Electron.IpcRendererEvent, connection: Connection) => callback(connection)
             ipcRenderer.on(AllowedChannelIpc.ConnectionsOAuthCompleted, listener)
             return () => ipcRenderer.removeListener(AllowedChannelIpc.ConnectionsOAuthCompleted, listener)
-        }
+        },
+        syncNow: (id: string) => ipcRenderer.invoke(AllowedChannelIpc.ConnectionsSyncNow, id),
+        update: (id: string, patch: { auto_sync?: boolean }) => ipcRenderer.invoke(AllowedChannelIpc.ConnectionsUpdate, id, patch)
     },
     emails: {
         getProcessingCounts: () => ipcRenderer.invoke(AllowedChannelIpc.EmailsGetProcessingCounts),
@@ -66,6 +70,21 @@ const ledgaAPI: LedgaAPI = {
         create: (input: RuleInput) => ipcRenderer.invoke(AllowedChannelIpc.RulesCreate, input),
         update: (id: string, input: Partial<RuleInput>) => ipcRenderer.invoke(AllowedChannelIpc.RulesUpdate, id, input),
         delete: (id: string) => ipcRenderer.invoke(AllowedChannelIpc.RulesDelete, id)
+    },
+    csv: {
+        browseFile: () => ipcRenderer.invoke(AllowedChannelIpc.CsvBrowseFile),
+        import: (filePath: string) => ipcRenderer.invoke(AllowedChannelIpc.CsvImport, filePath),
+        onProgress: (callback: (event: CsvImportProgressEvent) => void) => {
+            const listener = (_: Electron.IpcRendererEvent, event: CsvImportProgressEvent) => callback(event)
+            ipcRenderer.on(AllowedChannelIpc.CsvImportProgress, listener)
+            return () => ipcRenderer.removeListener(AllowedChannelIpc.CsvImportProgress, listener)
+        }
+    },
+    settings: {
+        revealDb: () => ipcRenderer.invoke(AllowedChannelIpc.SettingsRevealDb),
+        getDbPath: () => ipcRenderer.invoke(AllowedChannelIpc.SettingsGetDbPath),
+        exportCsv: () => ipcRenderer.invoke(AllowedChannelIpc.SettingsExportCsv),
+        clearData: () => ipcRenderer.invoke(AllowedChannelIpc.SettingsClearData)
     }
 }
 

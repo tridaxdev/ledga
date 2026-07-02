@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import { createRootRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router"
 import { ActivityTray } from "../components/ActivityTray"
 import { useEmailActivity } from "../hooks/useEmailActivity"
+import { onOpenActivityTray } from "../utils/activityTrayBus"
 
 export const Route = createRootRoute({
     component: RootLayout
@@ -38,6 +39,10 @@ function RootLayout() {
         document.addEventListener("mousedown", handleClickOutside)
         return () => document.removeEventListener("mousedown", handleClickOutside)
     }, [showActivity])
+
+    useEffect(() => {
+        return onOpenActivityTray(() => setShowActivity(true))
+    }, [])
 
     return (
         <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>

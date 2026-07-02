@@ -5,6 +5,7 @@ import type { Connection } from "./Connection"
 import type { CategoryAggregate, CategoryQueryParams, FlaggedTransaction, Transaction, TransactionQueryParams, TransactionSummary } from "./Transaction"
 import type { Category } from "./Category"
 import type { Rule, RuleInput } from "./Rule"
+import type { CsvImportProgressEvent } from "./CsvImportTypes"
 import type { Conversation, ConversationCreatedEvent, ConversationDeletedEvent, ConversationReferencesUpdatedEvent, ConversationStreamEvent, ConversationUpdatedEvent, ConversationWithMessages, CreateConversationRequest, CreateMessageRequest, DeleteConversationRequest, EditUserMessageRequest, GetConversationRequest, GetConversationsByProjectRequest, Message, RetryFromMessageRequest, StopConversationStreamRequest, ToolApprovalDecision, UpdateConversationRequest } from "./BaseTypes"
 import type { GetFileRequest, GetFilesByFolderRequest, GetFilesByProjectRequest, GetFilesByConversationRequest, ImportFilesRequest, RetryImportRequest, OpenFileRequest, RetryFileProcessingRequest, DeleteAssetsRequest } from "./FileImportTypes"
 import type { PyleHoundAsset, PyleHoundFile, AssetUpsertedEvent, AssetDeletedEvent } from "./ProjectTypes"
@@ -17,6 +18,9 @@ export interface DatabaseStats {
 }
 
 export interface LedgaAPI {
+    // Electron 32+ with contextIsolation no longer exposes File.path directly in the renderer;
+    // this must be resolved via webUtils in the preload script instead.
+    readonly getPathForFile: (file: File) => string
     readonly conversations: {
         readonly getAll: () => Promise<Result<Conversation[], Error>>
 
@@ -82,6 +86,8 @@ export interface LedgaAPI {
         readonly finalize: (flowId: string, autoSync: boolean) => Promise<Result<Connection, Error>>
         readonly disconnect: (id: string) => Promise<Result<void, Error>>
         readonly onOAuthCompleted: (callback: (connection: Connection) => void) => () => void
+        readonly syncNow: (id: string) => Promise<Result<{ newCount: number }, Error>>
+        readonly update: (id: string, patch: { auto_sync?: boolean }) => Promise<Result<Connection | null, Error>>
     }
     readonly emails: {
         readonly getProcessingCounts: () => Promise<{ processing: number; failed: number }>
@@ -104,5 +110,16 @@ export interface LedgaAPI {
         readonly create: (input: RuleInput) => Promise<Result<Rule, Error>>
         readonly update: (id: string, input: Partial<RuleInput>) => Promise<Result<void, Error>>
         readonly delete: (id: string) => Promise<Result<void, Error>>
+    }
+    readonly csv: {
+        readonly browseFile: () => Promise<Result<string | null, Error>>
+        readonly import: (filePath: string) => Promise<Result<{ taskId: string }, Error>>
+        readonly onProgress: (callback: (event: CsvImportProgressEvent) => void) => () => void
+    }
+    readonly settings: {
+        readonly revealDb: () => Promise<Result<void, Error>>
+        readonly getDbPath: () => Promise<Result<string, Error>>
+        readonly exportCsv: () => Promise<Result<string | null, Error>>
+        readonly clearData: () => Promise<Result<void, Error>>
     }
 }

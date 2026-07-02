@@ -55,5 +55,17 @@ export function useConnections() {
         return result
     }, [])
 
-    return { connections, isLoading, error, refetch, startOAuth, cancelOAuth, finalize, disconnect }
+    const syncNow = useCallback(async (id: string): Promise<Result<{ newCount: number }, Error>> => {
+        return getLedgaAPI().connections.syncNow(id)
+    }, [])
+
+    const setAutoSync = useCallback(async (id: string, autoSync: boolean): Promise<Result<Connection | null, Error>> => {
+        const result = await getLedgaAPI().connections.update(id, { auto_sync: autoSync })
+        if (result.kind === 'success') {
+            setConnections(prev => prev.map(c => (c.id === id ? { ...c, auto_sync: autoSync } : c)))
+        }
+        return result
+    }, [])
+
+    return { connections, isLoading, error, refetch, startOAuth, cancelOAuth, finalize, disconnect, syncNow, setAutoSync }
 }

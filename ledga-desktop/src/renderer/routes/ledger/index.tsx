@@ -6,7 +6,9 @@ import { useCategories } from '../../hooks/useCategories'
 import { useConnections } from '../../hooks/useConnections'
 import { DateRangePicker } from '../../components/DateRangePicker'
 import { CategoryBadge } from '../../components/CategoryBadge'
+import { ImportCsvModal } from '../../components/ImportCsvModal'
 import { formatCurrency, formatSignedAmount, formatDate } from '../../utils/formatCurrency'
+import { openActivityTray } from '../../utils/activityTrayBus'
 
 export const Route = createFileRoute('/ledger/')({ component: LedgerScreen })
 
@@ -27,6 +29,7 @@ function LedgerScreen() {
     const { connections } = useConnections()
     const [searchInput, setSearchInput] = useState('')
     const search = useDebouncedValue(searchInput, 250)
+    const [importOpen, setImportOpen] = useState(false)
 
     const { transactions, summary, updateCategory } = useTransactions({ from, to, search: search || undefined })
 
@@ -45,7 +48,7 @@ function LedgerScreen() {
                             All accounts
                             <ChevronDown />
                         </div>
-                        <button style={{ ...filterPillStyle, cursor: 'pointer', fontWeight: 500, color: 'var(--color-ledga-text)' }}>
+                        <button onClick={() => setImportOpen(true)} style={{ ...filterPillStyle, cursor: 'pointer', fontWeight: 500, color: 'var(--color-ledga-text)' }}>
                             <ImportIcon />
                             Import
                         </button>
@@ -131,6 +134,12 @@ function LedgerScreen() {
                     )}
                 </div>
             </div>
+
+            <ImportCsvModal
+                isOpen={importOpen}
+                onClose={() => setImportOpen(false)}
+                onViewStatus={openActivityTray}
+            />
         </div>
     )
 }
