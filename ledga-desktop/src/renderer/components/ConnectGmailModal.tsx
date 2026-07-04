@@ -1,4 +1,5 @@
 import { useState, useEffect, type MouseEvent } from "react"
+import { useTranslation } from "react-i18next"
 import { getLedgaAPI } from "../hooks/apiClient"
 import type { Connection } from "@/common/types/Connection"
 
@@ -19,6 +20,7 @@ const STEP_INDEX: Record<Step, number> = {
 }
 
 export function ConnectGmailModal({ isOpen, onClose, onSuccess }: Props) {
+    const { t } = useTranslation()
     const [step, setStep] = useState<Step>("explainer")
     const [flowId, setFlowId] = useState<string | null>(null)
     const [autoSync, setAutoSync] = useState(true)
@@ -113,7 +115,7 @@ export function ConnectGmailModal({ isOpen, onClose, onSuccess }: Props) {
                 >
                     <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", fontWeight: 500, color: "var(--color-ledga-text-secondary)" }}>
                         <MailIcon />
-                        Connect Gmail
+                        {t("connect_gmail_modal.header")}
                     </div>
                     <button onClick={handleCancel} style={{ color: "var(--color-ledga-text-muted)", cursor: "pointer", border: "none", background: "transparent", display: "inline-flex" }}>
                         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round" strokeLinejoin="round">
@@ -128,30 +130,32 @@ export function ConnectGmailModal({ isOpen, onClose, onSuccess }: Props) {
                 <div style={{ padding: "24px 22px" }}>
                     {step === "explainer" && (
                         <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-                            <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "24px", fontWeight: 600, margin: 0, color: "var(--color-ledga-text)" }}>Read only your bank emails</h2>
+                            <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "24px", fontWeight: 600, margin: 0, color: "var(--color-ledga-text)" }}>
+                                {t("connect_gmail_modal.explainer_title")}
+                            </h2>
                             <div style={{ display: "flex", flexDirection: "column", gap: "11px" }}>
                                 <ExplainerRow text="Ledga only opens emails from known bank senders." />
                                 <ExplainerRow text="It pulls out the amount, date and merchant — nothing else." />
                                 <ExplainerRow text="Everything is stored on this device only." />
                             </div>
-                            <PrimaryButton onClick={() => setStep("mailbox")}>Continue</PrimaryButton>
+                            <PrimaryButton onClick={() => setStep("mailbox")}>{t("connect_gmail_modal.continue_button")}</PrimaryButton>
                         </div>
                     )}
 
                     {step === "mailbox" && (
                         <div style={{ display: "flex", flexDirection: "column", gap: "13px" }}>
-                            <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "24px", fontWeight: 600, margin: 0, color: "var(--color-ledga-text)" }}>Which mailbox?</h2>
-                            <div style={{ fontSize: "13px", color: "var(--color-ledga-text-muted)" }}>
-                                You'll choose your Google account in the next step, and grant Ledga read-only access to your inbox.
-                            </div>
-                            <PrimaryButton onClick={handleStartOAuth}>Connect with Google</PrimaryButton>
+                            <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "24px", fontWeight: 600, margin: 0, color: "var(--color-ledga-text)" }}>
+                                {t("connect_gmail_modal.mailbox_title")}
+                            </h2>
+                            <div style={{ fontSize: "13px", color: "var(--color-ledga-text-muted)" }}>{t("connect_gmail_modal.mailbox_description")}</div>
+                            <PrimaryButton onClick={handleStartOAuth}>{t("connect_gmail_modal.connect_button")}</PrimaryButton>
                         </div>
                     )}
 
                     {step === "waiting" && (
                         <div style={{ display: "flex", flexDirection: "column", gap: "13px", alignItems: "center", textAlign: "center", padding: "8px 0" }}>
                             <Spinner />
-                            <p style={{ margin: 0, color: "var(--color-ledga-text-secondary)", fontSize: "14px" }}>Waiting for authorization in your browser…</p>
+                            <p style={{ margin: 0, color: "var(--color-ledga-text-secondary)", fontSize: "14px" }}>{t("connect_gmail_modal.waiting_text")}</p>
                             <button
                                 onClick={handleCancel}
                                 style={{
@@ -164,14 +168,16 @@ export function ConnectGmailModal({ isOpen, onClose, onSuccess }: Props) {
                                     fontSize: "14px"
                                 }}
                             >
-                                Cancel
+                                {t("connect_gmail_modal.cancel_button")}
                             </button>
                         </div>
                     )}
 
                     {step === "sync-preference" && (
                         <div style={{ display: "flex", flexDirection: "column", gap: "13px" }}>
-                            <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "24px", fontWeight: 600, margin: 0, color: "var(--color-ledga-text)" }}>Keep Ledga up to date?</h2>
+                            <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "24px", fontWeight: 600, margin: 0, color: "var(--color-ledga-text)" }}>
+                                {t("connect_gmail_modal.sync_preference_title")}
+                            </h2>
                             {connectedEmail && <div style={{ fontSize: "13px", color: "var(--color-ledga-text-muted)" }}>{connectedEmail}</div>}
                             <SyncOption selected={autoSync} onSelect={() => setAutoSync(true)} title="Automatic sync" description="Ledga is notified the moment a bank email arrives — no polling." />
                             <SyncOption selected={!autoSync} onSelect={() => setAutoSync(false)} title="Manual only" description="Sync when you click the button." />
@@ -198,11 +204,9 @@ export function ConnectGmailModal({ isOpen, onClose, onSuccess }: Props) {
                             >
                                 <CheckIcon size={28} strokeWidth={2.4} />
                             </span>
-                            <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "24px", fontWeight: 600, margin: 0, color: "var(--color-ledga-text)" }}>Gmail connected</h2>
-                            <div style={{ fontSize: "13px", color: "var(--color-ledga-text-secondary)", lineHeight: 1.5 }}>
-                                Parsing keeps running in the background — new transactions will appear in your ledger shortly.
-                            </div>
-                            <PrimaryButton onClick={onClose}>Go to ledger</PrimaryButton>
+                            <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "24px", fontWeight: 600, margin: 0, color: "var(--color-ledga-text)" }}>{t("connect_gmail_modal.done_title")}</h2>
+                            <div style={{ fontSize: "13px", color: "var(--color-ledga-text-secondary)", lineHeight: 1.5 }}>{t("connect_gmail_modal.done_description")}</div>
+                            <PrimaryButton onClick={onClose}>{t("connect_gmail_modal.go_to_ledger_button")}</PrimaryButton>
                         </div>
                     )}
                 </div>

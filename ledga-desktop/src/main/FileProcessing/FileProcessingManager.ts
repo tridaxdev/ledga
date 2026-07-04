@@ -126,7 +126,7 @@ export class FileProcessingManager {
         }
     }
 
-    private async executeFileProcessing(fileId: string, priority: ProcessingPriority, abortSignal?: AbortSignal): Promise<FileWorkerResult> {
+    private async executeFileProcessing(fileId: string, priority: ProcessingPriority, _abortSignal?: AbortSignal): Promise<FileWorkerResult> {
         const downloadedFilePath: string | null = null
 
         try {
@@ -141,9 +141,7 @@ export class FileProcessingManager {
                 throw new Error("File already in processing")
             }
 
-            let localPath: string | undefined
-
-            localPath = file.source.path
+            const localPath = file.source.path
 
             const extension = path.extname(file.name || "").toLowerCase()
             if (!extension || !(await FileProcessorRegistry.validateProcessor(localPath || ""))) {

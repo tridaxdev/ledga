@@ -68,7 +68,6 @@ export class PdfProcessor extends FileProcessorBase {
         super(logger, config, aiService)
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     protected async processFileContent(filePath: string, _fileId: string): Promise<ProcessingResult> {
         const pdfBytes = new Uint8Array(await readFile(filePath))
         const preferred = await this.loadLibPdf(pdfBytes)

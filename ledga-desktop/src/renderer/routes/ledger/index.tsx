@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 import { useDateRange, dateRangeToBounds } from "../../hooks/useDateRange"
 import { useTransactions } from "../../hooks/useTransactions"
 import { useCategories } from "../../hooks/useCategories"
@@ -22,6 +23,7 @@ function useDebouncedValue<T>(value: T, delayMs: number): T {
 }
 
 function LedgerScreen() {
+    const { t } = useTranslation()
     const navigate = useNavigate()
     const { state: rangeState } = useDateRange()
     const { from, to } = useMemo(() => dateRangeToBounds(rangeState), [rangeState])
@@ -45,12 +47,12 @@ function LedgerScreen() {
                     <DateRangePicker />
                     <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                         <div style={filterPillStyle}>
-                            All accounts
+                            {t("ledger.all_accounts")}
                             <ChevronDown />
                         </div>
                         <button onClick={() => setImportOpen(true)} style={{ ...filterPillStyle, cursor: "pointer", fontWeight: 500, color: "var(--color-ledga-text)" }}>
                             <ImportIcon />
-                            Import
+                            {t("ledger.import_button")}
                         </button>
                     </div>
                 </div>
@@ -81,10 +83,7 @@ function LedgerScreen() {
                     >
                         <WarningIcon />
                         <div style={{ flex: 1, fontSize: 13.5, color: "var(--color-ledga-text-secondary)" }}>
-                            <b style={{ color: "var(--color-ledga-text)" }}>
-                                {flagged.length} transaction{flagged.length === 1 ? "" : "s"} need{flagged.length === 1 ? "s" : ""} a look
-                            </b>{" "}
-                            — parsed with low confidence and saved to your ledger.
+                            <b style={{ color: "var(--color-ledga-text)" }}>{t("ledger.transactions_need_a_look", { count: flagged.length })}</b> {t("ledger.low_confidence_notice")}
                         </div>
                         <button
                             onClick={() => firstFlaggedCategoryId && navigate({ to: "/ledger/$categoryId", params: { categoryId: firstFlaggedCategoryId } })}
@@ -100,7 +99,7 @@ function LedgerScreen() {
                                 cursor: firstFlaggedCategoryId ? "pointer" : "default"
                             }}
                         >
-                            Review
+                            {t("ledger.review_button")}
                         </button>
                     </div>
                 )}
@@ -109,7 +108,7 @@ function LedgerScreen() {
                     from a row near the bottom of the table isn't clipped by this container */}
                 <div style={{ background: "#fff", border: "1px solid var(--color-ledga-border)", borderRadius: 8, boxShadow: "0 1px 2px rgba(63,56,47,.05)" }}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "13px 16px", borderBottom: "1px solid var(--color-ledga-border-subtle)" }}>
-                        <div style={{ fontWeight: 600, fontSize: 15, color: "var(--color-ledga-text)" }}>Transactions</div>
+                        <div style={{ fontWeight: 600, fontSize: 15, color: "var(--color-ledga-text)" }}>{t("ledger.transactions_heading")}</div>
                         <div style={{ display: "inline-flex", alignItems: "center", gap: 8, border: "1px solid var(--color-ledga-border)", borderRadius: 6, padding: "5px 10px", minWidth: 200 }}>
                             <SearchIcon />
                             <input
@@ -135,14 +134,14 @@ function LedgerScreen() {
                             color: "var(--color-ledga-text-muted)"
                         }}
                     >
-                        <span>Date</span>
-                        <span>Merchant</span>
-                        <span>Category</span>
-                        <span>Source</span>
-                        <span style={{ textAlign: "right" }}>Amount</span>
+                        <span>{t("ledger.table_header_date")}</span>
+                        <span>{t("ledger.table_header_merchant")}</span>
+                        <span>{t("ledger.table_header_category")}</span>
+                        <span>{t("ledger.table_header_source")}</span>
+                        <span style={{ textAlign: "right" }}>{t("ledger.table_header_amount")}</span>
                     </div>
                     {transactions.length === 0 ? (
-                        <div style={{ padding: "32px 16px", textAlign: "center", fontSize: 13.5, color: "var(--color-ledga-text-muted)" }}>No transactions in this range.</div>
+                        <div style={{ padding: "32px 16px", textAlign: "center", fontSize: 13.5, color: "var(--color-ledga-text-muted)" }}>{t("ledger.no_transactions")}</div>
                     ) : (
                         transactions.map(t => {
                             const category = t.category_id ? categoryById.get(t.category_id) : undefined

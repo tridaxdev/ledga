@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import type { Category } from "@/common/types/Category"
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export function CategoryBadge({ label, flagged, categories, currentCategoryId, onSelect }: Props) {
+    const { t } = useTranslation()
     const [open, setOpen] = useState(false)
     const ref = useRef<HTMLSpanElement>(null)
 
@@ -56,7 +58,7 @@ export function CategoryBadge({ label, flagged, categories, currentCategoryId, o
                         padding: 5
                     }}
                 >
-                    <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.09em", textTransform: "uppercase", color: "#a89c87", padding: "5px 8px 4px" }}>Move to</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.09em", textTransform: "uppercase", color: "#a89c87", padding: "5px 8px 4px" }}>{t("category_badge.move_to")}</div>
                     {categories.map(category => (
                         <button
                             key={category.id}

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { createRootRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 import { ActivityTray } from "../components/ActivityTray"
 import { useEmailActivity } from "../hooks/useEmailActivity"
 import { onOpenActivityTray } from "../utils/activityTrayBus"
@@ -18,6 +19,7 @@ function getPageTitle(pathname: string): string {
 }
 
 function RootLayout() {
+    const { t } = useTranslation()
     const routerState = useRouterState()
     const pathname = routerState.location.pathname
     const navigate = useNavigate()
@@ -183,7 +185,7 @@ function RootLayout() {
                                 <path d="M4 5h16M4 12h16M4 19h10" />
                             </svg>
                         </div>
-                        <span style={{ fontSize: 19, fontWeight: 600, color: "#1f1b16" }}>Ledga</span>
+                        <span style={{ fontSize: 19, fontWeight: 600, color: "#1f1b16" }}>{t("root.brand_name")}</span>
                     </div>
 
                     {/* Nav buttons */}
@@ -209,7 +211,7 @@ function RootLayout() {
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M4 5h16M4 12h16M4 19h10" />
                             </svg>
-                            Ledger
+                            {t("root.nav_ledger")}
                         </button>
                         <button
                             onClick={() => navigate({ to: "/settings" })}
@@ -233,7 +235,7 @@ function RootLayout() {
                                 <circle cx="12" cy="12" r="3" />
                                 <path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2.2 2.2M16.8 16.8 19 19M19 5l-2.2 2.2M7.2 16.8 5 19" />
                             </svg>
-                            Settings
+                            {t("root.nav_settings")}
                         </button>
                     </div>
 
@@ -251,7 +253,7 @@ function RootLayout() {
                                 color: "#8e8270"
                             }}
                         >
-                            Chats
+                            {t("root.chats_label")}
                         </span>
                         <button
                             onClick={handleNewChat}
@@ -360,7 +362,7 @@ function RootLayout() {
                                     whiteSpace: "nowrap"
                                 }}
                             >
-                                Avery Brooks
+                                {t("root.mock_user_name")}
                             </div>
                             <div
                                 style={{
@@ -371,7 +373,7 @@ function RootLayout() {
                                     whiteSpace: "nowrap"
                                 }}
                             >
-                                you@gmail.com
+                                {t("root.mock_user_email")}
                             </div>
                         </div>
                     </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 import { useConnections } from "../../hooks/useConnections"
 import { ConnectGmailModal } from "../../components/ConnectGmailModal"
 import { RulesSection } from "../../components/RulesSection"
@@ -9,6 +10,7 @@ import type { Connection } from "@/common/types/Connection"
 export const Route = createFileRoute("/settings/")({ component: SettingsScreen })
 
 function SettingsScreen() {
+    const { t } = useTranslation()
     const { connections, isLoading, disconnect, syncNow, setAutoSync } = useConnections()
     const [modalOpen, setModalOpen] = useState(false)
     const [justSyncedIds, setJustSyncedIds] = useState<Set<string>>(new Set())
@@ -31,19 +33,19 @@ function SettingsScreen() {
 
     return (
         <div style={{ padding: "40px", maxWidth: "640px" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ledga-text-muted)", marginBottom: 4 }}>Settings</div>
-            <h1 style={{ fontFamily: "var(--font-serif)", fontSize: 32, fontWeight: 600, letterSpacing: "-0.01em", margin: "0 0 32px", color: "var(--color-ledga-text)" }}>Sources &amp; data</h1>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ledga-text-muted)", marginBottom: 4 }}>{t("settings.eyebrow")}</div>
+            <h1 style={{ fontFamily: "var(--font-serif)", fontSize: 32, fontWeight: 600, letterSpacing: "-0.01em", margin: "0 0 32px", color: "var(--color-ledga-text)" }}>{t("settings.title")}</h1>
 
             <section>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
-                    <h2 style={{ fontSize: "15px", fontWeight: 600, color: "var(--color-ledga-text)", margin: 0 }}>Connected sources</h2>
+                    <h2 style={{ fontSize: "15px", fontWeight: 600, color: "var(--color-ledga-text)", margin: 0 }}>{t("settings.connected_sources_heading")}</h2>
                 </div>
 
                 {isLoading ? (
-                    <p style={{ fontSize: "14px", color: "var(--color-ledga-text-muted)" }}>Loading…</p>
+                    <p style={{ fontSize: "14px", color: "var(--color-ledga-text-muted)" }}>{t("settings.loading")}</p>
                 ) : connections.length === 0 ? (
                     <div style={{ padding: "24px", borderRadius: "8px", border: "1px dashed var(--color-ledga-border)", textAlign: "center", marginBottom: 14 }}>
-                        <p style={{ margin: 0, fontSize: "14px", color: "var(--color-ledga-text-muted)" }}>No email accounts connected. Add one to start syncing transactions.</p>
+                        <p style={{ margin: 0, fontSize: "14px", color: "var(--color-ledga-text-muted)" }}>{t("settings.no_connections")}</p>
                     </div>
                 ) : (
                     <ul style={{ listStyle: "none", margin: "0 0 14px", padding: 0, display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -79,7 +81,7 @@ function SettingsScreen() {
                                         </div>
                                     </div>
                                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                                        <span style={{ fontSize: 12, color: "var(--color-ledga-text-secondary)" }}>Auto-sync</span>
+                                        <span style={{ fontSize: 12, color: "var(--color-ledga-text-secondary)" }}>{t("settings.auto_sync_label")}</span>
                                         <Toggle checked={connection.auto_sync} onChange={checked => setAutoSync(connection.id, checked)} />
                                     </div>
                                 </div>
@@ -97,7 +99,7 @@ function SettingsScreen() {
                                         {syncingIds.has(connection.id) ? "Syncing…" : "Sync now"}
                                     </button>
                                     <button onClick={() => disconnect(connection.id)} style={{ ...secondaryButtonStyle, borderColor: "#e7c6b9", color: "var(--color-ledga-danger)" }}>
-                                        Disconnect
+                                        {t("settings.disconnect_button")}
                                     </button>
                                 </div>
                             </li>
@@ -107,7 +109,7 @@ function SettingsScreen() {
 
                 <button onClick={() => setModalOpen(true)} style={addSourceButtonStyle}>
                     <PlusIcon />
-                    Add source
+                    {t("settings.add_source_button")}
                 </button>
             </section>
 
@@ -121,6 +123,7 @@ function SettingsScreen() {
 }
 
 function DataSection({ connections }: { connections: Connection[] }) {
+    const { t } = useTranslation()
     const navigate = useNavigate()
     const [dbPath, setDbPath] = useState("")
     const [exportStatus, setExportStatus] = useState<string | null>(null)
@@ -163,21 +166,21 @@ function DataSection({ connections }: { connections: Connection[] }) {
 
     return (
         <section style={{ marginTop: 32 }}>
-            <h2 style={{ fontSize: 15, fontWeight: 600, color: "var(--color-ledga-text)", margin: "0 0 16px" }}>Data &amp; privacy</h2>
+            <h2 style={{ fontSize: 15, fontWeight: 600, color: "var(--color-ledga-text)", margin: "0 0 16px" }}>{t("settings.data_privacy_heading")}</h2>
 
             <div style={{ background: "#fff", border: "1px solid var(--color-ledga-border)", borderRadius: 8, overflow: "hidden" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", borderBottom: "1px solid var(--color-ledga-border-subtle)" }}>
                     <div>
-                        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-ledga-text-muted)" }}>Database</div>
+                        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-ledga-text-muted)" }}>{t("settings.database_label")}</div>
                         <div style={{ fontSize: 13.5, color: "var(--color-ledga-text)", fontFamily: "monospace", marginTop: 3 }}>{dbPath}</div>
                     </div>
                     <button onClick={handleReveal} style={secondaryButtonStyle}>
-                        Reveal
+                        {t("settings.reveal_button")}
                     </button>
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", borderBottom: "1px solid var(--color-ledga-border-subtle)" }}>
-                    <div style={{ fontSize: 14, color: "var(--color-ledga-text)" }}>Sync frequency</div>
+                    <div style={{ fontSize: 14, color: "var(--color-ledga-text)" }}>{t("settings.sync_frequency_label")}</div>
                     <div
                         style={{
                             display: "inline-flex",
@@ -196,15 +199,15 @@ function DataSection({ connections }: { connections: Connection[] }) {
 
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", borderBottom: "1px solid var(--color-ledga-border-subtle)" }}>
                     <div>
-                        <div style={{ fontSize: 14, color: "var(--color-ledga-text)" }}>Export everything</div>
-                        <div style={{ fontSize: 12, color: "var(--color-ledga-text-muted)" }}>{exportStatus ?? "All transactions as CSV."}</div>
+                        <div style={{ fontSize: 14, color: "var(--color-ledga-text)" }}>{t("settings.export_everything_label")}</div>
+                        <div style={{ fontSize: 12, color: "var(--color-ledga-text-muted)" }}>{exportStatus ?? t("settings.export_default_status")}</div>
                     </div>
                     <button
                         onClick={handleExport}
                         style={{ ...secondaryButtonStyle, borderColor: "var(--color-ledga-brand-border)", color: "var(--color-ledga-brand)", display: "inline-flex", alignItems: "center", gap: 6 }}
                     >
                         <ExportIcon />
-                        Export CSV
+                        {t("settings.export_csv_button")}
                     </button>
                 </div>
 
@@ -212,19 +215,19 @@ function DataSection({ connections }: { connections: Connection[] }) {
                     {!confirmingClear ? (
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                             <div>
-                                <div style={{ fontSize: 14, color: "var(--color-ledga-danger)", fontWeight: 500 }}>Clear all data</div>
-                                <div style={{ fontSize: 12, color: "var(--color-ledga-text-muted)" }}>Deletes the local ledger. Cannot be undone.</div>
+                                <div style={{ fontSize: 14, color: "var(--color-ledga-danger)", fontWeight: 500 }}>{t("settings.clear_all_data_label")}</div>
+                                <div style={{ fontSize: 12, color: "var(--color-ledga-text-muted)" }}>{t("settings.clear_all_data_description")}</div>
                             </div>
                             <button onClick={() => setConfirmingClear(true)} style={{ ...secondaryButtonStyle, borderColor: "#e7c6b9", color: "var(--color-ledga-danger)" }}>
-                                Clear
+                                {t("settings.clear_button")}
                             </button>
                         </div>
                     ) : (
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                            <div style={{ fontSize: 13.5, color: "var(--color-ledga-text)", fontWeight: 500 }}>Delete every transaction, email, and chat? This can&apos;t be undone.</div>
+                            <div style={{ fontSize: 13.5, color: "var(--color-ledga-text)", fontWeight: 500 }}>{t("settings.clear_confirm_prompt")}</div>
                             <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
                                 <button onClick={() => setConfirmingClear(false)} style={secondaryButtonStyle}>
-                                    Cancel
+                                    {t("settings.cancel_button")}
                                 </button>
                                 <button
                                     onClick={handleClearData}
@@ -251,7 +254,7 @@ function DataSection({ connections }: { connections: Connection[] }) {
 
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 14, color: "var(--color-ledga-text-muted)", fontSize: 12.5 }}>
                 <ShieldIcon />
-                No cloud — everything lives in one file on this device.
+                {t("settings.no_cloud_notice")}
             </div>
         </section>
     )

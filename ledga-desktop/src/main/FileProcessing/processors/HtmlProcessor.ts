@@ -12,11 +12,7 @@ export class HtmlProcessor extends FileProcessorBase {
         super(logger, config, aiService)
     }
 
-    protected async processFileContent(
-        filePath: string,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _fileId: string
-    ): Promise<ProcessingResult> {
+    protected async processFileContent(filePath: string, _fileId: string): Promise<ProcessingResult> {
         const buffer = await readFile(filePath)
         const htmlContent = buffer.toString("utf8")
 

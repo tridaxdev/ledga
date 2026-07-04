@@ -1,5 +1,6 @@
 import { useMemo } from "react"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 import { useDateRange, dateRangeToBounds } from "../../hooks/useDateRange"
 import { useCategoryTransactions } from "../../hooks/useCategoryTransactions"
 import { useCategories } from "../../hooks/useCategories"
@@ -9,6 +10,7 @@ import { formatCurrency, formatSignedAmount, formatDate } from "../../utils/form
 export const Route = createFileRoute("/ledger/$categoryId")({ component: CategoryReviewScreen })
 
 function CategoryReviewScreen() {
+    const { t } = useTranslation()
     const { categoryId } = Route.useParams()
     const navigate = useNavigate()
     const { state: rangeState } = useDateRange()
@@ -50,13 +52,13 @@ function CategoryReviewScreen() {
                     }}
                 >
                     <BackIcon />
-                    Ledger
+                    {t("category_review.ledger_link")}
                 </button>
 
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, marginBottom: 22 }}>
                     <div>
                         <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ledga-text-muted)", marginBottom: 6 }}>
-                            Category review
+                            {t("category_review.eyebrow")}
                         </div>
                         <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
                             <span style={{ width: 13, height: 13, borderRadius: "50%", flexShrink: 0, background: category?.color ?? "var(--color-ledga-text-muted)" }} />
@@ -65,7 +67,7 @@ function CategoryReviewScreen() {
                             </h1>
                         </div>
                         <div style={{ fontSize: 14, color: "var(--color-ledga-text-secondary)", marginTop: 7 }}>
-                            {aggregate.count} transaction{aggregate.count === 1 ? "" : "s"} in {title}
+                            {t("category_review.transaction_count_in_range", { count: aggregate.count, range: title })}
                         </div>
                     </div>
                     <div
@@ -89,20 +91,20 @@ function CategoryReviewScreen() {
 
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14, marginBottom: 18 }}>
                     <div style={statCardStyle}>
-                        <div style={statLabelStyle}>Total spent</div>
+                        <div style={statLabelStyle}>{t("category_review.stat_total_spent")}</div>
                         <div style={statValueStyle}>{formatCurrency(aggregate.total, currency)}</div>
                     </div>
                     <div style={statCardStyle}>
-                        <div style={statLabelStyle}>Transactions</div>
+                        <div style={statLabelStyle}>{t("category_review.stat_transactions")}</div>
                         <div style={statValueStyle}>{aggregate.count}</div>
                     </div>
                     <div style={{ ...statCardStyle, display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10 }}>
                         <div>
-                            <div style={statLabelStyle}>vs prior month</div>
+                            <div style={statLabelStyle}>{t("category_review.stat_vs_prior_month")}</div>
                             <div style={{ ...statValueStyle, color: trendDelta > 0 ? "var(--color-ledga-danger)" : "var(--color-ledga-brand)" }}>
                                 {trendPercent === null ? "—" : `${trendDelta > 0 ? "+" : ""}${trendPercent.toFixed(0)}%`}
                             </div>
-                            {!isMonthRange && <div style={{ fontSize: 12, color: "var(--color-ledga-text-secondary)", marginTop: 2 }}>Switch to Month view to compare</div>}
+                            {!isMonthRange && <div style={{ fontSize: 12, color: "var(--color-ledga-text-secondary)", marginTop: 2 }}>{t("category_review.switch_to_month_view")}</div>}
                         </div>
                         {isMonthRange && (
                             <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 38, flexShrink: 0 }}>
@@ -117,14 +119,12 @@ function CategoryReviewScreen() {
                     <div style={{ marginBottom: 20 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 9 }}>
                             <WarningIcon />
-                            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--color-ledga-text)" }}>
-                                {flagged.length} suggestion{flagged.length === 1 ? "" : "s"} to review
-                            </span>
+                            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--color-ledga-text)" }}>{t("category_review.suggestions_to_review", { count: flagged.length })}</span>
                         </div>
                         <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-                            {flagged.map(t => (
+                            {flagged.map(tx => (
                                 <div
-                                    key={t.id}
+                                    key={tx.id}
                                     style={{
                                         display: "flex",
                                         alignItems: "center",
@@ -136,12 +136,12 @@ function CategoryReviewScreen() {
                                     }}
                                 >
                                     <div style={{ flex: 1, minWidth: 0 }}>
-                                        <div style={{ fontSize: 14, fontWeight: 500, color: "var(--color-ledga-text)" }}>{t.merchant}</div>
+                                        <div style={{ fontSize: 14, fontWeight: 500, color: "var(--color-ledga-text)" }}>{tx.merchant}</div>
                                         <div style={{ fontSize: 12, color: "var(--color-ledga-text-muted)" }}>
-                                            {formatDate(t.timestamp)} · {t.bank}
+                                            {formatDate(tx.timestamp)} · {tx.bank}
                                         </div>
                                     </div>
-                                    {t.suggestedCategoryName && (
+                                    {tx.suggestedCategoryName && (
                                         <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5, color: "var(--color-ledga-text-secondary)", flexShrink: 0 }}>
                                             <span style={{ border: "1px solid var(--color-ledga-border)", background: "#fff", borderRadius: 999, padding: "2px 9px" }}>
                                                 {category?.name ?? "Uncategorized"}
@@ -157,22 +157,22 @@ function CategoryReviewScreen() {
                                                     fontWeight: 500
                                                 }}
                                             >
-                                                {t.suggestedCategoryName}
+                                                {tx.suggestedCategoryName}
                                             </span>
                                         </div>
                                     )}
                                     <span
                                         style={{ fontSize: 13.5, fontWeight: 600, color: "var(--color-ledga-text)", fontVariantNumeric: "tabular-nums", flexShrink: 0, width: 90, textAlign: "right" }}
                                     >
-                                        {formatSignedAmount(t.amount, t.type, t.currency)}
+                                        {formatSignedAmount(tx.amount, tx.type, tx.currency)}
                                     </span>
                                     <div style={{ display: "flex", gap: 7, flexShrink: 0 }}>
-                                        <button onClick={() => keepSuggestion(t.id)} style={keepButtonStyle}>
-                                            Keep
+                                        <button onClick={() => keepSuggestion(tx.id)} style={keepButtonStyle}>
+                                            {t("category_review.keep_button")}
                                         </button>
-                                        {t.suggestedCategoryId && (
-                                            <button onClick={() => updateCategory(t.id, t.suggestedCategoryId)} style={moveButtonStyle}>
-                                                Move to {t.suggestedCategoryName}
+                                        {tx.suggestedCategoryId && (
+                                            <button onClick={() => updateCategory(tx.id, tx.suggestedCategoryId)} style={moveButtonStyle}>
+                                                {t("category_review.move_to", { category: tx.suggestedCategoryName })}
                                             </button>
                                         )}
                                     </div>
@@ -194,14 +194,16 @@ function CategoryReviewScreen() {
                         }}
                     >
                         <CheckIcon />
-                        <span style={{ fontSize: 13.5, color: "var(--color-ledga-text-secondary)" }}>Everything here looks correctly categorized.</span>
+                        <span style={{ fontSize: 13.5, color: "var(--color-ledga-text-secondary)" }}>{t("category_review.all_categorized")}</span>
                     </div>
                 )}
 
                 <div style={{ background: "#fff", border: "1px solid var(--color-ledga-border)", borderRadius: 8, boxShadow: "0 1px 2px rgba(63,56,47,.05)" }}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "13px 16px", borderBottom: "1px solid var(--color-ledga-border-subtle)" }}>
-                        <div style={{ fontWeight: 600, fontSize: 15, color: "var(--color-ledga-text)" }}>Transactions in {category?.name ?? "Uncategorized"}</div>
-                        <span style={{ fontSize: 12, color: "var(--color-ledga-text-muted)" }}>{aggregate.count} total</span>
+                        <div style={{ fontWeight: 600, fontSize: 15, color: "var(--color-ledga-text)" }}>
+                            {t("category_review.transactions_in_category", { category: category?.name ?? "Uncategorized" })}
+                        </div>
+                        <span style={{ fontSize: 12, color: "var(--color-ledga-text-muted)" }}>{t("category_review.total_count", { n: aggregate.count })}</span>
                     </div>
                     <div
                         style={{
@@ -218,13 +220,15 @@ function CategoryReviewScreen() {
                             color: "var(--color-ledga-text-muted)"
                         }}
                     >
-                        <span>Date</span>
-                        <span>Merchant</span>
-                        <span>Category</span>
-                        <span style={{ textAlign: "right" }}>Amount</span>
+                        <span>{t("category_review.table_header_date")}</span>
+                        <span>{t("category_review.table_header_merchant")}</span>
+                        <span>{t("category_review.table_header_category")}</span>
+                        <span style={{ textAlign: "right" }}>{t("category_review.table_header_amount")}</span>
                     </div>
                     {transactions.length === 0 ? (
-                        <div style={{ padding: "32px 16px", textAlign: "center", fontSize: 13.5, color: "var(--color-ledga-text-muted)" }}>No transactions in this category for {title}.</div>
+                        <div style={{ padding: "32px 16px", textAlign: "center", fontSize: 13.5, color: "var(--color-ledga-text-muted)" }}>
+                            {t("category_review.no_transactions", { range: title })}
+                        </div>
                     ) : (
                         transactions.map(t => (
                             <div

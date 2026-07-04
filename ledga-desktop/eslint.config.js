@@ -7,6 +7,7 @@ import prettierPlugin from 'eslint-plugin-prettier'
 import prettierConfig from 'eslint-config-prettier'
 import importPlugin from 'eslint-plugin-import'
 import unicornPlugin from 'eslint-plugin-unicorn'
+import i18next from 'eslint-plugin-i18next'
 import betterTailwindcss from 'eslint-plugin-better-tailwindcss'
 
 export default [
@@ -86,6 +87,8 @@ export default [
             '@typescript-eslint/no-non-null-assertion': 'error',
             'max-params': 'off',
             '@typescript-eslint/no-explicit-any': 'error',
+            '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+            'i18next/no-literal-string': 'error',
             '@typescript-eslint/consistent-type-imports': ['error', {
                 prefer: 'type-imports',
                 disallowTypeAnnotations: false,

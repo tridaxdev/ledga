@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import { useDateRange, dateRangeToBounds, type RangeMode } from "../hooks/useDateRange"
 
 const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
 export function DateRangePicker() {
+    const { t } = useTranslation()
     const { state, update } = useDateRange()
     const [open, setOpen] = useState(false)
     const ref = useRef<HTMLDivElement>(null)
@@ -25,7 +27,9 @@ export function DateRangePicker() {
     return (
         <div ref={ref} style={{ position: "relative" }}>
             <button onClick={() => setOpen(prev => !prev)} style={{ textAlign: "left", background: "none", border: "none", cursor: "pointer", padding: 0, display: "block" }}>
-                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ledga-text-muted)", marginBottom: 4 }}>Ledger</div>
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ledga-text-muted)", marginBottom: 4 }}>
+                    {t("date_range_picker.ledger_label")}
+                </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <h1 style={{ fontFamily: "var(--font-serif)", fontSize: 34, fontWeight: 600, letterSpacing: "-0.01em", margin: 0, color: "var(--color-ledga-text)" }}>{title}</h1>
                     <span
@@ -136,7 +140,7 @@ export function DateRangePicker() {
                                 onClick={() => setOpen(false)}
                                 style={{ background: "var(--color-ledga-brand)", color: "#fff", border: "none", borderRadius: 7, padding: 9, fontSize: 13, fontWeight: 500, cursor: "pointer" }}
                             >
-                                Apply range
+                                {t("date_range_picker.apply_range_button")}
                             </button>
                         </div>
                     )}

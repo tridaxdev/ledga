@@ -16,11 +16,7 @@ export class TextProcessor extends FileProcessorBase {
         super(logger, config, aiService)
     }
 
-    protected async processFileContent(
-        filePath: string,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _fileId: string
-    ): Promise<ProcessingResult> {
+    protected async processFileContent(filePath: string, _fileId: string): Promise<ProcessingResult> {
         const encoding = await this.detectEncoding(filePath)
         const buffer = await readFile(filePath)
         const text = await this.decodeBuffer(buffer, encoding)

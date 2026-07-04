@@ -15,11 +15,7 @@ export class EmailProcessor extends FileProcessorBase {
         super(logger, config, aiService)
     }
 
-    protected async processFileContent(
-        filePath: string,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _fileId: string
-    ): Promise<ProcessingResult> {
+    protected async processFileContent(filePath: string, _fileId: string): Promise<ProcessingResult> {
         const emailContent = await this.readEmailWithEncoding(filePath)
         const parsed = await this.parseEmail(emailContent)
         const emailText = [parsed.subject, parsed.text].filter(Boolean).join("\n\n")

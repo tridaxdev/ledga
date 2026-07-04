@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { useConnections } from "../hooks/useConnections"
 
 interface Props {
@@ -6,6 +7,7 @@ interface Props {
 }
 
 export function ActivityTray({ processing, failed }: Props) {
+    const { t } = useTranslation()
     const { connections, isLoading } = useConnections()
 
     return (
@@ -34,34 +36,35 @@ export function ActivityTray({ processing, failed }: Props) {
                     color: "var(--color-ledga-text-muted)"
                 }}
             >
-                Activity
+                {t("activity_tray.title")}
             </div>
 
             {processing > 0 && (
                 <div style={{ padding: "13px 14px", borderBottom: "1px solid var(--color-ledga-border-subtle)", display: "flex", flexDirection: "column", gap: 7 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--color-ledga-text)" }}>
-                            Parsing {processing} email{processing === 1 ? "" : "s"}
-                        </span>
+                        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--color-ledga-text)" }}>{t("activity_tray.parsing_emails", { count: processing })}</span>
                         <SyncIcon spinning />
                     </div>
-                    <span style={{ fontSize: 11.5, color: "var(--color-ledga-text-muted)" }}>runs in the background{failed > 0 ? ` · ${failed} failed` : ""}</span>
+                    <span style={{ fontSize: 11.5, color: "var(--color-ledga-text-muted)" }}>
+                        {t("activity_tray.runs_in_background")}
+                        {failed > 0 ? ` · ${t("activity_tray.failed_count", { count: failed })}` : ""}
+                    </span>
                 </div>
             )}
 
             {isLoading ? null : connections.length === 0 ? (
                 <div style={{ padding: "13px 14px" }}>
-                    <span style={{ fontSize: 12.5, color: "var(--color-ledga-text-secondary)" }}>No sources connected</span>
+                    <span style={{ fontSize: 12.5, color: "var(--color-ledga-text-secondary)" }}>{t("activity_tray.no_sources")}</span>
                 </div>
             ) : (
                 connections.map(connection => (
                     <div key={connection.id} style={{ padding: "13px 14px", borderBottom: "1px solid var(--color-ledga-border-subtle)", display: "flex", flexDirection: "column", gap: 5 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                            <span style={{ fontSize: 13, fontWeight: 500, color: "var(--color-ledga-text)" }}>Gmail sync</span>
+                            <span style={{ fontSize: 13, fontWeight: 500, color: "var(--color-ledga-text)" }}>{t("activity_tray.gmail_sync")}</span>
                             <SyncIcon />
                         </div>
                         <span style={{ fontSize: 11.5, color: "var(--color-ledga-text-muted)" }}>
-                            {connection.auto_sync ? "auto-sync on" : "manual sync"} · {connection.email}
+                            {connection.auto_sync ? t("activity_tray.auto_sync_on") : t("activity_tray.manual_sync")} · {connection.email}
                         </span>
                     </div>
                 ))

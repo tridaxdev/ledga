@@ -17,11 +17,7 @@ export class DocumentProcessor extends FileProcessorBase {
         super(logger, config, aiService)
     }
 
-    protected async processFileContent(
-        filePath: string,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _fileId: string
-    ): Promise<ProcessingResult> {
+    protected async processFileContent(filePath: string, _fileId: string): Promise<ProcessingResult> {
         const { blocks, fullText } = await this.extractText(filePath)
         const result: ProcessingResult = { content: `${fullText?.trim() ?? ""}\n\n` }
 

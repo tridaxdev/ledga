@@ -41,11 +41,7 @@ export class MsgProcessor extends FileProcessorBase {
         return cleaned
     }
 
-    protected async processFileContent(
-        filePath: string,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _fileId: string
-    ): Promise<ProcessingResult> {
+    protected async processFileContent(filePath: string, _fileId: string): Promise<ProcessingResult> {
         try {
             const msgFileBuffer = await readFile(filePath)
             const msgReader = new MsgReader(msgFileBuffer)

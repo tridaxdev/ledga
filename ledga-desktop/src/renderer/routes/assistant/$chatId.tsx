@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, type KeyboardEvent } from "react"
 import { createFileRoute } from "@tanstack/react-router"
+import { useTranslation } from "react-i18next"
 import { useAssistant } from "../../hooks/useAssistant"
 import type { ChatMessage, ToolCallRecord } from "@/common/types/ChatTypes"
 
@@ -8,6 +9,7 @@ export const Route = createFileRoute("/assistant/$chatId")({ component: Assistan
 const SUGGESTED_PROMPTS = ["Biggest expense this month?", "Compare to April", "List my subscriptions"]
 
 function AssistantScreen() {
+    const { t } = useTranslation()
     const { chatId } = Route.useParams()
     const { messages, streamingText, isStreaming, isThinking, error, send, stop } = useAssistant(chatId)
     const [input, setInput] = useState("")
@@ -47,8 +49,8 @@ function AssistantScreen() {
                 }}
             >
                 <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ledga-text-muted)" }}>Assistant</div>
-                    <div style={{ fontSize: 14, color: "var(--color-ledga-text-secondary)", marginTop: 1 }}>A general financial assistant — it reads, never moves money.</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ledga-text-muted)" }}>{t("assistant_chat.header_label")}</div>
+                    <div style={{ fontSize: 14, color: "var(--color-ledga-text-secondary)", marginTop: 1 }}>{t("assistant_chat.header_description")}</div>
                 </div>
                 <span
                     style={{
@@ -65,7 +67,7 @@ function AssistantScreen() {
                     }}
                 >
                     <LedgerIcon />
-                    Using: all transactions
+                    {t("assistant_chat.using_all_transactions")}
                 </span>
             </div>
 
@@ -87,7 +89,7 @@ function AssistantScreen() {
                                     color: "var(--color-ledga-text-muted)"
                                 }}
                             >
-                                Thinking
+                                {t("assistant_chat.thinking_label")}
                                 <span
                                     style={{
                                         display: "inline-block",
@@ -245,6 +247,7 @@ function summarizeToolOutput(output: unknown): string {
 }
 
 function ToolDisclosure({ toolCalls }: { toolCalls: ToolCallRecord[] }) {
+    const { t } = useTranslation()
     const [open, setOpen] = useState(false)
     const summary = toolCalls.map(tc => summarizeToolOutput(tc.output)).join(", ")
 
@@ -266,7 +269,9 @@ function ToolDisclosure({ toolCalls }: { toolCalls: ToolCallRecord[] }) {
                 }}
             >
                 <SearchIcon />
-                <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--color-ledga-text-secondary)" }}>Used your ledger</span>
+                <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--color-ledga-text-secondary)" }}>
+                    {t("assistant_chat.used_ledger_label")}
+                </span>
                 <span style={{ fontSize: 12, color: "var(--color-ledga-text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{summary}</span>
                 <span style={{ display: "inline-flex", transform: open ? "rotate(180deg)" : "none", transition: "transform .15s" }}>
                     <ChevronDown />

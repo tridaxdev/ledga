@@ -1,4 +1,5 @@
 import { useState, type DragEvent, type MouseEvent } from "react"
+import { useTranslation } from "react-i18next"
 import { useCsvImport } from "../hooks/useCsvImport"
 import { getLedgaAPI } from "../hooks/apiClient"
 
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function ImportCsvModal({ isOpen, onClose, onViewStatus }: Props) {
+    const { t } = useTranslation()
     const { step, fileName, rowsParsed, totalRows, rowsAdded, error, startImport, browseFile, reset } = useCsvImport()
     const [isDragOver, setIsDragOver] = useState(false)
 
@@ -50,7 +52,7 @@ export function ImportCsvModal({ isOpen, onClose, onViewStatus }: Props) {
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 18px", borderBottom: "1px solid var(--color-ledga-border-subtle)" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 500, color: "var(--color-ledga-text-secondary)" }}>
                         <ImportIcon />
-                        Import a statement
+                        {t("import_csv_modal.header")}
                     </div>
                     <button onClick={handleClose} style={{ color: "var(--color-ledga-text-muted)", cursor: "pointer", border: "none", background: "transparent", display: "inline-flex" }}>
                         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round" strokeLinejoin="round">
@@ -86,8 +88,8 @@ export function ImportCsvModal({ isOpen, onClose, onViewStatus }: Props) {
                                     <path d="m7 9 5-5 5 5" />
                                     <path d="M5 20h14" />
                                 </svg>
-                                <div style={{ fontSize: 15, fontWeight: 600, color: "var(--color-ledga-text)" }}>Drop a CSV here</div>
-                                <div style={{ fontSize: 12, color: "var(--color-ledga-text-muted)" }}>Most banks supported · CSV</div>
+                                <div style={{ fontSize: 15, fontWeight: 600, color: "var(--color-ledga-text)" }}>{t("import_csv_modal.drop_zone_title")}</div>
+                                <div style={{ fontSize: 12, color: "var(--color-ledga-text-muted)" }}>{t("import_csv_modal.drop_zone_subtitle")}</div>
                             </div>
                             <button
                                 onClick={browseFile}
@@ -103,7 +105,7 @@ export function ImportCsvModal({ isOpen, onClose, onViewStatus }: Props) {
                                     cursor: "pointer"
                                 }}
                             >
-                                Browse files
+                                {t("import_csv_modal.browse_files_button")}
                             </button>
                             {error && <div style={{ fontSize: 13, color: "var(--color-ledga-danger)" }}>{error}</div>}
                         </div>
@@ -116,19 +118,15 @@ export function ImportCsvModal({ isOpen, onClose, onViewStatus }: Props) {
                                 <span style={{ fontSize: 13.5, color: "var(--color-ledga-text)" }}>{fileName}</span>
                                 <span style={{ marginLeft: "auto", fontSize: 11, color: "var(--color-ledga-brand)" }}>CSV</span>
                             </div>
-                            <div style={{ fontSize: 18, fontWeight: 600, fontFamily: "var(--font-serif)", color: "var(--color-ledga-text)" }}>Importing in the background</div>
+                            <div style={{ fontSize: 18, fontWeight: 600, fontFamily: "var(--font-serif)", color: "var(--color-ledga-text)" }}>{t("import_csv_modal.importing_title")}</div>
                             <div style={{ height: 8, borderRadius: 5, background: "var(--color-ledga-border-subtle)", overflow: "hidden" }}>
                                 <div style={{ height: "100%", width: `${percent}%`, background: "var(--color-ledga-brand)", borderRadius: 5, transition: "width .2s" }} />
                             </div>
                             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, color: "var(--color-ledga-text-secondary)" }}>
-                                <span>
-                                    {rowsParsed} / {totalRows || "…"} rows parsed
-                                </span>
-                                <span>added so far: {rowsAdded}</span>
+                                <span>{t("import_csv_modal.rows_parsed", { parsed: rowsParsed, total: totalRows || "…" })}</span>
+                                <span>{t("import_csv_modal.added_so_far", { count: rowsAdded })}</span>
                             </div>
-                            <div style={{ fontSize: 13, color: "var(--color-ledga-text-secondary)", lineHeight: 1.5 }}>
-                                You can keep working — transactions appear in your ledger as they&apos;re parsed. Low-confidence rows get flagged for review.
-                            </div>
+                            <div style={{ fontSize: 13, color: "var(--color-ledga-text-secondary)", lineHeight: 1.5 }}>{t("import_csv_modal.background_description")}</div>
                             {error && <div style={{ fontSize: 13, color: "var(--color-ledga-danger)" }}>{error}</div>}
                             <div style={{ display: "flex", gap: 9 }}>
                                 <button
@@ -144,7 +142,7 @@ export function ImportCsvModal({ isOpen, onClose, onViewStatus }: Props) {
                                         cursor: "pointer"
                                     }}
                                 >
-                                    Go to ledger
+                                    {t("import_csv_modal.go_to_ledger_button")}
                                 </button>
                                 <button
                                     onClick={() => {
@@ -162,7 +160,7 @@ export function ImportCsvModal({ isOpen, onClose, onViewStatus }: Props) {
                                         cursor: "pointer"
                                     }}
                                 >
-                                    View status
+                                    {t("import_csv_modal.view_status_button")}
                                 </button>
                             </div>
                         </div>

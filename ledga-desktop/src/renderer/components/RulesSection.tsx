@@ -1,8 +1,10 @@
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 import { useRules } from "../hooks/useRules"
 import { useCategories } from "../hooks/useCategories"
 
 export function RulesSection() {
+    const { t } = useTranslation()
     const { rules, isLoading, createRule, deleteRule } = useRules()
     const { categories } = useCategories()
     const [formOpen, setFormOpen] = useState(false)
@@ -33,19 +35,19 @@ export function RulesSection() {
     return (
         <section style={{ marginTop: 32 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-                <h2 style={{ fontSize: 15, fontWeight: 600, color: "var(--color-ledga-text)", margin: 0 }}>Rules</h2>
+                <h2 style={{ fontSize: 15, fontWeight: 600, color: "var(--color-ledga-text)", margin: 0 }}>{t("rules_section.title")}</h2>
                 {!formOpen && (
                     <button onClick={() => setFormOpen(true)} style={addButtonStyle}>
-                        Add rule
+                        {t("rules_section.add_rule_button")}
                     </button>
                 )}
             </div>
 
             {isLoading ? (
-                <p style={{ fontSize: 14, color: "var(--color-ledga-text-muted)" }}>Loading…</p>
+                <p style={{ fontSize: 14, color: "var(--color-ledga-text-muted)" }}>{t("rules_section.loading")}</p>
             ) : rules.length === 0 && !formOpen ? (
                 <div style={{ padding: 24, borderRadius: 8, border: "1px dashed var(--color-ledga-border)", textAlign: "center" }}>
-                    <p style={{ margin: 0, fontSize: 14, color: "var(--color-ledga-text-muted)" }}>No rules yet. Rules auto-categorise and rename matching transactions.</p>
+                    <p style={{ margin: 0, fontSize: 14, color: "var(--color-ledga-text-muted)" }}>{t("rules_section.no_rules")}</p>
                 </div>
             ) : (
                 <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 8 }}>
@@ -53,7 +55,7 @@ export function RulesSection() {
                         <li key={rule.id} style={ruleRowStyle}>
                             <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
                                 <span style={{ fontSize: 14, color: "var(--color-ledga-text)" }}>
-                                    Contains <b>&quot;{rule.match_keyword}&quot;</b>
+                                    {t("rules_section.contains_prefix")} <b>&quot;{rule.match_keyword}&quot;</b>
                                 </span>
                                 <span style={{ fontSize: 12, color: "var(--color-ledga-text-muted)" }}>
                                     {rule.rename_merchant && `Rename to "${rule.rename_merchant}"`}
@@ -63,7 +65,7 @@ export function RulesSection() {
                                 </span>
                             </div>
                             <button onClick={() => deleteRule(rule.id)} style={deleteButtonStyle}>
-                                Delete
+                                {t("rules_section.delete_button")}
                             </button>
                         </li>
                     ))}
@@ -91,7 +93,7 @@ export function RulesSection() {
                     </Field>
                     <Field label="Category (optional)">
                         <select value={categoryName} onChange={e => setCategoryName(e.target.value)} style={inputStyle}>
-                            <option value="">No category</option>
+                            <option value="">{t("rules_section.no_category_option")}</option>
                             {categories.map(category => (
                                 <option key={category.id} value={category.name}>
                                     {category.name}
@@ -101,7 +103,7 @@ export function RulesSection() {
                     </Field>
                     <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
                         <button onClick={resetForm} style={cancelButtonStyle}>
-                            Cancel
+                            {t("rules_section.cancel_button")}
                         </button>
                         <button onClick={handleSave} disabled={!keyword.trim() || isSaving} style={{ ...addButtonStyle, opacity: !keyword.trim() || isSaving ? 0.6 : 1 }}>
                             {isSaving ? "Saving…" : "Save rule"}

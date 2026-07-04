@@ -1,7 +1,7 @@
 import type { PyleHoundFile, PyleHoundAsset } from "./ProjectTypes"
 import type { RemoteConfig } from "./AppConfigTypes"
 import type { ImportFile } from "./FileImportTypes"
-import type { QuoteScanToolResult, GetProjectFilesToolResult, GetSingleFileDetailsToolResult } from "./ToolTypes"
+import type { GetProjectFilesToolResult, GetSingleFileDetailsToolResult } from "./ToolTypes"
 import type { InstallMode, ReleaseTrack } from "./InstallConfigTypes"
 
 export interface Conversation {
