@@ -55,8 +55,8 @@ export function useConnections() {
         return result
     }, [])
 
-    const syncNow = useCallback(async (id: string): Promise<Result<{ newCount: number }, Error>> => {
-        return getLedgaAPI().connections.syncNow(id)
+    const syncNow = useCallback(async (id: string, from?: Date, to?: Date): Promise<Result<{ newCount: number }, Error>> => {
+        return getLedgaAPI().connections.syncNow(id, from?.toISOString(), to?.toISOString())
     }, [])
 
     const setAutoSync = useCallback(async (id: string, autoSync: boolean): Promise<Result<Connection | null, Error>> => {

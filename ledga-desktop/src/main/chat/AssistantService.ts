@@ -9,7 +9,7 @@ import type { ChatRepository, ChatMessageRow } from "./ChatRepository"
 import type { ToolCallRecord, ChatMessage } from "@/common/types/ChatTypes"
 import { AllowedChannelIpc } from "@/common/types/AllowedChannelIpc"
 
-const MODEL_ID = "gemini-2.0-flash"
+const MODEL_ID = "gemini-3.5-flash"
 const MAX_HISTORY_MESSAGES = 20
 const MAX_TITLE_LENGTH = 48
 const SEARCH_ROW_LIMIT = 300
@@ -86,6 +86,21 @@ export class AssistantService {
     }
 
     async sendMessage(chatId: string, userText: string): Promise<void> {
+        this.chatRepository.appendMessage(chatId, "user", userText)
+        this.maybeSetTitleFromFirstMessage(chatId, userText)
+        await this.runAssistantTurn(chatId)
+    }
+
+    // Regenerates a reply: deletes the target message and everything after it (so an assistant
+    // reply the user didn't like, plus any turns that followed it, aren't left dangling on a
+    // conversation that no longer matches what the model actually saw), then re-runs generation
+    // against whatever history remains -- which still ends on the preceding user message.
+    async reloadMessage(chatId: string, messageId: string): Promise<void> {
+        this.chatRepository.deleteMessagesFrom(chatId, messageId)
+        await this.runAssistantTurn(chatId)
+    }
+
+    private async runAssistantTurn(chatId: string): Promise<void> {
         // Cancel any stream already running for this chat first, rather than letting a second
         // concurrent call silently overwrite the first's AbortController in activeStreams (which
         // would leave the first stream un-cancellable via stop() and race both calls' appendMessage
@@ -99,8 +114,6 @@ export class AssistantService {
         const toolCalls = new Map<string, ToolCallRecord>()
 
         try {
-            this.chatRepository.appendMessage(chatId, "user", userText)
-            this.maybeSetTitleFromFirstMessage(chatId, userText)
             const messages = this.buildHistory(chatId)
 
             const result = streamText({

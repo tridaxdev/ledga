@@ -35,7 +35,7 @@ const ledgaAPI: LedgaAPI = {
             ipcRenderer.on(AllowedChannelIpc.ConnectionsOAuthCompleted, listener)
             return () => ipcRenderer.removeListener(AllowedChannelIpc.ConnectionsOAuthCompleted, listener)
         },
-        syncNow: (id: string) => ipcRenderer.invoke(AllowedChannelIpc.ConnectionsSyncNow, id),
+        syncNow: (id: string, from?: string, to?: string) => ipcRenderer.invoke(AllowedChannelIpc.ConnectionsSyncNow, id, from, to),
         update: (id: string, patch: { auto_sync?: boolean }) => ipcRenderer.invoke(AllowedChannelIpc.ConnectionsUpdate, id, patch)
     },
     emails: {
@@ -99,6 +99,7 @@ const ledgaAPI: LedgaAPI = {
     },
     assistant: {
         send: (chatId: string, text: string) => ipcRenderer.invoke(AllowedChannelIpc.AssistantSend, chatId, text),
+        reload: (chatId: string, messageId: string) => ipcRenderer.invoke(AllowedChannelIpc.AssistantReload, chatId, messageId),
         stop: (chatId: string) => ipcRenderer.invoke(AllowedChannelIpc.AssistantStop, chatId),
         onStreamChunk: (callback: (event: AssistantStreamChunkEvent) => void) => {
             const listener = (_: Electron.IpcRendererEvent, event: AssistantStreamChunkEvent) => callback(event)

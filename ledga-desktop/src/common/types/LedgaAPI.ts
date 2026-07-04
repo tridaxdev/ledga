@@ -116,7 +116,7 @@ export interface LedgaAPI {
         readonly finalize: (flowId: string, autoSync: boolean) => Promise<Result<Connection, Error>>
         readonly disconnect: (id: string) => Promise<Result<void, Error>>
         readonly onOAuthCompleted: (callback: (connection: Connection) => void) => () => void
-        readonly syncNow: (id: string) => Promise<Result<{ newCount: number }, Error>>
+        readonly syncNow: (id: string, from?: string, to?: string) => Promise<Result<{ newCount: number }, Error>>
         readonly update: (id: string, patch: { auto_sync?: boolean }) => Promise<Result<Connection | null, Error>>
     }
     readonly emails: {
@@ -160,6 +160,7 @@ export interface LedgaAPI {
     }
     readonly assistant: {
         readonly send: (chatId: string, text: string) => Promise<Result<void, Error>>
+        readonly reload: (chatId: string, messageId: string) => Promise<Result<void, Error>>
         readonly stop: (chatId: string) => Promise<Result<void, Error>>
         readonly onStreamChunk: (callback: (event: AssistantStreamChunkEvent) => void) => () => void
         readonly onStreamDone: (callback: (event: AssistantStreamDoneEvent) => void) => () => void

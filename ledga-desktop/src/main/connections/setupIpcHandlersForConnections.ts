@@ -85,9 +85,11 @@ export function setupIpcHandlersForConnections(
 
     registerIpcHandler(AllowedChannelIpc.ConnectionsSyncNow, async (_, ...args) => {
         const connectionId = args[0] as string
+        const fromArg = args[1] as string | undefined
+        const toArg = args[2] as string | undefined
         try {
-            const endDate = new Date()
-            const startDate = new Date(endDate.getTime() - SYNC_NOW_LOOKBACK_DAYS * 24 * 60 * 60 * 1000)
+            const endDate = toArg ? new Date(toArg) : new Date()
+            const startDate = fromArg ? new Date(fromArg) : new Date(endDate.getTime() - SYNC_NOW_LOOKBACK_DAYS * 24 * 60 * 60 * 1000)
             const result = await emailService.fetchAndStoreEmails(connectionId, startDate, endDate)
             return ResultFactory.success(result)
         } catch (error) {

@@ -59,9 +59,26 @@ export function useAssistant(chatId: string) {
         [chatId, isStreaming]
     )
 
+    const reload = useCallback(
+        async (messageId: string) => {
+            if (isStreaming) return
+            setError(null)
+            setIsStreaming(true)
+            // Optimistically drop this message and everything after it so the UI doesn't keep
+            // showing stale replies while the regenerated response streams in -- the eventual
+            // refetch() on stream-done will reconcile with what the main process actually kept.
+            setMessages(prev => {
+                const index = prev.findIndex(m => m.id === messageId)
+                return index === -1 ? prev : prev.slice(0, index)
+            })
+            await getLedgaAPI().assistant.reload(chatId, messageId)
+        },
+        [chatId, isStreaming]
+    )
+
     const stop = useCallback(async () => {
         await getLedgaAPI().assistant.stop(chatId)
     }, [chatId])
 
-    return { messages, streamingText, isStreaming, isThinking: isStreaming && streamingText === "", error, send, stop }
+    return { messages, streamingText, isStreaming, isThinking: isStreaming && streamingText === "", error, send, reload, stop }
 }

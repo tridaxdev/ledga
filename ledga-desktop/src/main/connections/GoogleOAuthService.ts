@@ -4,9 +4,10 @@ import { shell } from "electron"
 import type { Logger } from "../logging/FileLogger"
 import { getAvailablePort } from "@/common/utils/getAvailablePort"
 
-const CLIENT_ID = process.env.GOOGLE_CLIENT_ID ?? ""
-const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET ?? ""
 const SCOPES = ["https://mail.google.com/", "https://www.googleapis.com/auth/userinfo.email"]
+// Must match the redirect URI registered for this OAuth client in Google Cloud Console exactly --
+// unlike a "Desktop app" client, a "Web application" client can't accept an arbitrary loopback port.
+const OAUTH_REDIRECT_PORT = 8080
 
 export class OAuthCancelledError extends Error {
     constructor() {
@@ -39,8 +40,16 @@ interface UserInfoResponse {
 
 export class GoogleOAuthService {
     private activeFlow: { server: http.Server; reject: (err: Error) => void } | null = null
+    private readonly clientId: string
+    private readonly clientSecret: string
 
-    constructor(private readonly logger: Logger) {}
+    constructor(private readonly logger: Logger) {
+        // Read at construction time (after setupEnvironment() has loaded .env), not at module
+        // load time -- these would otherwise always be empty since dotenv hasn't run yet when
+        // this module is first imported.
+        this.clientId = process.env.GOOGLE_CLIENT_ID ?? ""
+        this.clientSecret = process.env.GOOGLE_CLIENT_SECRET ?? ""
+    }
 
     async startOAuthFlow(): Promise<OAuthResult> {
         // Only one flow can be in flight at a time — starting a new one (e.g. a double-click
@@ -48,7 +57,7 @@ export class GoogleOAuthService {
         // instead of orphaning it.
         this.cancel()
 
-        const port = await getAvailablePort()
+        const port = await getAvailablePort(OAUTH_REDIRECT_PORT, OAUTH_REDIRECT_PORT, OAUTH_REDIRECT_PORT)
         const redirectUri = `http://localhost:${port}/callback`
         const codeVerifier = base64url(randomBytes(32))
         const codeChallenge = base64url(createHash("sha256").update(codeVerifier).digest())
@@ -63,15 +72,16 @@ export class GoogleOAuthService {
 
     cancel(): void {
         if (!this.activeFlow) return
-        this.activeFlow.server.close()
-        this.activeFlow.reject(new OAuthCancelledError())
+        const flow = this.activeFlow
         this.activeFlow = null
+        flow.server.close()
+        flow.reject(new OAuthCancelledError())
     }
 
     async refreshAccessToken(refreshToken: string): Promise<{ accessToken: string; refreshToken?: string; expiryDate: Date }> {
         const params = new URLSearchParams({
-            client_id: CLIENT_ID,
-            client_secret: CLIENT_SECRET,
+            client_id: this.clientId,
+            client_secret: this.clientSecret,
             refresh_token: refreshToken,
             grant_type: "refresh_token"
         })
@@ -125,6 +135,9 @@ export class GoogleOAuthService {
             server.listen(port, "127.0.0.1", () => {
                 const authUrl = this.buildAuthUrl(redirectUri, codeChallenge)
                 this.logger.info("Opening browser for OAuth flow")
+                // Google blocks sign-in inside embedded browser windows (Error: "This browser or
+                // app may not be secure") regardless of user agent, so this must open in the
+                // user's actual system browser, not an in-app BrowserWindow.
                 shell.openExternal(authUrl).catch((err: unknown) => {
                     server.close()
                     this.activeFlow = null
@@ -136,7 +149,7 @@ export class GoogleOAuthService {
 
     private buildAuthUrl(redirectUri: string, codeChallenge: string): string {
         const params = new URLSearchParams({
-            client_id: CLIENT_ID,
+            client_id: this.clientId,
             redirect_uri: redirectUri,
             response_type: "code",
             scope: SCOPES.join(" "),
@@ -150,8 +163,8 @@ export class GoogleOAuthService {
 
     private async exchangeCodeForTokens(code: string, redirectUri: string, codeVerifier: string): Promise<TokenResponse> {
         const params = new URLSearchParams({
-            client_id: CLIENT_ID,
-            client_secret: CLIENT_SECRET,
+            client_id: this.clientId,
+            client_secret: this.clientSecret,
             code,
             redirect_uri: redirectUri,
             grant_type: "authorization_code",

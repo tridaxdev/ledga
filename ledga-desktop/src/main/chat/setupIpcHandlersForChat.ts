@@ -43,4 +43,15 @@ export function setupIpcHandlersForChat(chatRepository: ChatRepository, assistan
         assistantService.stop(chatId)
         return ResultFactory.success(undefined)
     })
+
+    registerIpcHandler(AllowedChannelIpc.AssistantReload, (_, ...args) => {
+        const chatId = args[0] as string
+        const messageId = args[1] as string
+        // Fire-and-forget, same as assistant:send -- progress is delivered via the stream-chunk/
+        // stream-done push channels.
+        assistantService.reloadMessage(chatId, messageId).catch(error => {
+            logger.error("Unhandled assistant reload error", { chatId, messageId, error })
+        })
+        return ResultFactory.success(undefined)
+    })
 }

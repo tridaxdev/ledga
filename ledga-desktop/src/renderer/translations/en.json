@@ -11,6 +11,7 @@
     "activity_tray.title": "Activity",
     "assistant_chat.header_description": "A general financial assistant — it reads, never moves money.",
     "assistant_chat.header_label": "Assistant",
+    "assistant_chat.reload_button": "Reload",
     "assistant_chat.thinking_label": "Thinking",
     "assistant_chat.used_ledger_label": "Used your ledger",
     "assistant_chat.using_all_transactions": "Using: all transactions",
@@ -106,5 +107,17 @@
     "settings.no_connections": "No email accounts connected. Add one to start syncing transactions.",
     "settings.reveal_button": "Reveal",
     "settings.sync_frequency_label": "Sync frequency",
-    "settings.title": "Sources & data"
+    "settings.title": "Sources & data",
+    "sync_period_modal.confirm_button": "Sync now",
+    "sync_period_modal.custom": "Custom",
+    "sync_period_modal.description": "Pick how far back to fetch emails from this account.",
+    "sync_period_modal.from_label": "From",
+    "sync_period_modal.header": "Choose sync period",
+    "sync_period_modal.one_month": "1 month",
+    "sync_period_modal.one_year": "1 year",
+    "sync_period_modal.range_incomplete": "Pick a start and end date.",
+    "sync_period_modal.range_preview": "Fetching emails from {{from}} to {{to}}",
+    "sync_period_modal.this_month": "This month",
+    "sync_period_modal.three_months": "3 months",
+    "sync_period_modal.to_label": "To"
 }

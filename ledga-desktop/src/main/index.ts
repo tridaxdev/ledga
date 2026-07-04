@@ -31,6 +31,7 @@ import { setupIpcHandlersForSettings } from "./settings/setupIpcHandlersForSetti
 import { ChatRepository } from "./chat/ChatRepository"
 import { AssistantService } from "./chat/AssistantService"
 import { setupIpcHandlersForChat } from "./chat/setupIpcHandlersForChat"
+import { setupEnvironment } from "@/common/utils/setupEnvironment"
 
 const loggerPath = path.join(app.getPath("userData"), "logs")
 const logger = new FileLogger(loggerPath, "debug")
@@ -68,6 +69,7 @@ if (!isSingleInstance) {
 
     app.whenReady()
         .then(async () => {
+            setupEnvironment()
             await initializeI18next(logger)
             const userDataPath = app.getPath("userData")
             const dbPath = DatabaseLoader.databasePath(userDataPath)

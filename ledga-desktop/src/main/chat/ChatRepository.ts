@@ -67,4 +67,12 @@ export class ChatRepository {
     updateChatTitle(chatId: string, title: string): void {
         this.db.executeQuery("UPDATE chats SET title = ? WHERE id = ?", [title, chatId])
     }
+
+    // Deletes the given message and every message that came after it in this chat. Ordered by
+    // SQLite's implicit rowid (insertion order) rather than created_at -- a user message and the
+    // assistant's reply to it are routinely created within the same second, so created_at alone
+    // can't be trusted to break the tie correctly.
+    deleteMessagesFrom(chatId: string, messageId: string): void {
+        this.db.executeQuery("DELETE FROM chat_messages WHERE chat_id = ? AND rowid >= (SELECT rowid FROM chat_messages WHERE id = ? AND chat_id = ?)", [chatId, messageId, chatId])
+    }
 }

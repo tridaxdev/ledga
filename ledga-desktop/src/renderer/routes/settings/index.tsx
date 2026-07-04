@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 import { useConnections } from "../../hooks/useConnections"
 import { ConnectGmailModal } from "../../components/ConnectGmailModal"
+import { SyncPeriodModal } from "../../components/SyncPeriodModal"
 import { RulesSection } from "../../components/RulesSection"
 import { getLedgaAPI } from "../../hooks/apiClient"
 import type { Connection } from "@/common/types/Connection"
@@ -13,6 +14,7 @@ function SettingsScreen() {
     const { t } = useTranslation()
     const { connections, isLoading, disconnect, syncNow, setAutoSync } = useConnections()
     const [modalOpen, setModalOpen] = useState(false)
+    const [syncPeriodConnectionId, setSyncPeriodConnectionId] = useState<string | null>(null)
     const [justSyncedIds, setJustSyncedIds] = useState<Set<string>>(new Set())
     const [syncingIds, setSyncingIds] = useState<Set<string>>(new Set())
 
@@ -20,15 +22,21 @@ function SettingsScreen() {
         setModalOpen(false)
     }
 
-    async function handleSyncNow(id: string) {
+    async function handleSyncNow(id: string, from: Date, to: Date) {
         setSyncingIds(prev => new Set(prev).add(id))
-        await syncNow(id)
+        await syncNow(id, from, to)
         setSyncingIds(prev => {
             const next = new Set(prev)
             next.delete(id)
             return next
         })
         setJustSyncedIds(prev => new Set(prev).add(id))
+    }
+
+    function handleSyncPeriodConfirm(range: { from: Date; to: Date }) {
+        const id = syncPeriodConnectionId
+        setSyncPeriodConnectionId(null)
+        if (id) handleSyncNow(id, range.from, range.to)
     }
 
     return (
@@ -87,7 +95,7 @@ function SettingsScreen() {
                                 </div>
                                 <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 16px" }}>
                                     <button
-                                        onClick={() => handleSyncNow(connection.id)}
+                                        onClick={() => setSyncPeriodConnectionId(connection.id)}
                                         disabled={syncingIds.has(connection.id)}
                                         style={{
                                             ...secondaryButtonStyle,
@@ -118,6 +126,7 @@ function SettingsScreen() {
             <DataSection connections={connections} />
 
             <ConnectGmailModal isOpen={modalOpen} onClose={() => setModalOpen(false)} onSuccess={handleSuccess} />
+            <SyncPeriodModal isOpen={syncPeriodConnectionId !== null} onClose={() => setSyncPeriodConnectionId(null)} onConfirm={handleSyncPeriodConfirm} />
         </div>
     )
 }

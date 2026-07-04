@@ -83,7 +83,8 @@ export enum AllowedChannelIpc {
     AssistantStreamChunk = "assistant:stream-chunk",
     AssistantStreamDone = "assistant:stream-done",
     AssistantStreamError = "assistant:stream-error",
-    AssistantStop = "assistant:stop"
+    AssistantStop = "assistant:stop",
+    AssistantReload = "assistant:reload"
 }
 
 export function isAllowedChannel(channel: string): channel is AllowedChannelIpc {

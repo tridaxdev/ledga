@@ -11,7 +11,7 @@ const SUGGESTED_PROMPTS = ["Biggest expense this month?", "Compare to April", "L
 function AssistantScreen() {
     const { t } = useTranslation()
     const { chatId } = Route.useParams()
-    const { messages, streamingText, isStreaming, isThinking, error, send, stop } = useAssistant(chatId)
+    const { messages, streamingText, isStreaming, isThinking, error, send, reload, stop } = useAssistant(chatId)
     const [input, setInput] = useState("")
     const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -74,7 +74,7 @@ function AssistantScreen() {
             <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", padding: "24px 28px" }}>
                 <div style={{ maxWidth: 720, margin: "0 auto", display: "flex", flexDirection: "column", gap: 16 }}>
                     {messages.map(message => (
-                        <MessageBubble key={message.id} message={message} />
+                        <MessageBubble key={message.id} message={message} onReload={reload} reloadDisabled={isStreaming} />
                     ))}
 
                     {isThinking && (
@@ -187,7 +187,9 @@ function AssistantScreen() {
     )
 }
 
-function MessageBubble({ message }: { message: ChatMessage }) {
+function MessageBubble({ message, onReload, reloadDisabled }: { message: ChatMessage; onReload: (messageId: string) => void; reloadDisabled: boolean }) {
+    const { t } = useTranslation()
+
     if (message.role === "user") {
         return (
             <div style={{ display: "flex" }}>
@@ -230,6 +232,25 @@ function MessageBubble({ message }: { message: ChatMessage }) {
                     {message.content}
                 </div>
             )}
+            <button
+                onClick={() => onReload(message.id)}
+                disabled={reloadDisabled}
+                style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 5,
+                    border: "none",
+                    background: "transparent",
+                    color: "var(--color-ledga-text-muted)",
+                    fontSize: 12,
+                    padding: "2px 4px",
+                    cursor: reloadDisabled ? "default" : "pointer",
+                    opacity: reloadDisabled ? 0.5 : 1
+                }}
+            >
+                <ReloadIcon />
+                {t("assistant_chat.reload_button")}
+            </button>
         </div>
     )
 }
@@ -378,6 +399,15 @@ function StopIcon() {
     return (
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none">
             <rect x="5" y="5" width="14" height="14" rx="2" />
+        </svg>
+    )
+}
+
+function ReloadIcon() {
+    return (
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 12a9 9 0 1 1-3-6.7L21 8" />
+            <path d="M21 3v5h-5" />
         </svg>
     )
 }
