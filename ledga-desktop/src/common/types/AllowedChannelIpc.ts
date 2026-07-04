@@ -55,6 +55,9 @@ export enum AllowedChannelIpc {
     EmailsGetProcessingCounts = "emails:get-processing-counts",
     EmailsPulled = "emails:pulled",
     EmailsProcessingUpdate = "emails:processing-update",
+    TransactionsQuery = "transactions:query",
+    TransactionsUpdateCategory = "transactions:update-category",
+    CategoriesGetAll = "categories:get-all",
 }
 
 export function isAllowedChannel(channel: string): channel is AllowedChannelIpc {

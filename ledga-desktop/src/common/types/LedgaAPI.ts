@@ -2,6 +2,8 @@ import type { Alert } from "@/renderer/AlertFeature/types/Alert"
 import type { AppInstallation, UpdateCheckResult, UpdateProgressCallback } from "./AppTypes"
 import type { Result } from "./Result"
 import type { Connection } from "./Connection"
+import type { Transaction, TransactionQueryParams, TransactionSummary } from "./Transaction"
+import type { Category } from "./Category"
 import type { Conversation, ConversationCreatedEvent, ConversationDeletedEvent, ConversationReferencesUpdatedEvent, ConversationStreamEvent, ConversationUpdatedEvent, ConversationWithMessages, CreateConversationRequest, CreateMessageRequest, DeleteConversationRequest, EditUserMessageRequest, GetConversationRequest, GetConversationsByProjectRequest, Message, RetryFromMessageRequest, StopConversationStreamRequest, ToolApprovalDecision, UpdateConversationRequest } from "./BaseTypes"
 import type { GetFileRequest, GetFilesByFolderRequest, GetFilesByProjectRequest, GetFilesByConversationRequest, ImportFilesRequest, RetryImportRequest, OpenFileRequest, RetryFileProcessingRequest, DeleteAssetsRequest } from "./FileImportTypes"
 import type { PyleHoundAsset, PyleHoundFile, AssetUpsertedEvent, AssetDeletedEvent } from "./ProjectTypes"
@@ -84,5 +86,12 @@ export interface LedgaAPI {
         readonly getProcessingCounts: () => Promise<{ processing: number; failed: number }>
         readonly onProcessingUpdate: (callback: (counts: { processing: number; failed: number }) => void) => () => void
         readonly onPulled: (callback: (event: { connectionId: string; newCount: number }) => void) => () => void
+    }
+    readonly transactions: {
+        readonly query: (params: TransactionQueryParams) => Promise<Result<{ transactions: Transaction[]; summary: TransactionSummary }, Error>>
+        readonly updateCategory: (id: string, categoryId: string | null) => Promise<Result<void, Error>>
+    }
+    readonly categories: {
+        readonly getAll: () => Promise<Result<Category[], Error>>
     }
 }

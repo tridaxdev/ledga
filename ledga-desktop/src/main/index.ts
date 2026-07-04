@@ -22,6 +22,8 @@ import { RulesService } from "./rules/RulesService"
 import { BillPaymentService } from "./billPayments/BillPaymentService"
 import { EmailService } from "./email/emailService"
 import { setupIpcHandlersForEmail } from "./email/setupIpcHandlersForEmail"
+import { setupIpcHandlersForTransactions } from "./transactions/setupIpcHandlersForTransactions"
+import { setupIpcHandlersForCategories } from "./categories/setupIpcHandlersForCategories"
 
 const loggerPath = path.join(app.getPath("userData"), "logs")
 const logger = new FileLogger(loggerPath, "debug")
@@ -110,6 +112,8 @@ if(!isSingleInstance) {
             )
 
             setupIpcHandlersForEmail(emailService, logger)
+            setupIpcHandlersForTransactions(transactionRepository)
+            setupIpcHandlersForCategories(categoryRepository)
 
             windowManager.showMainWindow(app.getName())
 

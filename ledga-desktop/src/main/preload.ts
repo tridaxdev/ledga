@@ -1,6 +1,7 @@
 import { AllowedChannelIpc } from "@/common/types/AllowedChannelIpc";
 import type { LedgaAPI } from "@/common/types/LedgaAPI";
 import type { Connection } from "@/common/types/Connection";
+import type { TransactionQueryParams } from "@/common/types/Transaction";
 import { contextBridge, ipcRenderer } from "electron";
 
 const ledgaAPI: LedgaAPI = {
@@ -43,6 +44,13 @@ const ledgaAPI: LedgaAPI = {
             ipcRenderer.on(AllowedChannelIpc.EmailsPulled, listener)
             return () => ipcRenderer.removeListener(AllowedChannelIpc.EmailsPulled, listener)
         }
+    },
+    transactions: {
+        query: (params: TransactionQueryParams) => ipcRenderer.invoke(AllowedChannelIpc.TransactionsQuery, params),
+        updateCategory: (id: string, categoryId: string | null) => ipcRenderer.invoke(AllowedChannelIpc.TransactionsUpdateCategory, id, categoryId)
+    },
+    categories: {
+        getAll: () => ipcRenderer.invoke(AllowedChannelIpc.CategoriesGetAll)
     }
 }
 
