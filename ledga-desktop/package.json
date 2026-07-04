@@ -30,6 +30,7 @@
         "url": "https://github.com/Ledga-Finance-App/ledga-desktop-app.git"
     },
     "dependencies": {
+        "@ai-sdk/google": "^3.0.88",
         "@tanstack/react-router": "^1.170.16",
         "ai": "^6.0.62",
         "better-sqlite3": "^12.11.1",

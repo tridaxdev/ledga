@@ -75,6 +75,15 @@ export enum AllowedChannelIpc {
     SettingsClearData = "settings:clear-data",
     SettingsRevealDb = "settings:reveal-db",
     SettingsGetDbPath = "settings:get-db-path",
+    ChatsGetAll = "chats:get-all",
+    ChatsCreate = "chats:create",
+    ChatsGetMessages = "chats:get-messages",
+    ChatsUpdated = "chats:updated",
+    AssistantSend = "assistant:send",
+    AssistantStreamChunk = "assistant:stream-chunk",
+    AssistantStreamDone = "assistant:stream-done",
+    AssistantStreamError = "assistant:stream-error",
+    AssistantStop = "assistant:stop",
 }
 
 export function isAllowedChannel(channel: string): channel is AllowedChannelIpc {

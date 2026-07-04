@@ -4,6 +4,7 @@ import type { Connection } from "@/common/types/Connection";
 import type { CategoryQueryParams, TransactionQueryParams } from "@/common/types/Transaction";
 import type { RuleInput } from "@/common/types/Rule";
 import type { CsvImportProgressEvent } from "@/common/types/CsvImportTypes";
+import type { AssistantStreamChunkEvent, AssistantStreamDoneEvent, AssistantStreamErrorEvent } from "@/common/types/ChatTypes";
 import { contextBridge, ipcRenderer, webUtils } from "electron";
 
 const ledgaAPI: LedgaAPI = {
@@ -85,6 +86,35 @@ const ledgaAPI: LedgaAPI = {
         getDbPath: () => ipcRenderer.invoke(AllowedChannelIpc.SettingsGetDbPath),
         exportCsv: () => ipcRenderer.invoke(AllowedChannelIpc.SettingsExportCsv),
         clearData: () => ipcRenderer.invoke(AllowedChannelIpc.SettingsClearData)
+    },
+    chats: {
+        getAll: () => ipcRenderer.invoke(AllowedChannelIpc.ChatsGetAll),
+        create: () => ipcRenderer.invoke(AllowedChannelIpc.ChatsCreate),
+        getMessages: (chatId: string) => ipcRenderer.invoke(AllowedChannelIpc.ChatsGetMessages, chatId),
+        onUpdated: (callback: () => void) => {
+            const listener = () => callback()
+            ipcRenderer.on(AllowedChannelIpc.ChatsUpdated, listener)
+            return () => ipcRenderer.removeListener(AllowedChannelIpc.ChatsUpdated, listener)
+        }
+    },
+    assistant: {
+        send: (chatId: string, text: string) => ipcRenderer.invoke(AllowedChannelIpc.AssistantSend, chatId, text),
+        stop: (chatId: string) => ipcRenderer.invoke(AllowedChannelIpc.AssistantStop, chatId),
+        onStreamChunk: (callback: (event: AssistantStreamChunkEvent) => void) => {
+            const listener = (_: Electron.IpcRendererEvent, event: AssistantStreamChunkEvent) => callback(event)
+            ipcRenderer.on(AllowedChannelIpc.AssistantStreamChunk, listener)
+            return () => ipcRenderer.removeListener(AllowedChannelIpc.AssistantStreamChunk, listener)
+        },
+        onStreamDone: (callback: (event: AssistantStreamDoneEvent) => void) => {
+            const listener = (_: Electron.IpcRendererEvent, event: AssistantStreamDoneEvent) => callback(event)
+            ipcRenderer.on(AllowedChannelIpc.AssistantStreamDone, listener)
+            return () => ipcRenderer.removeListener(AllowedChannelIpc.AssistantStreamDone, listener)
+        },
+        onStreamError: (callback: (event: AssistantStreamErrorEvent) => void) => {
+            const listener = (_: Electron.IpcRendererEvent, event: AssistantStreamErrorEvent) => callback(event)
+            ipcRenderer.on(AllowedChannelIpc.AssistantStreamError, listener)
+            return () => ipcRenderer.removeListener(AllowedChannelIpc.AssistantStreamError, listener)
+        }
     }
 }
 
