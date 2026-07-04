@@ -1,4 +1,4 @@
-import { streamText, tool, type ModelMessage } from "ai"
+import { streamText, tool, stepCountIs, type ModelMessage } from "ai"
 import { google } from "@ai-sdk/google"
 import { z } from "zod"
 import type { TransactionRepository } from "../transactions/TransactionRepository"
@@ -10,6 +10,10 @@ import type { ToolCallRecord, ChatMessage } from "@/common/types/ChatTypes"
 import { AllowedChannelIpc } from "@/common/types/AllowedChannelIpc"
 
 const MODEL_ID = "gemini-3.5-flash"
+// streamText defaults to stopWhen: stepCountIs(1) -- without raising this, the SDK stops right
+// after a tool call's result comes back and never lets the model produce the follow-up text
+// that's supposed to summarize it for the user.
+const MAX_AGENT_STEPS = 5
 const MAX_HISTORY_MESSAGES = 20
 const MAX_TITLE_LENGTH = 48
 const SEARCH_ROW_LIMIT = 300
@@ -127,6 +131,7 @@ export class AssistantService {
                     "correctly filtered. Keep answers concise.",
                 messages,
                 tools: { search_transactions: this.searchTransactionsTool() },
+                stopWhen: stepCountIs(MAX_AGENT_STEPS),
                 abortSignal: abortController.signal
             })
 

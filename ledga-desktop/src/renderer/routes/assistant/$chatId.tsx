@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, type KeyboardEvent } from "react"
 import { createFileRoute } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 import { useAssistant } from "../../hooks/useAssistant"
+import { Markdown } from "../../components/Markdown"
 import type { ChatMessage, ToolCallRecord } from "@/common/types/ChatTypes"
 
 export const Route = createFileRoute("/assistant/$chatId")({ component: AssistantScreen })
@@ -114,12 +115,10 @@ function AssistantScreen() {
                                     borderRadius: "14px 14px 14px 4px",
                                     padding: "11px 14px",
                                     fontSize: 14,
-                                    lineHeight: 1.6,
-                                    color: "var(--color-ledga-text)",
-                                    whiteSpace: "pre-wrap"
+                                    color: "var(--color-ledga-text)"
                                 }}
                             >
-                                {streamingText}
+                                <Markdown content={streamingText} />
                             </div>
                         </div>
                     )}
@@ -224,12 +223,10 @@ function MessageBubble({ message, onReload, reloadDisabled }: { message: ChatMes
                         borderRadius: "14px 14px 14px 4px",
                         padding: "11px 14px",
                         fontSize: 14,
-                        lineHeight: 1.6,
-                        color: "var(--color-ledga-text)",
-                        whiteSpace: "pre-wrap"
+                        color: "var(--color-ledga-text)"
                     }}
                 >
-                    {message.content}
+                    <Markdown content={message.content} />
                 </div>
             )}
             <button
