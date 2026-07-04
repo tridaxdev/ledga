@@ -35,8 +35,16 @@ export function useConnections() {
         })
     }, [refetch])
 
-    const connect = useCallback((): Promise<Result<Connection, Error>> => {
-        return getLedgaAPI().connections.connect()
+    const startOAuth = useCallback((): Promise<Result<{ flowId: string; email: string }, Error>> => {
+        return getLedgaAPI().connections.startOAuth()
+    }, [])
+
+    const cancelOAuth = useCallback((flowId?: string): Promise<Result<void, Error>> => {
+        return getLedgaAPI().connections.cancelOAuth(flowId)
+    }, [])
+
+    const finalize = useCallback((flowId: string, autoSync: boolean): Promise<Result<Connection, Error>> => {
+        return getLedgaAPI().connections.finalize(flowId, autoSync)
     }, [])
 
     const disconnect = useCallback(async (id: string): Promise<Result<void, Error>> => {
@@ -47,5 +55,5 @@ export function useConnections() {
         return result
     }, [])
 
-    return { connections, isLoading, error, refetch, connect, disconnect }
+    return { connections, isLoading, error, refetch, startOAuth, cancelOAuth, finalize, disconnect }
 }

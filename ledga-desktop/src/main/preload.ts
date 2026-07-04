@@ -21,7 +21,9 @@ const ledgaAPI: LedgaAPI = {
     },
     connections: {
         getAll: () => ipcRenderer.invoke(AllowedChannelIpc.ConnectionsGetAll),
-        connect: () => ipcRenderer.invoke(AllowedChannelIpc.ConnectionsStartOAuth),
+        startOAuth: () => ipcRenderer.invoke(AllowedChannelIpc.ConnectionsStartOAuth),
+        cancelOAuth: (flowId?: string) => ipcRenderer.invoke(AllowedChannelIpc.ConnectionsCancelOAuth, flowId),
+        finalize: (flowId: string, autoSync: boolean) => ipcRenderer.invoke(AllowedChannelIpc.ConnectionsFinalize, flowId, autoSync),
         disconnect: (id: string) => ipcRenderer.invoke(AllowedChannelIpc.ConnectionsDelete, id),
         onOAuthCompleted: (callback: (connection: Connection) => void) => {
             const listener = (_: Electron.IpcRendererEvent, connection: Connection) => callback(connection)

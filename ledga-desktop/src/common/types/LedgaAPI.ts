@@ -74,7 +74,9 @@ export interface LedgaAPI {
     }
     readonly connections: {
         readonly getAll: () => Promise<Result<Connection[], Error>>
-        readonly connect: () => Promise<Result<Connection, Error>>
+        readonly startOAuth: () => Promise<Result<{ flowId: string; email: string }, Error>>
+        readonly cancelOAuth: (flowId?: string) => Promise<Result<void, Error>>
+        readonly finalize: (flowId: string, autoSync: boolean) => Promise<Result<Connection, Error>>
         readonly disconnect: (id: string) => Promise<Result<void, Error>>
         readonly onOAuthCompleted: (callback: (connection: Connection) => void) => () => void
     }
