@@ -25,6 +25,9 @@ import { setupIpcHandlersForEmail } from "./email/setupIpcHandlersForEmail"
 import { setupIpcHandlersForTransactions } from "./transactions/setupIpcHandlersForTransactions"
 import { setupIpcHandlersForCategories } from "./categories/setupIpcHandlersForCategories"
 import { setupIpcHandlersForRules } from "./rules/setupIpcHandlersForRules"
+import { CsvImportService } from "./csvImport/CsvImportService"
+import { setupIpcHandlersForCsvImport } from "./csvImport/setupIpcHandlersForCsvImport"
+import { setupIpcHandlersForSettings } from "./settings/setupIpcHandlersForSettings"
 
 const loggerPath = path.join(app.getPath("userData"), "logs")
 const logger = new FileLogger(loggerPath, "debug")
@@ -109,6 +112,7 @@ if(!isSingleInstance) {
                 tokenStorage,
                 oauthService,
                 notificationService,
+                emailService,
                 logger
             )
 
@@ -116,6 +120,19 @@ if(!isSingleInstance) {
             setupIpcHandlersForTransactions(transactionRepository, categoryRepository)
             setupIpcHandlersForCategories(categoryRepository)
             setupIpcHandlersForRules(rulesService, notificationService)
+
+            const csvImportService = new CsvImportService(
+                transactionRepository,
+                categoryRepository,
+                rulesService,
+                billPaymentService,
+                backgroundWorkerManager,
+                notificationService,
+                logger
+            )
+            setupIpcHandlersForCsvImport(csvImportService)
+
+            setupIpcHandlersForSettings(databaseManager, transactionRepository, categoryRepository, dbPath, logger)
 
             windowManager.showMainWindow(app.getName())
 

@@ -5,7 +5,9 @@ import { CANCELLED_EXIT_CODE, type DbQueryTaskPayload, type MainToWorkerMessage 
 import { WorkerLogger } from "../logging/WorkerLogger"
 import { WorkerDatabaseManager } from "../Database/WorkerDatabaseManager"
 import type { EmailProcessingTaskPayload, EmailProcessingWorkerResult } from "@/common/types/FileProcessingTypes"
+import type { CsvImportTaskPayload, CsvImportWorkerResult } from "@/common/types/CsvImportTypes"
 import { createScrapingManager } from "../scraping/createScrapingManager"
+import { parseCsvStatement } from "../csvImport/CsvStatementParser"
 
 const logger = new WorkerLogger()
 const { dbPath } = workerData as { dbPath: string; appStorageDir: string }
@@ -86,6 +88,37 @@ async function handleTaskMessage(message: MainToWorkerMessage): Promise<void> {
                     result,
                     error: result.success ? undefined : result.error
                 })
+                break
+            }
+
+            case "csv_import": {
+                const { filePath } = message.payload as CsvImportTaskPayload
+                try {
+                    const content = fs.readFileSync(filePath, "utf-8")
+                    const rows = parseCsvStatement(content)
+                    const totalRows = rows.length
+                    for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+                        parentPort?.postMessage({
+                            type: "PROGRESS",
+                            taskId: message.taskId,
+                            progress: { rowIndex, totalRows, row: rows[rowIndex] }
+                        })
+                    }
+                    const result: CsvImportWorkerResult = { totalRows }
+                    parentPort?.postMessage({
+                        type: "RESULT",
+                        taskId: message.taskId,
+                        success: true,
+                        result
+                    })
+                } catch (error) {
+                    parentPort?.postMessage({
+                        type: "RESULT",
+                        taskId: message.taskId,
+                        success: false,
+                        error: error instanceof Error ? error.message : String(error)
+                    })
+                }
                 break
             }
 

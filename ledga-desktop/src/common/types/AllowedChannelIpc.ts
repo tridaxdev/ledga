@@ -66,6 +66,15 @@ export enum AllowedChannelIpc {
     RulesCreate = "rules:create",
     RulesUpdate = "rules:update",
     RulesDelete = "rules:delete",
+    CsvImport = "csv:import",
+    CsvImportProgress = "csv:import-progress",
+    CsvBrowseFile = "csv:browse-file",
+    ConnectionsSyncNow = "connections:sync-now",
+    ConnectionsUpdate = "connections:update",
+    SettingsExportCsv = "settings:export-csv",
+    SettingsClearData = "settings:clear-data",
+    SettingsRevealDb = "settings:reveal-db",
+    SettingsGetDbPath = "settings:get-db-path",
 }
 
 export function isAllowedChannel(channel: string): channel is AllowedChannelIpc {

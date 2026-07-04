@@ -52,8 +52,14 @@ export interface AIResponse<T = unknown> {
     error?: string
 }
 
-export const WorkerTaskTypeSchema = z.enum(["file_processing", "db_query", "cleanup_orphaned_files", "email_processing"])
+export const WorkerTaskTypeSchema = z.enum(["file_processing", "db_query", "cleanup_orphaned_files", "email_processing", "csv_import"])
 export type WorkerTaskType = z.infer<typeof WorkerTaskTypeSchema>
+
+export interface WorkerProgressMessage<TProgress = unknown> {
+    type: "PROGRESS"
+    taskId: string
+    progress: TProgress
+}
 
 export interface WorkerTaskMessage<TPayload = unknown> {
     type: "TASK"
@@ -67,4 +73,4 @@ export interface WorkerCancelMessage {
 }
 
 export type MainToWorkerMessage = WorkerTaskMessage<unknown>  | WorkerCancelMessage
-export type WorkerToMainMessage = WorkerResultMessage<unknown> | WorkerLogMessage 
+export type WorkerToMainMessage = WorkerResultMessage<unknown> | WorkerLogMessage | WorkerProgressMessage<unknown>
