@@ -1,15 +1,16 @@
+import * as fs from "node:fs"
+import * as path from "node:path"
 import { parentPort, workerData } from "worker_threads"
 import { CANCELLED_EXIT_CODE, type DbQueryTaskPayload, type MainToWorkerMessage } from "../../common/types/WorkerTypes"
 import { WorkerLogger } from "../logging/WorkerLogger"
 import { WorkerDatabaseManager } from "../Database/WorkerDatabaseManager"
-import { FileProcessorRegistry } from "../FileProcessing/FileProcessorRegistry"
-import type { FileProcessingResultMessage, FileProcessingTaskPayload } from "@/common/types/FileProcessingTypes"
-import { OrphanedFilesCleanupProcessor } from "../AssetManagement/OrphanedFilesCleanupProcessor"
-import { BackgroundWorkerAIService } from "./BackgroundWorkerAIService"
+import type { EmailProcessingTaskPayload, EmailProcessingWorkerResult } from "@/common/types/FileProcessingTypes"
+import { createScrapingManager } from "../scraping/createScrapingManager"
 
 const logger = new WorkerLogger()
-const { dbPath, appStorageDir } = workerData as { dbPath: string; appStorageDir: string }
+const { dbPath } = workerData as { dbPath: string; appStorageDir: string }
 const workerDb = new WorkerDatabaseManager(dbPath)
+const scrapingManager = createScrapingManager()
 
 if (!parentPort) {
     logger.error("BackgroundWorker must run in worker thread")
@@ -42,7 +43,6 @@ function handleUnhandledRejection(reason: unknown): void {
     process.exit(0)
 }
 
-const workerAIService = new BackgroundWorkerAIService(logger)
 let activeAbortController: AbortController | null = null
 
 async function handleTaskMessage(message: MainToWorkerMessage): Promise<void> {
@@ -54,30 +54,6 @@ async function handleTaskMessage(message: MainToWorkerMessage): Promise<void> {
 
     try {
         switch (message.taskType) {
-            case "file_processing": {
-                const { fileId, originalPath, fileName, appStorageDir, config } = message.payload as FileProcessingTaskPayload
-                const processor = await FileProcessorRegistry.createProcessor(originalPath, logger, config, workerAIService)
-                const result = await processor.processFileComplete(fileId, originalPath, appStorageDir, fileName)
-                const response: FileProcessingResultMessage = {
-                    type: "RESULT",
-                    taskId: message.taskId,
-                    success: result.success,
-                    result: result,
-                    error: result.error
-                }
-                if (result.extractedText) {
-                    const encoded = new TextEncoder().encode(result.extractedText)
-                    const transferableResponse = {
-                        ...response,
-                        result: { ...result, extractedText: undefined, extractedTextBuffer: encoded.buffer }
-                    }
-                    parentPort?.postMessage(transferableResponse, [encoded.buffer])
-                } else {
-                    parentPort?.postMessage(response)
-                }
-                break
-            }
-
             case "db_query": {
                 const { sql, params } = message.payload as DbQueryTaskPayload
                 const results = workerDb.executeQuery(sql, params)
@@ -90,14 +66,25 @@ async function handleTaskMessage(message: MainToWorkerMessage): Promise<void> {
                 break
             }
 
-            case "cleanup_orphaned_files": {
-                const processor = new OrphanedFilesCleanupProcessor(logger, workerDb, appStorageDir)
-                const result = await processor.process()
+            case "email_processing": {
+                const { emailId, appStorageDir: emailsDir } = message.payload as EmailProcessingTaskPayload
+                const filePath = path.join(emailsDir, `${emailId}.eml`)
+                let result: EmailProcessingWorkerResult
+                try {
+                    const raw = fs.readFileSync(filePath, "utf-8")
+                    const transaction = await scrapingManager.scrape(raw)
+                    result = transaction
+                        ? { success: true, transaction }
+                        : { success: false, error: "No matching bank scraper for this email" }
+                } catch (error) {
+                    result = { success: false, error: error instanceof Error ? error.message : String(error) }
+                }
                 parentPort?.postMessage({
                     type: "RESULT",
                     taskId: message.taskId,
-                    success: true,
-                    result
+                    success: result.success,
+                    result,
+                    error: result.success ? undefined : result.error
                 })
                 break
             }

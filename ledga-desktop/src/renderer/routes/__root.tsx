@@ -1,4 +1,7 @@
+import { useEffect, useRef, useState } from "react"
 import { createRootRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router"
+import { ActivityTray } from "../components/ActivityTray"
+import { useEmailActivity } from "../hooks/useEmailActivity"
 
 export const Route = createRootRoute({
     component: RootLayout
@@ -19,6 +22,22 @@ function RootLayout() {
 
     const isLedgerActive = pathname === "/ledger" || pathname.startsWith("/ledger/")
     const isSettingsActive = pathname === "/settings"
+
+    const { processing, failed } = useEmailActivity()
+    const isActive = processing > 0
+    const [showActivity, setShowActivity] = useState(false)
+    const activityRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        if (!showActivity) return
+        function handleClickOutside(event: MouseEvent) {
+            if (activityRef.current && !activityRef.current.contains(event.target as Node)) {
+                setShowActivity(false)
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside)
+        return () => document.removeEventListener("mousedown", handleClickOutside)
+    }, [showActivity])
 
     return (
         <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
@@ -66,32 +85,47 @@ function RootLayout() {
 
                 {/* Activity pill */}
                 <div
+                    ref={activityRef}
                     style={{
                         marginLeft: "auto",
                         paddingRight: 12,
                         WebkitAppRegion: "no-drag",
+                        position: "relative",
                     } as React.CSSProperties}
                 >
                     <button
+                        onClick={() => setShowActivity(prev => !prev)}
                         style={{
                             display: "flex",
                             alignItems: "center",
                             gap: 7,
-                            border: "1px solid #e5dfcc",
-                            background: "#fff",
-                            color: "#8e8270",
+                            border: `1px solid ${isActive ? "#b8dcc6" : "#e5dfcc"}`,
+                            background: isActive ? "#f4f8f1" : "#fff",
+                            color: isActive ? "#037b68" : "#8e8270",
                             borderRadius: 999,
                             padding: "4px 11px",
                             fontSize: 12,
-                            cursor: "default",
+                            fontWeight: 500,
+                            cursor: "pointer",
                         }}
                     >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                        <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.75"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={isActive ? { animation: "spin 1.6s linear infinite" } : undefined}
+                        >
                             <path d="M21 12a9 9 0 1 1-3-6.7L21 8" />
                             <path d="M21 3v5h-5" />
                         </svg>
-                        Idle
+                        {isActive ? `Parsing ${processing}` : "Idle"}
                     </button>
+                    {showActivity && <ActivityTray processing={processing} failed={failed} />}
                 </div>
             </div>
 

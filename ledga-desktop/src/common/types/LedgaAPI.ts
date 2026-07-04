@@ -80,4 +80,9 @@ export interface LedgaAPI {
         readonly disconnect: (id: string) => Promise<Result<void, Error>>
         readonly onOAuthCompleted: (callback: (connection: Connection) => void) => () => void
     }
+    readonly emails: {
+        readonly getProcessingCounts: () => Promise<{ processing: number; failed: number }>
+        readonly onProcessingUpdate: (callback: (counts: { processing: number; failed: number }) => void) => () => void
+        readonly onPulled: (callback: (event: { connectionId: string; newCount: number }) => void) => () => void
+    }
 }

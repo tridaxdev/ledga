@@ -5,8 +5,8 @@ import type { ConnectionRepository } from "../connections/ConnectionRepository";
 import type { Logger } from "../logging/FileLogger";
 import type { BackgroundWorkerManager } from "../BackgroundWorker/BackgroundWorkerManager";
 import type { GoogleOAuthService } from "../connections/GoogleOAuthService";
-import type { BackgroundTask } from "../BackgroundWorker/BackgroundWorkerManager";
-import type { MainWindowNotificationService } from "../WindowManagement/MainWindowNotification.ts";
+import type { BackgroundTask } from "../BackgroundWorker/WorkerPool";
+import type { MainWindowNotificationService } from "../windowManagement/MainWindowNotification";
 import type { CategoryRepository } from "../categories/CategoryRepository";
 import type { TransactionRepository } from "../transactions/TransactionRepository";
 import type { BillPaymentService } from "../billPayments/BillPaymentService";
@@ -27,16 +27,30 @@ import {
   ProcessingPriority,
   type EmailProcessingTaskPayload,
   type EmailProcessingWorkerResult,
-  type EmailMetadataTaskPayload,
   type EmailMetadataWorkerResult,
 } from "@/common/types/FileProcessingTypes";
 import { AllowedChannelIpc } from "@/common/types/AllowedChannelIpc";
 
 const EMAIL_TASK_TYPE = "email_processing";
-const EMAIL_METADATA_TASK_TYPE = "email_metadata";
 const EMAIL_TASK_TIMEOUT_MS = 120_000;
-const EMAIL_METADATA_TASK_TIMEOUT_MS = 30_000;
+const EMAIL_METADATA_TIMEOUT_MS = 30_000;
 const EMAILS_DIR = "emails";
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(message)), timeoutMs);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (err) => {
+        clearTimeout(timer);
+        reject(err);
+      },
+    );
+  });
+}
 
 export interface FetchAndStoreResult {
   newCount: number;
@@ -102,19 +116,22 @@ export class EmailService {
       try {
         const tokens =
           await this.googleOAuthService.refreshAccessToken(storedRefreshToken);
+        // Google only returns a new refresh_token occasionally (e.g. on re-consent) --
+        // when it's omitted, the previous one is still valid and must be kept.
+        const refreshToken = tokens.refreshToken ?? storedRefreshToken;
         await this.tokenStorage.setTokens(
           conn.id,
           tokens.accessToken,
-          tokens.refreshToken,
+          refreshToken,
         );
-        await this.connectionRepository.update(conn.id, {
-          expiryDate: tokens.expiryDate,
+        this.connectionRepository.update(conn.id, {
+          expiry_date: Math.floor(tokens.expiryDate.getTime() / 1000),
         });
         return {
           id: conn.id,
           expiryDate: tokens.expiryDate,
           accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken,
+          refreshToken,
         };
       } catch (err) {
         this.onTokenRefreshFailed?.(conn.id);
@@ -122,6 +139,12 @@ export class EmailService {
       }
     };
     return new GmailApiClass(connection, this.logger, refreshTokensFn);
+  }
+
+  private toExpiryDate(connection: Connection): Date | undefined {
+    return connection.expiry_date
+      ? new Date(connection.expiry_date * 1000)
+      : undefined;
   }
 
   private isGmailConnection(connection: Connection): boolean {
@@ -163,7 +186,7 @@ export class EmailService {
     });
     const api = this.createEmailApi({
       id: connectionId,
-      expiryDate: connection.expiryDate,
+      expiryDate: this.toExpiryDate(connection),
       accessToken,
       refreshToken,
     });
@@ -218,10 +241,23 @@ export class EmailService {
     this.enqueueEmailProcessingTask(connectionId, row);
   }
 
-  private enqueueEmailProcessingTask(
+  private async runEmailProcessingTask(
     connectionId: string,
     row: EmailRow,
-  ): void {
+  ): Promise<EmailProcessingWorkerResult> {
+    try {
+      await this.getEmailContentAndSaveToFile(connectionId, row.id);
+    } catch (err) {
+      this.logger.error("Failed to fetch email content before processing", {
+        emailId: row.id,
+        error: err instanceof Error ? err.message : String(err),
+      });
+      return {
+        success: false,
+        error: err instanceof Error ? err.message : String(err),
+      };
+    }
+
     const payload: EmailProcessingTaskPayload = {
       emailId: row.id,
       connectionId,
@@ -240,7 +276,7 @@ export class EmailService {
       reject: () => {},
       enqueuedAt: 0,
     };
-    const promise = this.backgroundWorkerManager
+    return this.backgroundWorkerManager
       .executeTask(processingTask)
       .catch((err) => {
         this.logger.error("Background email task failed", {
@@ -252,10 +288,32 @@ export class EmailService {
           error: err instanceof Error ? err.message : String(err),
         } as EmailProcessingWorkerResult;
       });
+  }
+
+  // Registers the in-flight promise synchronously (before any await) so that concurrent
+  // callers -- handleMetadataSuccess and enqueuePendingEmails can both target the same row --
+  // see it in emailProcessingPromises immediately and skip enqueuing a duplicate task.
+  private enqueueEmailProcessingTask(connectionId: string, row: EmailRow): void {
+    const promise = this.runEmailProcessingTask(connectionId, row);
     this.emailProcessingPromises.set(row.id, promise);
     promise
       .then((processingResult) => {
+        const timestamp = processingResult.success && processingResult.transaction
+          ? Math.floor(new Date(processingResult.transaction.timestamp).getTime() / 1000)
+          : null;
+        const hasValidTransaction =
+          processingResult.success &&
+          !!processingResult.transaction &&
+          Number.isFinite(timestamp);
+        if (!hasValidTransaction && processingResult.success && processingResult.transaction) {
+          this.logger.error("Discarding transaction with unparseable timestamp", {
+            emailId: row.id,
+            bank: processingResult.transaction.bank,
+            rawTimestamp: processingResult.transaction.timestamp,
+          });
+        }
         if (
+          hasValidTransaction &&
           processingResult.success &&
           processingResult.transaction &&
           !this.transactionRepository.findByEmailId(row.id)
@@ -266,6 +324,7 @@ export class EmailService {
           const inserted = this.transactionRepository.insert({
             emailId: row.id,
             ...processingResult.transaction,
+            timestamp: timestamp as number,
             merchant: applied.merchant,
             categoryId: this.resolveCategoryIdFromRuleName(applied.category),
           });
@@ -275,12 +334,10 @@ export class EmailService {
             bank: processingResult.transaction.bank,
           });
         }
-        this.emailRepository.updateStatus(
-          row.id,
-          processingResult.success ? "processed" : "failed",
-        );
+        const succeeded = processingResult.success && (!processingResult.transaction || hasValidTransaction);
+        this.emailRepository.updateStatus(row.id, succeeded ? "processed" : "failed");
         this.notifyProcessingUpdate();
-        if (processingResult.success) {
+        if (succeeded) {
           this.notificationService.notifyMainWindow(
             AllowedChannelIpc.EmailsPulled,
             { connectionId, newCount: 1 },
@@ -326,35 +383,33 @@ export class EmailService {
     });
     this.notifyProcessingUpdate();
 
-    const taskId = `metadata-${connectionId}-${providerMessageId}`;
-    const metadataPayload: EmailMetadataTaskPayload = {
-      connectionId,
-      providerMessageId,
-    };
-    const metadataTask: BackgroundTask<
-      EmailMetadataTaskPayload,
-      EmailMetadataWorkerResult
-    > = {
-      id: taskId,
-      type: EMAIL_METADATA_TASK_TYPE,
-      priority: ProcessingPriority.NORMAL,
-      payload: metadataPayload,
-      timeout: EMAIL_METADATA_TASK_TIMEOUT_MS,
-      resolve: () => {},
-      reject: () => {},
-      enqueuedAt: 0,
-    };
-    this.backgroundWorkerManager
-      .executeTask(metadataTask)
-      .then((result) => {
+    // Fetching message headers requires the Gmail API (network + keychain tokens), which only
+    // the main process has access to -- there is no worker thread to hand this off to, unlike
+    // email_processing below which is pure CPU-bound parsing of an already-downloaded file.
+    // Timed out so a hung request can't leave the placeholder row stuck in "processing" forever.
+    withTimeout(
+      this.getMessageMetadataForWorker(connectionId, providerMessageId),
+      EMAIL_METADATA_TIMEOUT_MS,
+      `Timed out fetching metadata for ${providerMessageId}`,
+    )
+      .then((header) => {
+        const result: EmailMetadataWorkerResult = header
+          ? {
+              emailId: header.emailId,
+              fromAddr: header.fromAddr,
+              timestamp: header.timestamp,
+              contentForHash: header.contentForHash,
+            }
+          : { skipped: true };
         this.handleMetadataResult(connectionId, row, result);
       })
       .catch((err) => {
-        this.logger.error("Background email metadata task failed", {
-          taskId,
+        this.logger.error("Email metadata fetch failed", {
           providerMessageId,
           error: err instanceof Error ? err.message : String(err),
         });
+        this.emailRepository.updateStatus(row.id, "failed");
+        this.notifyProcessingUpdate();
       });
     return true;
   }
@@ -423,7 +478,7 @@ export class EmailService {
     }
     const api = this.createEmailApi({
       id: connectionId,
-      expiryDate: connection.expiryDate,
+      expiryDate: this.toExpiryDate(connection),
       accessToken,
       refreshToken,
     });
@@ -492,68 +547,7 @@ export class EmailService {
       if (this.emailProcessingPromises.has(id)) continue;
       const row = this.emailRepository.findById(id);
       if (!row) continue;
-      const payload: EmailProcessingTaskPayload = {
-        emailId: row.id,
-        connectionId: row.connection_id,
-        appStorageDir: this.emailsDir,
-      };
-      const task: BackgroundTask<
-        EmailProcessingTaskPayload,
-        EmailProcessingWorkerResult
-      > = {
-        id: row.id,
-        type: EMAIL_TASK_TYPE,
-        priority: ProcessingPriority.HIGH,
-        payload,
-        timeout: EMAIL_TASK_TIMEOUT_MS,
-        resolve: () => {},
-        reject: () => {},
-        enqueuedAt: 0,
-      };
-      const promise = this.backgroundWorkerManager
-        .executeTask(task)
-        .catch((err) => {
-          this.logger.error("Background email task failed (resume)", {
-            emailId: row.id,
-            error: err instanceof Error ? err.message : String(err),
-          });
-          return {
-            success: false,
-            error: err instanceof Error ? err.message : String(err),
-          } as EmailProcessingWorkerResult;
-        });
-      this.emailProcessingPromises.set(row.id, promise);
-      promise
-        .then((result) => {
-          this.emailRepository.updateStatus(
-            row.id,
-            result.success ? "processed" : "failed",
-          );
-          this.notifyProcessingUpdate();
-          if (
-            result.success &&
-            result.transaction &&
-            !this.transactionRepository.findByEmailId(row.id)
-          ) {
-            const applied = this.rulesService.applyRules(
-              result.transaction.merchant,
-            );
-            const inserted = this.transactionRepository.insert({
-              emailId: row.id,
-              ...result.transaction,
-              merchant: applied.merchant,
-              categoryId: this.resolveCategoryIdFromRuleName(applied.category),
-            });
-            this.billPaymentService.tryLinkAfterInsert(inserted);
-            this.logger.debug("Persisted transaction from email", {
-              emailId: row.id,
-              bank: result.transaction.bank,
-            });
-          }
-        })
-        .finally(() => {
-          this.emailProcessingPromises.delete(row.id);
-        });
+      this.enqueueEmailProcessingTask(row.connection_id, row);
     }
   }
 
@@ -594,7 +588,7 @@ export class EmailService {
     }
     const api = this.createEmailApi({
       id: connectionId,
-      expiryDate: connection.expiryDate,
+      expiryDate: this.toExpiryDate(connection),
       accessToken,
       refreshToken,
     });

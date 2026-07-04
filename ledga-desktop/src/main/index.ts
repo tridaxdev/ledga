@@ -14,6 +14,14 @@ import { GoogleOAuthService } from "./connections/GoogleOAuthService"
 import { TokenStorageService } from "./encryption/TokenStorageService"
 import { setupIpcHandlers } from "./ipc/setupIpcHandlers"
 import { setupIpcHandlersForConnections } from "./connections/setupIpcHandlersForConnections"
+import { BackgroundWorkerManager } from "./BackgroundWorker/BackgroundWorkerManager"
+import { EmailRepository } from "./email/emailRepository"
+import { TransactionRepository } from "./transactions/TransactionRepository"
+import { CategoryRepository } from "./categories/CategoryRepository"
+import { RulesService } from "./rules/RulesService"
+import { BillPaymentService } from "./billPayments/BillPaymentService"
+import { EmailService } from "./email/emailService"
+import { setupIpcHandlersForEmail } from "./email/setupIpcHandlersForEmail"
 
 const loggerPath = path.join(app.getPath("userData"), "logs")
 const logger = new FileLogger(loggerPath, "debug")
@@ -64,6 +72,30 @@ if(!isSingleInstance) {
             const tokenStorage = new TokenStorageService(logger)
             const oauthService = new GoogleOAuthService(logger)
 
+            const backgroundWorkerManager = new BackgroundWorkerManager(dbPath, userDataPath, logger)
+            app.on("before-quit", () => {
+                backgroundWorkerManager.shutdown().catch(err => logger.error("Error shutting down background workers:", err))
+            })
+            const emailRepository = new EmailRepository(databaseManager, logger)
+            const transactionRepository = new TransactionRepository(databaseManager, logger)
+            const categoryRepository = new CategoryRepository(databaseManager, logger)
+            const rulesService = new RulesService(databaseManager, logger)
+            const billPaymentService = new BillPaymentService()
+            const emailService = new EmailService(
+                connectionRepository,
+                emailRepository,
+                transactionRepository,
+                categoryRepository,
+                rulesService,
+                backgroundWorkerManager,
+                oauthService,
+                tokenStorage,
+                notificationService,
+                userDataPath,
+                logger,
+                billPaymentService
+            )
+
             setupIpcHandlers(
                 debugService,
                 databaseDebugService
@@ -76,6 +108,12 @@ if(!isSingleInstance) {
                 notificationService,
                 logger
             )
+
+            setupIpcHandlersForEmail(emailService, logger)
+
+            windowManager.showMainWindow(app.getName())
+
+            emailService.enqueuePendingEmails()
         })
         .catch(async error => {
             logger.error("Fatal error during application startup:", error)
