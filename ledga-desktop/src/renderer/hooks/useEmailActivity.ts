@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react'
-import { getLedgaAPI } from './apiClient'
+import { useState, useEffect, useCallback } from "react"
+import { getLedgaAPI } from "./apiClient"
 
 export function useEmailActivity() {
     const [counts, setCounts] = useState({ processing: 0, failed: 0 })

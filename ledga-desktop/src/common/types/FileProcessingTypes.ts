@@ -217,15 +217,11 @@ export interface EmailProcessingTaskPayload {
     appStorageDir: string
 }
 
-export type EmailProcessingWorkerResult =
-    | { success: true; transaction: NormalizedTransaction }
-    | { success: false; error?: string }
+export type EmailProcessingWorkerResult = { success: true; transaction: NormalizedTransaction } | { success: false; error?: string }
 
 export interface EmailMetadataTaskPayload {
     connectionId: string
     providerMessageId: string
 }
 
-export type EmailMetadataWorkerResult =
-    | { skipped: true }
-    | { emailId: string; fromAddr: string; timestamp: number; contentForHash: string }
+export type EmailMetadataWorkerResult = { skipped: true } | { emailId: string; fromAddr: string; timestamp: number; contentForHash: string }

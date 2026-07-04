@@ -9,12 +9,7 @@ import type { MainWindowNotificationService } from "../windowManagement/MainWind
 import type { Logger } from "../logging/FileLogger"
 import { ProcessingPriority } from "@/common/types/WorkerTypes"
 import { AllowedChannelIpc } from "@/common/types/AllowedChannelIpc"
-import type {
-    CsvImportProgressEvent,
-    CsvImportRowProgress,
-    CsvImportTaskPayload,
-    CsvImportWorkerResult
-} from "@/common/types/CsvImportTypes"
+import type { CsvImportProgressEvent, CsvImportRowProgress, CsvImportTaskPayload, CsvImportWorkerResult } from "@/common/types/CsvImportTypes"
 
 const CSV_IMPORT_TASK_TIMEOUT_MS = 10 * 60_000
 
@@ -107,9 +102,7 @@ export class CsvImportService {
         }
 
         const applied = this.rulesService.applyRules(transaction.merchant)
-        const categoryId = applied.category
-            ? (this.categoryRepository.findIdByDisplayName(applied.category) ?? null)
-            : null
+        const categoryId = applied.category ? (this.categoryRepository.findIdByDisplayName(applied.category) ?? null) : null
         const parsedTimestamp = transaction.timestamp ? Math.floor(new Date(transaction.timestamp).getTime() / 1000) : 0
         const timestamp = Number.isFinite(parsedTimestamp) ? parsedTimestamp : 0
 

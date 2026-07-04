@@ -1,13 +1,10 @@
-import { AllowedChannelIpc } from "@/common/types/AllowedChannelIpc";
-import type { ReadLogFileRequest } from "@/common/types/DebugTypes";
-import type { DatabaseDebugService } from "../DebugService/DatabaseDebugService";
-import type { DebugService } from "../DebugService/DebugService";
-import { registerIpcHandler } from "./registerIpcHandler";
+import type { DatabaseDebugService } from "../DebugService/DatabaseDebugService"
+import type { DebugService } from "../DebugService/DebugService"
+import { registerIpcHandler } from "./registerIpcHandler"
+import type { ReadLogFileRequest } from "@/common/types/DebugTypes"
+import { AllowedChannelIpc } from "@/common/types/AllowedChannelIpc"
 
-export function setupIpcHandlers(
-    debugService: DebugService,
-    databaseDebugService: DatabaseDebugService,
-){
+export function setupIpcHandlers(debugService: DebugService, databaseDebugService: DatabaseDebugService) {
     registerIpcHandler(AllowedChannelIpc.DebugLogsGetFiles, () => debugService.getLogFiles())
     registerIpcHandler(AllowedChannelIpc.DebugLogsReadFile, (_, ...args) => {
         const request = args[0] as ReadLogFileRequest

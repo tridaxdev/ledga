@@ -39,12 +39,11 @@ export function createMainWindow(appName: string): BrowserWindow {
     mainWindow.webContents.setUserAgent(cleanUserAgent(appName, userAgent))
     mainWindow.webContents.on("will-navigate", (event, url) => {
         if (!event.isMainFrame) {
-            
-                event.preventDefault()
-                if (url.startsWith("http://") || url.startsWith("https://")) {
-                    shell.openExternal(url)
-                }
-            
+            event.preventDefault()
+            if (url.startsWith("http://") || url.startsWith("https://")) {
+                shell.openExternal(url)
+            }
+
             return
         }
 

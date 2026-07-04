@@ -127,10 +127,10 @@ export class FileProcessingManager {
     }
 
     private async executeFileProcessing(fileId: string, priority: ProcessingPriority, abortSignal?: AbortSignal): Promise<FileWorkerResult> {
-        let downloadedFilePath: string | null = null
+        const downloadedFilePath: string | null = null
 
         try {
-            let file = await this.assetRepository.getFileById(fileId)
+            const file = await this.assetRepository.getFileById(fileId)
 
             if (!file) {
                 this.logger.warn(`File not found for processing: ${fileId}`)
@@ -142,9 +142,9 @@ export class FileProcessingManager {
             }
 
             let localPath: string | undefined
-            
-                localPath = file.source.path
-            
+
+            localPath = file.source.path
+
             const extension = path.extname(file.name || "").toLowerCase()
             if (!extension || !(await FileProcessorRegistry.validateProcessor(localPath || ""))) {
                 return await this.handleUnsupportedFileType(file)

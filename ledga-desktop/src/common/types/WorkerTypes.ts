@@ -72,5 +72,5 @@ export interface WorkerCancelMessage {
     type: "CANCEL"
 }
 
-export type MainToWorkerMessage = WorkerTaskMessage<unknown>  | WorkerCancelMessage
+export type MainToWorkerMessage = WorkerTaskMessage<unknown> | WorkerCancelMessage
 export type WorkerToMainMessage = WorkerResultMessage<unknown> | WorkerLogMessage | WorkerProgressMessage<unknown>

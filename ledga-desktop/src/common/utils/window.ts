@@ -1,5 +1,5 @@
-import type { App } from "electron"
 import path from "path"
+import type { App } from "electron"
 
 export function cleanUserAgent(appName: string, userAgent: string): string {
     return userAgent

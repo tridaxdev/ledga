@@ -72,10 +72,8 @@ export interface LoadFileExecutionStep extends BaseToolExecutionStep {
     result?: GetSingleFileDetailsToolResult
 }
 
-export type AssistantToolExecutionStep =
-    | GetProjectFilesExecutionStep
-    | LoadFileExecutionStep
-export type ToolExecutionStep = AssistantToolExecutionStep 
+export type AssistantToolExecutionStep = GetProjectFilesExecutionStep | LoadFileExecutionStep
+export type ToolExecutionStep = AssistantToolExecutionStep
 
 export type AssistantMessageStep = ThinkingStep | ContentStep | AssistantToolExecutionStep
 export type UserMessageStep = ContentStep

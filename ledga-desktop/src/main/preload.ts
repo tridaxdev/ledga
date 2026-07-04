@@ -1,11 +1,11 @@
-import { AllowedChannelIpc } from "@/common/types/AllowedChannelIpc";
-import type { LedgaAPI } from "@/common/types/LedgaAPI";
-import type { Connection } from "@/common/types/Connection";
-import type { CategoryQueryParams, TransactionQueryParams } from "@/common/types/Transaction";
-import type { RuleInput } from "@/common/types/Rule";
-import type { CsvImportProgressEvent } from "@/common/types/CsvImportTypes";
-import type { AssistantStreamChunkEvent, AssistantStreamDoneEvent, AssistantStreamErrorEvent } from "@/common/types/ChatTypes";
-import { contextBridge, ipcRenderer, webUtils } from "electron";
+import { contextBridge, ipcRenderer, webUtils } from "electron"
+import { AllowedChannelIpc } from "@/common/types/AllowedChannelIpc"
+import type { LedgaAPI } from "@/common/types/LedgaAPI"
+import type { Connection } from "@/common/types/Connection"
+import type { CategoryQueryParams, TransactionQueryParams } from "@/common/types/Transaction"
+import type { RuleInput } from "@/common/types/Rule"
+import type { CsvImportProgressEvent } from "@/common/types/CsvImportTypes"
+import type { AssistantStreamChunkEvent, AssistantStreamDoneEvent, AssistantStreamErrorEvent } from "@/common/types/ChatTypes"
 
 const ledgaAPI: LedgaAPI = {
     getPathForFile: (file: File) => webUtils.getPathForFile(file),

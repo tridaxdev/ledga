@@ -52,7 +52,7 @@ export class ProjectAssetRepository {
                 type: "folder",
                 assetCount: (row.asset_count as number) || 0,
                 path: (row.path as string) || ""
-            } as ProjectFolder
+            }
         } else {
             const file = {
                 ...baseAsset,

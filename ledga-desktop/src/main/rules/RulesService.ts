@@ -76,23 +76,19 @@ export class RulesService {
         if (!rule) return { updatedCount: 0 }
 
         const keywordLower = rule.match_keyword.toLowerCase()
-        const candidates = this.transactionRepository
-            .findAll({})
-            .filter(t =>
+        const candidates = this.transactionRepository.findAll({}).filter(
+            t =>
                 // Merchant still contains the keyword (the common case), OR the merchant now
                 // exactly equals what this rule renamed it to -- a rename can erase the keyword
                 // from the merchant text entirely (e.g. "AMZN MKTP" -> "Amazon"), which would
                 // otherwise make a rename-only rule's effect permanently un-revertable on delete.
-                t.merchant.toLowerCase().includes(keywordLower) ||
-                (rule.rename_merchant !== null && t.merchant === rule.rename_merchant)
-            )
+                t.merchant.toLowerCase().includes(keywordLower) || (rule.rename_merchant !== null && t.merchant === rule.rename_merchant)
+        )
 
         let updatedCount = 0
         for (const transaction of candidates) {
             const applied = this.applyRules(transaction.merchant)
-            const newCategoryId = applied.category
-                ? (this.categoryRepository.findIdByDisplayName(applied.category) ?? null)
-                : null
+            const newCategoryId = applied.category ? (this.categoryRepository.findIdByDisplayName(applied.category) ?? null) : null
             const merchantChanged = applied.merchant !== transaction.merchant
             const categoryChanged = newCategoryId !== transaction.category_id
 
@@ -108,10 +104,7 @@ export class RulesService {
     }
 
     findById(id: string): RuleRow | null {
-        const rows = this.db.executeQuery(
-            "SELECT * FROM rules WHERE id = ? LIMIT 1",
-            [id]
-        ) as RuleRow[] | unknown
+        const rows = this.db.executeQuery("SELECT * FROM rules WHERE id = ? LIMIT 1", [id]) as RuleRow[] | unknown
         const list = Array.isArray(rows) ? rows : []
         return list[0] ?? null
     }
@@ -137,9 +130,7 @@ export class RulesService {
     }
 
     findAll(): RuleRow[] {
-        const rows = this.db.executeQuery(
-            "SELECT * FROM rules ORDER BY position ASC"
-        ) as RuleRow[] | unknown
+        const rows = this.db.executeQuery("SELECT * FROM rules ORDER BY position ASC") as RuleRow[] | unknown
         return Array.isArray(rows) ? rows : []
     }
 
@@ -148,18 +139,9 @@ export class RulesService {
         this.db.executeQuery(
             `INSERT INTO rules (id, match_keyword, rename_merchant, category_name, position)
              VALUES (?, ?, ?, ?, ?)`,
-            [
-                id,
-                input.matchKeyword,
-                input.renameMerchant ?? null,
-                input.categoryName ?? null,
-                input.position ?? 0
-            ]
+            [id, input.matchKeyword, input.renameMerchant ?? null, input.categoryName ?? null, input.position ?? 0]
         )
-        const rows = this.db.executeQuery(
-            "SELECT * FROM rules WHERE id = ? LIMIT 1",
-            [id]
-        ) as RuleRow[] | unknown
+        const rows = this.db.executeQuery("SELECT * FROM rules WHERE id = ? LIMIT 1", [id]) as RuleRow[] | unknown
         const list = Array.isArray(rows) ? rows : []
         this.logger.debug("Rule inserted", { id, matchKeyword: input.matchKeyword })
         return list[0] as RuleRow
@@ -189,10 +171,7 @@ export class RulesService {
         if (sets.length === 0) return
         params.push(id)
 
-        this.db.executeQuery(
-            `UPDATE rules SET ${sets.join(", ")} WHERE id = ?`,
-            params
-        )
+        this.db.executeQuery(`UPDATE rules SET ${sets.join(", ")} WHERE id = ?`, params)
     }
 
     delete(id: string): void {

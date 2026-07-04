@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { getLedgaAPI } from './apiClient'
+import { useState, useEffect, useCallback, useRef } from "react"
+import { getLedgaAPI } from "./apiClient"
 
-export type CsvImportStep = 'drop' | 'importing'
+export type CsvImportStep = "drop" | "importing"
 
 export function useCsvImport() {
-    const [step, setStep] = useState<CsvImportStep>('drop')
-    const [fileName, setFileName] = useState('')
+    const [step, setStep] = useState<CsvImportStep>("drop")
+    const [fileName, setFileName] = useState("")
     const [rowsParsed, setRowsParsed] = useState(0)
     const [totalRows, setTotalRows] = useState(0)
     const [rowsAdded, setRowsAdded] = useState(0)
@@ -23,8 +23,8 @@ export function useCsvImport() {
     }, [])
 
     const reset = useCallback(() => {
-        setStep('drop')
-        setFileName('')
+        setStep("drop")
+        setFileName("")
         setRowsParsed(0)
         setTotalRows(0)
         setRowsAdded(0)
@@ -34,10 +34,10 @@ export function useCsvImport() {
 
     const startImport = useCallback(async (filePath: string, displayName: string) => {
         setFileName(displayName)
-        setStep('importing')
+        setStep("importing")
         setError(null)
         const result = await getLedgaAPI().csv.import(filePath)
-        if (result.kind === 'success') {
+        if (result.kind === "success") {
             activeTaskId.current = result.value.taskId
         } else {
             setError(result.error.message)
@@ -46,7 +46,7 @@ export function useCsvImport() {
 
     const browseFile = useCallback(async () => {
         const result = await getLedgaAPI().csv.browseFile()
-        if (result.kind === 'success' && result.value) {
+        if (result.kind === "success" && result.value) {
             const displayName = result.value.split(/[\\/]/).pop() ?? result.value
             await startImport(result.value, displayName)
         }

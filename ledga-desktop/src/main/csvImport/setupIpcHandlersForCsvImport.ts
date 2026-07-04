@@ -1,8 +1,8 @@
 import { dialog } from "electron"
-import { AllowedChannelIpc } from "@/common/types/AllowedChannelIpc"
-import { ResultFactory } from "@/common/types/Result"
 import { registerIpcHandler } from "../ipc/registerIpcHandler"
 import type { CsvImportService } from "./CsvImportService"
+import { AllowedChannelIpc } from "@/common/types/AllowedChannelIpc"
+import { ResultFactory } from "@/common/types/Result"
 
 export function setupIpcHandlersForCsvImport(csvImportService: CsvImportService): void {
     registerIpcHandler(AllowedChannelIpc.CsvImport, (_, ...args) => {

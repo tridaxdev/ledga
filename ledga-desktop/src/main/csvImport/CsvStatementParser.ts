@@ -55,7 +55,7 @@ export function parseCsvStatement(content: string): ParsedCsvRow[] {
         const dateStr = (dateCol ? row[dateCol] : "")?.trim() ?? ""
         const parsedDate = dateStr ? new Date(dateStr) : null
         const hasValidDate = parsedDate !== null && !Number.isNaN(parsedDate.getTime())
-        const timestamp = hasValidDate ? (parsedDate as Date).toISOString() : ""
+        const timestamp = hasValidDate ? parsedDate.toISOString() : ""
 
         let amount = 0
         let type: "credit" | "debit" = "debit"

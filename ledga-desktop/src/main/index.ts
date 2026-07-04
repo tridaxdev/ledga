@@ -38,7 +38,7 @@ const windowManager = new WindowManager(app.getName(), logger)
 const isSingleInstance = app.requestSingleInstanceLock()
 let databaseManager: DatabaseManager | null = null
 
-if(!isSingleInstance) {
+if (!isSingleInstance) {
     logger.error("Instance of pylehound is already running, Quitting...")
     app.quit()
 } else {
@@ -53,7 +53,7 @@ if(!isSingleInstance) {
     })
 
     app.on("activate", () => {
-        windowManager.showMainWindow(app.getName());
+        windowManager.showMainWindow(app.getName())
     })
 
     process.on("SIGTERM", () => {
@@ -105,34 +105,16 @@ if(!isSingleInstance) {
                 billPaymentService
             )
 
-            setupIpcHandlers(
-                debugService,
-                databaseDebugService
-            )
+            setupIpcHandlers(debugService, databaseDebugService)
 
-            setupIpcHandlersForConnections(
-                connectionRepository,
-                tokenStorage,
-                oauthService,
-                notificationService,
-                emailService,
-                logger
-            )
+            setupIpcHandlersForConnections(connectionRepository, tokenStorage, oauthService, notificationService, emailService, logger)
 
             setupIpcHandlersForEmail(emailService, logger)
             setupIpcHandlersForTransactions(transactionRepository, categoryRepository)
             setupIpcHandlersForCategories(categoryRepository)
             setupIpcHandlersForRules(rulesService, notificationService)
 
-            const csvImportService = new CsvImportService(
-                transactionRepository,
-                categoryRepository,
-                rulesService,
-                billPaymentService,
-                backgroundWorkerManager,
-                notificationService,
-                logger
-            )
+            const csvImportService = new CsvImportService(transactionRepository, categoryRepository, rulesService, billPaymentService, backgroundWorkerManager, notificationService, logger)
             setupIpcHandlersForCsvImport(csvImportService)
 
             setupIpcHandlersForSettings(databaseManager, transactionRepository, categoryRepository, dbPath, logger)

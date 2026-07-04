@@ -16,26 +16,18 @@ export class CategoryRepository {
     ) {}
 
     findAll(): CategoryRow[] {
-        const rows = this.db.executeQuery(
-            "SELECT * FROM categories ORDER BY name ASC"
-        ) as CategoryRow[] | unknown
+        const rows = this.db.executeQuery("SELECT * FROM categories ORDER BY name ASC") as CategoryRow[] | unknown
         return Array.isArray(rows) ? rows : []
     }
 
     findById(id: string): CategoryRow | null {
-        const rows = this.db.executeQuery(
-            "SELECT * FROM categories WHERE id = ? LIMIT 1",
-            [id]
-        ) as CategoryRow[] | unknown
+        const rows = this.db.executeQuery("SELECT * FROM categories WHERE id = ? LIMIT 1", [id]) as CategoryRow[] | unknown
         const list = Array.isArray(rows) ? rows : []
         return list[0] ?? null
     }
 
     findIdByDisplayName(name: string): string | null {
-        const rows = this.db.executeQuery(
-            "SELECT id FROM categories WHERE LOWER(name) = LOWER(?) LIMIT 1",
-            [name]
-        ) as unknown
+        const rows = this.db.executeQuery("SELECT id FROM categories WHERE LOWER(name) = LOWER(?) LIMIT 1", [name]) as unknown
         const list = Array.isArray(rows) ? rows : []
         const row = list[0] as { id: string } | undefined
         return row?.id ?? null
@@ -43,14 +35,8 @@ export class CategoryRepository {
 
     insert(name: string, color: string): CategoryRow {
         const id = randomUUID()
-        this.db.executeQuery(
-            "INSERT INTO categories (id, name, color) VALUES (?, ?, ?)",
-            [id, name, color]
-        )
-        const rows = this.db.executeQuery(
-            "SELECT * FROM categories WHERE id = ? LIMIT 1",
-            [id]
-        ) as CategoryRow[] | unknown
+        this.db.executeQuery("INSERT INTO categories (id, name, color) VALUES (?, ?, ?)", [id, name, color])
+        const rows = this.db.executeQuery("SELECT * FROM categories WHERE id = ? LIMIT 1", [id]) as CategoryRow[] | unknown
         const list = Array.isArray(rows) ? rows : []
         this.logger.debug("Category inserted", { id, name })
         return list[0] as CategoryRow
@@ -72,10 +58,7 @@ export class CategoryRepository {
         if (sets.length === 0) return
         params.push(id)
 
-        this.db.executeQuery(
-            `UPDATE categories SET ${sets.join(", ")} WHERE id = ?`,
-            params
-        )
+        this.db.executeQuery(`UPDATE categories SET ${sets.join(", ")} WHERE id = ?`, params)
     }
 
     delete(id: string): void {

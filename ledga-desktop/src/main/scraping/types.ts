@@ -5,8 +5,8 @@ export type { NormalizedTransaction }
 export type EmailTransactionType = "credit" | "debit"
 
 export interface ParsedEmail {
-  from: string
-  subject: string
-  html: string
-  text?: string
+    from: string
+    subject: string
+    html: string
+    text?: string
 }

@@ -1,22 +1,22 @@
-import * as http from 'node:http'
-import { randomBytes, createHash } from 'node:crypto'
-import { shell } from 'electron'
-import { getAvailablePort } from '@/common/utils/getAvailablePort'
-import type { Logger } from '../logging/FileLogger'
+import * as http from "node:http"
+import { randomBytes, createHash } from "node:crypto"
+import { shell } from "electron"
+import type { Logger } from "../logging/FileLogger"
+import { getAvailablePort } from "@/common/utils/getAvailablePort"
 
-const CLIENT_ID = process.env.GOOGLE_CLIENT_ID ?? ''
-const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET ?? ''
-const SCOPES = ['https://mail.google.com/', 'https://www.googleapis.com/auth/userinfo.email']
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID ?? ""
+const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET ?? ""
+const SCOPES = ["https://mail.google.com/", "https://www.googleapis.com/auth/userinfo.email"]
 
 export class OAuthCancelledError extends Error {
     constructor() {
-        super('OAuth flow was cancelled')
-        this.name = 'OAuthCancelledError'
+        super("OAuth flow was cancelled")
+        this.name = "OAuthCancelledError"
     }
 }
 
 function base64url(input: Buffer): string {
-    return input.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+    return input.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")
 }
 
 export interface OAuthResult {
@@ -51,7 +51,7 @@ export class GoogleOAuthService {
         const port = await getAvailablePort()
         const redirectUri = `http://localhost:${port}/callback`
         const codeVerifier = base64url(randomBytes(32))
-        const codeChallenge = base64url(createHash('sha256').update(codeVerifier).digest())
+        const codeChallenge = base64url(createHash("sha256").update(codeVerifier).digest())
 
         const code = await this.waitForAuthCode(port, redirectUri, codeChallenge)
         const tokens = await this.exchangeCodeForTokens(code, redirectUri, codeVerifier)
@@ -73,12 +73,12 @@ export class GoogleOAuthService {
             client_id: CLIENT_ID,
             client_secret: CLIENT_SECRET,
             refresh_token: refreshToken,
-            grant_type: 'refresh_token'
+            grant_type: "refresh_token"
         })
 
-        const response = await fetch('https://oauth2.googleapis.com/token', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        const response = await fetch("https://oauth2.googleapis.com/token", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: params.toString()
         })
 
@@ -86,7 +86,7 @@ export class GoogleOAuthService {
             throw new Error(`Token refresh failed: ${response.status}`)
         }
 
-        const data = await response.json() as TokenResponse
+        const data = (await response.json()) as TokenResponse
         const expiryDate = new Date(Date.now() + data.expires_in * 1000)
 
         return { accessToken: data.access_token, refreshToken: data.refresh_token, expiryDate }
@@ -95,17 +95,17 @@ export class GoogleOAuthService {
     private waitForAuthCode(port: number, redirectUri: string, codeChallenge: string): Promise<string> {
         return new Promise((resolve, reject) => {
             const server = http.createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
-                const url = new URL(req.url ?? '/', `http://localhost:${port}`)
-                if (url.pathname !== '/callback') {
+                const url = new URL(req.url ?? "/", `http://localhost:${port}`)
+                if (url.pathname !== "/callback") {
                     res.end()
                     return
                 }
 
-                const code = url.searchParams.get('code')
-                const error = url.searchParams.get('error')
+                const code = url.searchParams.get("code")
+                const error = url.searchParams.get("error")
 
-                res.writeHead(200, { 'Content-Type': 'text/html' })
-                res.end('<html><body><h1>Authorization complete. You can close this tab.</h1></body></html>')
+                res.writeHead(200, { "Content-Type": "text/html" })
+                res.end("<html><body><h1>Authorization complete. You can close this tab.</h1></body></html>")
                 server.close()
                 this.activeFlow = null
 
@@ -114,17 +114,17 @@ export class GoogleOAuthService {
                 } else if (code) {
                     resolve(code)
                 } else {
-                    reject(new Error('No authorization code received'))
+                    reject(new Error("No authorization code received"))
                 }
             })
 
-            server.on('error', (err: Error) => reject(err))
+            server.on("error", (err: Error) => reject(err))
 
             this.activeFlow = { server, reject }
 
-            server.listen(port, '127.0.0.1', () => {
+            server.listen(port, "127.0.0.1", () => {
                 const authUrl = this.buildAuthUrl(redirectUri, codeChallenge)
-                this.logger.info('Opening browser for OAuth flow')
+                this.logger.info("Opening browser for OAuth flow")
                 shell.openExternal(authUrl).catch((err: unknown) => {
                     server.close()
                     this.activeFlow = null
@@ -138,12 +138,12 @@ export class GoogleOAuthService {
         const params = new URLSearchParams({
             client_id: CLIENT_ID,
             redirect_uri: redirectUri,
-            response_type: 'code',
-            scope: SCOPES.join(' '),
-            access_type: 'offline',
-            prompt: 'consent',
+            response_type: "code",
+            scope: SCOPES.join(" "),
+            access_type: "offline",
+            prompt: "consent",
             code_challenge: codeChallenge,
-            code_challenge_method: 'S256'
+            code_challenge_method: "S256"
         })
         return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`
     }
@@ -154,13 +154,13 @@ export class GoogleOAuthService {
             client_secret: CLIENT_SECRET,
             code,
             redirect_uri: redirectUri,
-            grant_type: 'authorization_code',
+            grant_type: "authorization_code",
             code_verifier: codeVerifier
         })
 
-        const response = await fetch('https://oauth2.googleapis.com/token', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        const response = await fetch("https://oauth2.googleapis.com/token", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: params.toString()
         })
 
@@ -173,7 +173,7 @@ export class GoogleOAuthService {
     }
 
     private async getUserEmail(accessToken: string): Promise<string> {
-        const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+        const response = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
             headers: { Authorization: `Bearer ${accessToken}` }
         })
 
@@ -181,7 +181,7 @@ export class GoogleOAuthService {
             throw new Error(`Failed to get user info: ${response.status}`)
         }
 
-        const data = await response.json() as UserInfoResponse
+        const data = (await response.json()) as UserInfoResponse
         return data.email
     }
 }

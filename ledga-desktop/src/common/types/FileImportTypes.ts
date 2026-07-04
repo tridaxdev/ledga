@@ -1,4 +1,4 @@
-import type { LocalFileSource } from "./SourceFileTypes";
+import type { LocalFileSource } from "./SourceFileTypes"
 
 export type ImportFile = { fileName: string; source: LocalFileSource; folderId?: string }
 export type DownloadedFile = { filePath: string; fileName: string }

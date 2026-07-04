@@ -1,13 +1,6 @@
 import type { Worker } from "worker_threads"
 import type { Logger } from "../logging/FileLogger"
-import {
-    CANCELLED_EXIT_CODE,
-    type ProcessingPriority,
-    type WorkerTaskType,
-    type WorkerToMainMessage,
-    type WorkerTaskMessage,
-    type WorkerLogMessage,
-} from "../../common/types/WorkerTypes"
+import { CANCELLED_EXIT_CODE, type ProcessingPriority, type WorkerTaskType, type WorkerToMainMessage, type WorkerTaskMessage, type WorkerLogMessage } from "../../common/types/WorkerTypes"
 
 export interface BackgroundTask<TPayload, TResult, TProgress = unknown> {
     id: string
@@ -140,7 +133,7 @@ export class WorkerPool {
             }
 
             this.logger.debug(`[${this.name}] Worker completed task ${task.id}`)
-            ;(task.resolve as (result: unknown) => void)(result)
+            task.resolve(result)
 
             this.processQueue().catch(error => {
                 this.logger.error(`[${this.name}] Error processing queue after task completion:`, error)

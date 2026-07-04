@@ -1,13 +1,13 @@
 import { streamText, tool, type ModelMessage } from "ai"
 import { google } from "@ai-sdk/google"
 import { z } from "zod"
-import { AllowedChannelIpc } from "@/common/types/AllowedChannelIpc"
-import type { ToolCallRecord, ChatMessage } from "@/common/types/ChatTypes"
-import type { ChatRepository, ChatMessageRow } from "./ChatRepository"
 import type { TransactionRepository } from "../transactions/TransactionRepository"
 import type { CategoryRepository } from "../categories/CategoryRepository"
 import type { MainWindowNotificationService } from "../windowManagement/MainWindowNotification"
 import type { Logger } from "../logging/FileLogger"
+import type { ChatRepository, ChatMessageRow } from "./ChatRepository"
+import type { ToolCallRecord, ChatMessage } from "@/common/types/ChatTypes"
+import { AllowedChannelIpc } from "@/common/types/AllowedChannelIpc"
 
 const MODEL_ID = "gemini-2.0-flash"
 const MAX_HISTORY_MESSAGES = 20
@@ -49,13 +49,9 @@ export class AssistantService {
                 keyword: z.string().optional().describe("Merchant name keyword to search for")
             }),
             execute: async ({ dateFrom, dateTo, category, keyword }) => {
-                const from = dateFrom && !Number.isNaN(Date.parse(dateFrom))
-                    ? Math.floor(new Date(`${dateFrom}T00:00:00Z`).getTime() / 1000)
-                    : undefined
-                const to = dateTo && !Number.isNaN(Date.parse(dateTo))
-                    ? Math.floor(new Date(`${dateTo}T23:59:59Z`).getTime() / 1000)
-                    : undefined
-                const categoryId = category ? this.categoryRepository.findIdByDisplayName(category) ?? undefined : undefined
+                const from = dateFrom && !Number.isNaN(Date.parse(dateFrom)) ? Math.floor(new Date(`${dateFrom}T00:00:00Z`).getTime() / 1000) : undefined
+                const to = dateTo && !Number.isNaN(Date.parse(dateTo)) ? Math.floor(new Date(`${dateTo}T23:59:59Z`).getTime() / 1000) : undefined
+                const categoryId = category ? (this.categoryRepository.findIdByDisplayName(category) ?? undefined) : undefined
                 // The model can't ground its answer correctly if it doesn't know a category name
                 // didn't resolve (the query would otherwise silently run unfiltered) -- surface it
                 // explicitly rather than pretending the filter was applied.
@@ -175,12 +171,7 @@ export class AssistantService {
                     this.notificationService.notifyMainWindow(AllowedChannelIpc.AssistantStreamDone, { chatId, message: null })
                     return
                 }
-                const savedRow = this.chatRepository.appendMessage(
-                    chatId,
-                    "assistant",
-                    fullText,
-                    toolCalls.size > 0 ? Array.from(toolCalls.values()) : undefined
-                )
+                const savedRow = this.chatRepository.appendMessage(chatId, "assistant", fullText, toolCalls.size > 0 ? Array.from(toolCalls.values()) : undefined)
                 this.notificationService.notifyMainWindow(AllowedChannelIpc.AssistantStreamDone, {
                     chatId,
                     message: toChatMessage(savedRow)

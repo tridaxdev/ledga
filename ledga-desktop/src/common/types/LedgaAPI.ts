@@ -1,4 +1,3 @@
-import type { Alert } from "@/renderer/AlertFeature/types/Alert"
 import type { AppInstallation, UpdateCheckResult, UpdateProgressCallback } from "./AppTypes"
 import type { Result } from "./Result"
 import type { Connection } from "./Connection"
@@ -7,9 +6,39 @@ import type { Category } from "./Category"
 import type { Rule, RuleInput } from "./Rule"
 import type { CsvImportProgressEvent } from "./CsvImportTypes"
 import type { Chat, ChatMessage, AssistantStreamChunkEvent, AssistantStreamDoneEvent, AssistantStreamErrorEvent } from "./ChatTypes"
-import type { Conversation, ConversationCreatedEvent, ConversationDeletedEvent, ConversationReferencesUpdatedEvent, ConversationStreamEvent, ConversationUpdatedEvent, ConversationWithMessages, CreateConversationRequest, CreateMessageRequest, DeleteConversationRequest, EditUserMessageRequest, GetConversationRequest, GetConversationsByProjectRequest, Message, RetryFromMessageRequest, StopConversationStreamRequest, ToolApprovalDecision, UpdateConversationRequest } from "./BaseTypes"
-import type { GetFileRequest, GetFilesByFolderRequest, GetFilesByProjectRequest, GetFilesByConversationRequest, ImportFilesRequest, RetryImportRequest, OpenFileRequest, RetryFileProcessingRequest, DeleteAssetsRequest } from "./FileImportTypes"
+import type {
+    Conversation,
+    ConversationCreatedEvent,
+    ConversationDeletedEvent,
+    ConversationReferencesUpdatedEvent,
+    ConversationStreamEvent,
+    ConversationUpdatedEvent,
+    ConversationWithMessages,
+    CreateConversationRequest,
+    CreateMessageRequest,
+    DeleteConversationRequest,
+    EditUserMessageRequest,
+    GetConversationRequest,
+    GetConversationsByProjectRequest,
+    Message,
+    RetryFromMessageRequest,
+    StopConversationStreamRequest,
+    ToolApprovalDecision,
+    UpdateConversationRequest
+} from "./BaseTypes"
+import type {
+    GetFileRequest,
+    GetFilesByFolderRequest,
+    GetFilesByProjectRequest,
+    GetFilesByConversationRequest,
+    ImportFilesRequest,
+    RetryImportRequest,
+    OpenFileRequest,
+    RetryFileProcessingRequest,
+    DeleteAssetsRequest
+} from "./FileImportTypes"
 import type { PyleHoundAsset, PyleHoundFile, AssetUpsertedEvent, AssetDeletedEvent } from "./ProjectTypes"
+import type { Alert } from "@/renderer/AlertFeature/types/Alert"
 
 export interface DatabaseStats {
     size: string

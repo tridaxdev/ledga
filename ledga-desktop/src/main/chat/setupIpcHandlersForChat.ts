@@ -1,10 +1,10 @@
+import { registerIpcHandler } from "../ipc/registerIpcHandler"
+import type { Logger } from "../logging/FileLogger"
+import type { ChatRepository, ChatMessageRow } from "./ChatRepository"
+import type { AssistantService } from "./AssistantService"
 import { AllowedChannelIpc } from "@/common/types/AllowedChannelIpc"
 import { ResultFactory } from "@/common/types/Result"
 import type { ChatMessage } from "@/common/types/ChatTypes"
-import { registerIpcHandler } from "../ipc/registerIpcHandler"
-import type { ChatRepository, ChatMessageRow } from "./ChatRepository"
-import type { AssistantService } from "./AssistantService"
-import type { Logger } from "../logging/FileLogger"
 
 function toChatMessage(row: ChatMessageRow): ChatMessage {
     return {
@@ -13,11 +13,7 @@ function toChatMessage(row: ChatMessageRow): ChatMessage {
     }
 }
 
-export function setupIpcHandlersForChat(
-    chatRepository: ChatRepository,
-    assistantService: AssistantService,
-    logger: Logger
-): void {
+export function setupIpcHandlersForChat(chatRepository: ChatRepository, assistantService: AssistantService, logger: Logger): void {
     registerIpcHandler(AllowedChannelIpc.ChatsGetAll, () => {
         return ResultFactory.success(chatRepository.findAllChats())
     })

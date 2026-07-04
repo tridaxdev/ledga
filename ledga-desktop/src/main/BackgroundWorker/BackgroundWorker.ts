@@ -4,10 +4,10 @@ import { parentPort, workerData } from "worker_threads"
 import { CANCELLED_EXIT_CODE, type DbQueryTaskPayload, type MainToWorkerMessage } from "../../common/types/WorkerTypes"
 import { WorkerLogger } from "../logging/WorkerLogger"
 import { WorkerDatabaseManager } from "../Database/WorkerDatabaseManager"
-import type { EmailProcessingTaskPayload, EmailProcessingWorkerResult } from "@/common/types/FileProcessingTypes"
-import type { CsvImportTaskPayload, CsvImportWorkerResult } from "@/common/types/CsvImportTypes"
 import { createScrapingManager } from "../scraping/createScrapingManager"
 import { parseCsvStatement } from "../csvImport/CsvStatementParser"
+import type { EmailProcessingTaskPayload, EmailProcessingWorkerResult } from "@/common/types/FileProcessingTypes"
+import type { CsvImportTaskPayload, CsvImportWorkerResult } from "@/common/types/CsvImportTypes"
 
 const logger = new WorkerLogger()
 const { dbPath } = workerData as { dbPath: string; appStorageDir: string }
@@ -75,9 +75,7 @@ async function handleTaskMessage(message: MainToWorkerMessage): Promise<void> {
                 try {
                     const raw = fs.readFileSync(filePath, "utf-8")
                     const transaction = await scrapingManager.scrape(raw)
-                    result = transaction
-                        ? { success: true, transaction }
-                        : { success: false, error: "No matching bank scraper for this email" }
+                    result = transaction ? { success: true, transaction } : { success: false, error: "No matching bank scraper for this email" }
                 } catch (error) {
                     result = { success: false, error: error instanceof Error ? error.message : String(error) }
                 }

@@ -1,13 +1,16 @@
-import type { BrowserWindow } from "electron";
-import type {Logger} from "../logging/FileLogger"
-import { createMainWindow, createAuthWindow} from "./windowFactories"
+import type { BrowserWindow } from "electron"
+import type { Logger } from "../logging/FileLogger"
+import { createMainWindow, createAuthWindow } from "./windowFactories"
 
 export class WindowManager {
-    private appName: string 
+    private appName: string
     private mainWindow: BrowserWindow | null = null
     private authWindow: BrowserWindow | null = null
 
-    constructor(appName: string, private logger: Logger) {
+    constructor(
+        appName: string,
+        private logger: Logger
+    ) {
         this.appName = appName
     }
 

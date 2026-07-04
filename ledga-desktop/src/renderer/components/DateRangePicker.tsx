@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from 'react'
-import { useDateRange, dateRangeToBounds, type RangeMode } from '../hooks/useDateRange'
+import { useState, useRef, useEffect } from "react"
+import { useDateRange, dateRangeToBounds, type RangeMode } from "../hooks/useDateRange"
 
-const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
 export function DateRangePicker() {
     const { state, update } = useDateRange()
@@ -14,8 +14,8 @@ export function DateRangePicker() {
         function handleClickOutside(event: MouseEvent) {
             if (ref.current && !ref.current.contains(event.target as Node)) setOpen(false)
         }
-        document.addEventListener('mousedown', handleClickOutside)
-        return () => document.removeEventListener('mousedown', handleClickOutside)
+        document.addEventListener("mousedown", handleClickOutside)
+        return () => document.removeEventListener("mousedown", handleClickOutside)
     }, [open])
 
     function selectMode(mode: RangeMode) {
@@ -23,19 +23,24 @@ export function DateRangePicker() {
     }
 
     return (
-        <div ref={ref} style={{ position: 'relative' }}>
-            <button
-                onClick={() => setOpen(prev => !prev)}
-                style={{ textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'block' }}
-            >
-                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-ledga-text-muted)', marginBottom: 4 }}>
-                    Ledger
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 34, fontWeight: 600, letterSpacing: '-0.01em', margin: 0, color: 'var(--color-ledga-text)' }}>
-                        {title}
-                    </h1>
-                    <span style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid var(--color-ledga-border)', background: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-ledga-text-muted)' }}>
+        <div ref={ref} style={{ position: "relative" }}>
+            <button onClick={() => setOpen(prev => !prev)} style={{ textAlign: "left", background: "none", border: "none", cursor: "pointer", padding: 0, display: "block" }}>
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--color-ledga-text-muted)", marginBottom: 4 }}>Ledger</div>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <h1 style={{ fontFamily: "var(--font-serif)", fontSize: 34, fontWeight: 600, letterSpacing: "-0.01em", margin: 0, color: "var(--color-ledga-text)" }}>{title}</h1>
+                    <span
+                        style={{
+                            width: 26,
+                            height: 26,
+                            borderRadius: 6,
+                            border: "1px solid var(--color-ledga-border)",
+                            background: "#fff",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "var(--color-ledga-text-muted)"
+                        }}
+                    >
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round" strokeLinejoin="round">
                             <path d="m6 9 6 6 6-6" />
                         </svg>
@@ -46,35 +51,35 @@ export function DateRangePicker() {
             {open && (
                 <div
                     style={{
-                        position: 'absolute',
-                        top: 'calc(100% + 8px)',
+                        position: "absolute",
+                        top: "calc(100% + 8px)",
                         left: 0,
                         width: 304,
-                        backgroundColor: '#fff',
-                        border: '1px solid var(--color-ledga-border)',
+                        backgroundColor: "#fff",
+                        border: "1px solid var(--color-ledga-border)",
                         borderRadius: 10,
-                        boxShadow: '0 14px 30px -10px rgba(63,56,47,.24), 0 4px 10px -2px rgba(63,56,47,.1)',
+                        boxShadow: "0 14px 30px -10px rgba(63,56,47,.24), 0 4px 10px -2px rgba(63,56,47,.1)",
                         zIndex: 40,
                         padding: 14
                     }}
                 >
-                    <div style={{ display: 'flex', gap: 4, background: 'var(--color-ledga-sidebar)', border: '1px solid var(--color-ledga-border)', borderRadius: 8, padding: 3, marginBottom: 13 }}>
-                        {(['month', 'year', 'custom'] as RangeMode[]).map(mode => (
+                    <div style={{ display: "flex", gap: 4, background: "var(--color-ledga-sidebar)", border: "1px solid var(--color-ledga-border)", borderRadius: 8, padding: 3, marginBottom: 13 }}>
+                        {(["month", "year", "custom"] as RangeMode[]).map(mode => (
                             <button
                                 key={mode}
                                 onClick={() => selectMode(mode)}
                                 style={{
                                     flex: 1,
-                                    textTransform: 'capitalize',
-                                    padding: '6px 0',
+                                    textTransform: "capitalize",
+                                    padding: "6px 0",
                                     borderRadius: 6,
-                                    border: 'none',
+                                    border: "none",
                                     fontSize: 13,
                                     fontWeight: 500,
-                                    cursor: 'pointer',
-                                    background: state.mode === mode ? '#fff' : 'transparent',
-                                    color: state.mode === mode ? 'var(--color-ledga-text)' : 'var(--color-ledga-text-secondary)',
-                                    boxShadow: state.mode === mode ? '0 1px 2px rgba(63,56,47,.12)' : 'none'
+                                    cursor: "pointer",
+                                    background: state.mode === mode ? "#fff" : "transparent",
+                                    color: state.mode === mode ? "var(--color-ledga-text)" : "var(--color-ledga-text-secondary)",
+                                    boxShadow: state.mode === mode ? "0 1px 2px rgba(63,56,47,.12)" : "none"
                                 }}
                             >
                                 {mode}
@@ -82,19 +87,22 @@ export function DateRangePicker() {
                         ))}
                     </div>
 
-                    {state.mode === 'month' && (
+                    {state.mode === "month" && (
                         <>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
                                 <IconButton onClick={() => update({ year: state.year - 1 })} path="m15 18-6-6 6-6" />
-                                <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-ledga-text)' }}>{state.year}</span>
+                                <span style={{ fontSize: 15, fontWeight: 600, color: "var(--color-ledga-text)" }}>{state.year}</span>
                                 <IconButton onClick={() => update({ year: state.year + 1 })} path="m9 18 6-6-6-6" />
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 5 }}>
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 5 }}>
                                 {MONTH_SHORT.map((label, index) => (
                                     <button
                                         key={label}
-                                        onClick={() => { update({ mode: 'month', month: index }); setOpen(false) }}
-                                        style={monthYearButtonStyle(state.mode === 'month' && state.month === index)}
+                                        onClick={() => {
+                                            update({ mode: "month", month: index })
+                                            setOpen(false)
+                                        }}
+                                        style={monthYearButtonStyle(state.mode === "month" && state.month === index)}
                                     >
                                         {label}
                                     </button>
@@ -103,12 +111,15 @@ export function DateRangePicker() {
                         </>
                     )}
 
-                    {state.mode === 'year' && (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6 }}>
+                    {state.mode === "year" && (
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 6 }}>
                             {Array.from({ length: 4 }, (_, i) => state.year - 2 + i).map(year => (
                                 <button
                                     key={year}
-                                    onClick={() => { update({ mode: 'year', year }); setOpen(false) }}
+                                    onClick={() => {
+                                        update({ mode: "year", year })
+                                        setOpen(false)
+                                    }}
                                     style={monthYearButtonStyle(state.year === year)}
                                 >
                                     {year}
@@ -117,13 +128,13 @@ export function DateRangePicker() {
                         </div>
                     )}
 
-                    {state.mode === 'custom' && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+                    {state.mode === "custom" && (
+                        <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
                             <DateField label="From" value={state.customFrom} onChange={v => update({ customFrom: v })} />
                             <DateField label="To" value={state.customTo} onChange={v => update({ customTo: v })} />
                             <button
                                 onClick={() => setOpen(false)}
-                                style={{ background: 'var(--color-ledga-brand)', color: '#fff', border: 'none', borderRadius: 7, padding: 9, fontSize: 13, fontWeight: 500, cursor: 'pointer' }}
+                                style={{ background: "var(--color-ledga-brand)", color: "#fff", border: "none", borderRadius: 7, padding: 9, fontSize: 13, fontWeight: 500, cursor: "pointer" }}
                             >
                                 Apply range
                             </button>
@@ -137,14 +148,14 @@ export function DateRangePicker() {
 
 function monthYearButtonStyle(selected: boolean): React.CSSProperties {
     return {
-        padding: '8px 0',
+        padding: "8px 0",
         borderRadius: 6,
-        border: 'none',
+        border: "none",
         fontSize: 13,
         fontWeight: 500,
-        cursor: 'pointer',
-        background: selected ? 'var(--color-ledga-brand)' : 'transparent',
-        color: selected ? '#fff' : 'var(--color-ledga-text)'
+        cursor: "pointer",
+        background: selected ? "var(--color-ledga-brand)" : "transparent",
+        color: selected ? "#fff" : "var(--color-ledga-text)"
     }
 }
 
@@ -152,7 +163,18 @@ function IconButton({ onClick, path }: { onClick: () => void; path: string }) {
     return (
         <button
             onClick={onClick}
-            style={{ width: 28, height: 28, border: '1px solid var(--color-ledga-border)', borderRadius: 6, background: '#fff', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-ledga-text-secondary)' }}
+            style={{
+                width: 28,
+                height: 28,
+                border: "1px solid var(--color-ledga-border)",
+                borderRadius: 6,
+                background: "#fff",
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "var(--color-ledga-text-secondary)"
+            }}
         >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round" strokeLinejoin="round">
                 <path d={path} />
@@ -164,14 +186,21 @@ function IconButton({ onClick, path }: { onClick: () => void; path: string }) {
 function DateField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
     return (
         <div>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--color-ledga-text-muted)', marginBottom: 4 }}>
-                {label}
-            </div>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-ledga-text-muted)", marginBottom: 4 }}>{label}</div>
             <input
                 type="date"
                 value={value}
                 onChange={e => onChange(e.target.value)}
-                style={{ width: '100%', border: '1px solid var(--color-ledga-border)', borderRadius: 6, padding: '7px 9px', fontFamily: 'inherit', fontSize: 13, color: 'var(--color-ledga-text)', background: '#fff' }}
+                style={{
+                    width: "100%",
+                    border: "1px solid var(--color-ledga-border)",
+                    borderRadius: 6,
+                    padding: "7px 9px",
+                    fontFamily: "inherit",
+                    fontSize: 13,
+                    color: "var(--color-ledga-text)",
+                    background: "#fff"
+                }}
             />
         </div>
     )

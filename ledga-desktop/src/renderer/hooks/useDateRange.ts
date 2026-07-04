@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from "react"
 
-export type RangeMode = 'month' | 'year' | 'custom'
+export type RangeMode = "month" | "year" | "custom"
 
 export interface DateRangeState {
     mode: RangeMode
@@ -10,14 +10,11 @@ export interface DateRangeState {
     customTo: string
 }
 
-const MONTH_NAMES = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-]
+const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
 function defaultState(): DateRangeState {
     const now = new Date()
-    return { mode: 'month', month: now.getMonth(), year: now.getFullYear(), customFrom: '', customTo: '' }
+    return { mode: "month", month: now.getMonth(), year: now.getFullYear(), customFrom: "", customTo: "" }
 }
 
 // Module-level so the selected range survives navigating away from /ledger and back,
@@ -38,14 +35,14 @@ function unixSecondsAt(year: number, month: number, day: number): number {
 }
 
 export function dateRangeToBounds(state: DateRangeState): { from?: number; to?: number; title: string } {
-    if (state.mode === 'month') {
+    if (state.mode === "month") {
         return {
             from: unixSecondsAt(state.year, state.month, 1),
             to: unixSecondsAt(state.year, state.month + 1, 1) - 1,
             title: `${MONTH_NAMES[state.month]} ${state.year}`
         }
     }
-    if (state.mode === 'year') {
+    if (state.mode === "year") {
         return {
             from: unixSecondsAt(state.year, 0, 1),
             to: unixSecondsAt(state.year + 1, 0, 1) - 1,
@@ -59,7 +56,7 @@ export function dateRangeToBounds(state: DateRangeState): { from?: number; to?: 
             title: `${state.customFrom} → ${state.customTo}`
         }
     }
-    return { title: 'Custom range' }
+    return { title: "Custom range" }
 }
 
 export function useDateRange() {

@@ -46,10 +46,7 @@ export class TransactionRepository {
 
     insert(input: TransactionInsertInput): TransactionRow {
         const id = randomUUID()
-        const needsReview =
-            input.needsReview !== undefined
-                ? input.needsReview ? 1 : 0
-                : input.merchant.trim() === "" || input.amount === 0 ? 1 : 0
+        const needsReview = input.needsReview !== undefined ? (input.needsReview ? 1 : 0) : input.merchant.trim() === "" || input.amount === 0 ? 1 : 0
 
         this.db.executeQuery(
             `INSERT INTO transactions
@@ -76,32 +73,19 @@ export class TransactionRepository {
             ]
         )
 
-        const rows = this.db.executeQuery(
-            "SELECT * FROM transactions WHERE id = ?",
-            [id]
-        ) as TransactionRow[] | unknown
+        const rows = this.db.executeQuery("SELECT * FROM transactions WHERE id = ?", [id]) as TransactionRow[] | unknown
         const list = Array.isArray(rows) ? rows : []
         this.logger.debug("Transaction inserted", { id })
         return list[0] as TransactionRow
     }
 
     findByEmailId(emailId: string): TransactionRow | null {
-        const rows = this.db.executeQuery(
-            "SELECT * FROM transactions WHERE email_id = ? LIMIT 1",
-            [emailId]
-        ) as TransactionRow[] | unknown
+        const rows = this.db.executeQuery("SELECT * FROM transactions WHERE email_id = ? LIMIT 1", [emailId]) as TransactionRow[] | unknown
         const list = Array.isArray(rows) ? rows : []
         return list[0] ?? null
     }
 
-    findAll(opts?: {
-        categoryId?: string
-        search?: string
-        limit?: number
-        offset?: number
-        from?: number
-        to?: number
-    }): TransactionRow[] {
+    findAll(opts?: { categoryId?: string; search?: string; limit?: number; offset?: number; from?: number; to?: number }): TransactionRow[] {
         const { where, params } = this.buildFilter(opts)
         const limitClause = opts?.limit !== undefined ? `LIMIT ${opts.limit}` : ""
         const offsetClause = opts?.offset !== undefined ? `OFFSET ${opts.offset}` : ""
@@ -111,12 +95,7 @@ export class TransactionRepository {
         return Array.isArray(rows) ? rows : []
     }
 
-    private buildFilter(opts?: {
-        categoryId?: string
-        search?: string
-        from?: number
-        to?: number
-    }): { where: string; params: unknown[] } {
+    private buildFilter(opts?: { categoryId?: string; search?: string; from?: number; to?: number }): { where: string; params: unknown[] } {
         const conditions: string[] = []
         const params: unknown[] = []
 
@@ -184,47 +163,36 @@ export class TransactionRepository {
     }
 
     findById(id: string): TransactionRow | null {
-        const rows = this.db.executeQuery(
-            "SELECT * FROM transactions WHERE id = ?",
-            [id]
-        ) as TransactionRow[] | unknown
+        const rows = this.db.executeQuery("SELECT * FROM transactions WHERE id = ?", [id]) as TransactionRow[] | unknown
         const list = Array.isArray(rows) ? rows : []
         return list[0] ?? null
     }
 
     existsByBankReference(bankReference: string): boolean {
-        const rows = this.db.executeQuery(
-            "SELECT 1 FROM transactions WHERE bank_reference = ? LIMIT 1",
-            [bankReference]
-        ) as unknown
+        const rows = this.db.executeQuery("SELECT 1 FROM transactions WHERE bank_reference = ? LIMIT 1", [bankReference]) as unknown
         return Array.isArray(rows) && rows.length > 0
     }
 
     updateMerchant(id: string, merchant: string): void {
-        this.db.executeQuery(
-            "UPDATE transactions SET merchant = ? WHERE id = ?",
-            [merchant, id]
-        )
+        this.db.executeQuery("UPDATE transactions SET merchant = ? WHERE id = ?", [merchant, id])
     }
 
     findNeedingReview(): TransactionRow[] {
-        const rows = this.db.executeQuery(
-            "SELECT * FROM transactions WHERE needs_review = 1 ORDER BY timestamp DESC"
-        ) as TransactionRow[] | unknown
+        const rows = this.db.executeQuery("SELECT * FROM transactions WHERE needs_review = 1 ORDER BY timestamp DESC") as TransactionRow[] | unknown
         return Array.isArray(rows) ? rows : []
     }
 
     findFlaggedByCategory(categoryId: string): TransactionRow[] {
-        const rows = this.db.executeQuery(
-            "SELECT * FROM transactions WHERE needs_review = 1 AND category_id = ? ORDER BY timestamp DESC",
-            [categoryId]
-        ) as TransactionRow[] | unknown
+        const rows = this.db.executeQuery("SELECT * FROM transactions WHERE needs_review = 1 AND category_id = ? ORDER BY timestamp DESC", [categoryId]) as TransactionRow[] | unknown
         return Array.isArray(rows) ? rows : []
     }
 
     // total/count are scoped to the given period; priorMonthTotal is the same category's total for
     // the calendar month immediately before `from`, used to render the "vs last month" trend card.
-    aggregateByCategory(categoryId: string, opts?: { from?: number; to?: number }): {
+    aggregateByCategory(
+        categoryId: string,
+        opts?: { from?: number; to?: number }
+    ): {
         total: number
         count: number
         priorMonthTotal: number
@@ -241,10 +209,7 @@ export class TransactionRepository {
             const priorFrom = Math.floor(Date.UTC(fromDate.getUTCFullYear(), fromDate.getUTCMonth() - 1, 1) / 1000)
             const priorTo = Math.floor(Date.UTC(fromDate.getUTCFullYear(), fromDate.getUTCMonth(), 1) / 1000) - 1
             const priorFilter = this.buildFilter({ categoryId, from: priorFrom, to: priorTo })
-            const priorRows = this.db.executeQuery(
-                `SELECT COALESCE(SUM(amount), 0) AS total FROM transactions ${priorFilter.where}`.trimEnd(),
-                priorFilter.params
-            ) as unknown
+            const priorRows = this.db.executeQuery(`SELECT COALESCE(SUM(amount), 0) AS total FROM transactions ${priorFilter.where}`.trimEnd(), priorFilter.params) as unknown
             const priorList = Array.isArray(priorRows) ? priorRows : []
             priorMonthTotal = (priorList[0] as { total: number } | undefined)?.total ?? 0
         }
@@ -258,15 +223,9 @@ export class TransactionRepository {
     // the IPC handler) so an automatic recategorisation never silently dismisses a real flag.
     updateCategory(id: string, categoryId: string | null, clearNeedsReview = false): void {
         if (clearNeedsReview) {
-            this.db.executeQuery(
-                "UPDATE transactions SET category_id = ?, needs_review = 0 WHERE id = ?",
-                [categoryId, id]
-            )
+            this.db.executeQuery("UPDATE transactions SET category_id = ?, needs_review = 0 WHERE id = ?", [categoryId, id])
         } else {
-            this.db.executeQuery(
-                "UPDATE transactions SET category_id = ? WHERE id = ?",
-                [categoryId, id]
-            )
+            this.db.executeQuery("UPDATE transactions SET category_id = ? WHERE id = ?", [categoryId, id])
         }
     }
 

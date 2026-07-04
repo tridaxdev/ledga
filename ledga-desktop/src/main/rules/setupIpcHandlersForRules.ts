@@ -1,9 +1,9 @@
+import { registerIpcHandler } from "../ipc/registerIpcHandler"
+import type { MainWindowNotificationService } from "../windowManagement/MainWindowNotification"
+import type { RulesService } from "./RulesService"
 import { AllowedChannelIpc } from "@/common/types/AllowedChannelIpc"
 import { ResultFactory } from "@/common/types/Result"
 import type { RuleInput } from "@/common/types/Rule"
-import { registerIpcHandler } from "../ipc/registerIpcHandler"
-import type { RulesService } from "./RulesService"
-import type { MainWindowNotificationService } from "../windowManagement/MainWindowNotification"
 
 function toInsertInput(input: RuleInput) {
     return {
@@ -14,10 +14,7 @@ function toInsertInput(input: RuleInput) {
     }
 }
 
-export function setupIpcHandlersForRules(
-    rulesService: RulesService,
-    notificationService: MainWindowNotificationService
-): void {
+export function setupIpcHandlersForRules(rulesService: RulesService, notificationService: MainWindowNotificationService): void {
     function applyRetroactivelyAndNotify(): void {
         rulesService.applyRulesRetroactively()
         notificationService.notifyMainWindow(AllowedChannelIpc.TransactionsInvalidated, undefined)

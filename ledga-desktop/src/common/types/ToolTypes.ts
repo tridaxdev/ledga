@@ -33,9 +33,7 @@ export interface GetProjectFilesToolResult {
 
 export type GetSingleFileDetailsToolResult = PyleHoundFile[]
 
-export type ToolExecutionResult =
-    GetProjectFilesToolResult
-    | GetSingleFileDetailsToolResult
+export type ToolExecutionResult = GetProjectFilesToolResult | GetSingleFileDetailsToolResult
 
 export type ToolFactory = () => Tool | Promise<Tool>
 

@@ -59,26 +59,30 @@ function RootLayout() {
         <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
             {/* Title bar */}
             <div
-                style={{
-                    height: 40,
-                    background: "#f7f3ea",
-                    borderBottom: "1px solid #e5dfcc",
-                    display: "flex",
-                    alignItems: "center",
-                    flexShrink: 0,
-                    position: "relative",
-                    WebkitAppRegion: "drag",
-                } as React.CSSProperties}
+                style={
+                    {
+                        height: 40,
+                        background: "#f7f3ea",
+                        borderBottom: "1px solid #e5dfcc",
+                        display: "flex",
+                        alignItems: "center",
+                        flexShrink: 0,
+                        position: "relative",
+                        WebkitAppRegion: "drag"
+                    } as React.CSSProperties
+                }
             >
                 {/* Traffic lights */}
                 <div
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                        paddingLeft: 16,
-                        WebkitAppRegion: "no-drag",
-                    } as React.CSSProperties}
+                    style={
+                        {
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            paddingLeft: 16,
+                            WebkitAppRegion: "no-drag"
+                        } as React.CSSProperties
+                    }
                 >
                     <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#e0826f" }} />
                     <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#e0bb6f" }} />
@@ -93,7 +97,7 @@ function RootLayout() {
                         transform: "translateX(-50%)",
                         fontSize: 13,
                         fontWeight: 500,
-                        color: "#6e6354",
+                        color: "#6e6354"
                     }}
                 >
                     {title}
@@ -102,12 +106,14 @@ function RootLayout() {
                 {/* Activity pill */}
                 <div
                     ref={activityRef}
-                    style={{
-                        marginLeft: "auto",
-                        paddingRight: 12,
-                        WebkitAppRegion: "no-drag",
-                        position: "relative",
-                    } as React.CSSProperties}
+                    style={
+                        {
+                            marginLeft: "auto",
+                            paddingRight: 12,
+                            WebkitAppRegion: "no-drag",
+                            position: "relative"
+                        } as React.CSSProperties
+                    }
                 >
                     <button
                         onClick={() => setShowActivity(prev => !prev)}
@@ -122,7 +128,7 @@ function RootLayout() {
                             padding: "4px 11px",
                             fontSize: 12,
                             fontWeight: 500,
-                            cursor: "pointer",
+                            cursor: "pointer"
                         }}
                     >
                         <svg
@@ -156,7 +162,7 @@ function RootLayout() {
                         display: "flex",
                         flexDirection: "column",
                         padding: "16px 12px 12px",
-                        flexShrink: 0,
+                        flexShrink: 0
                     }}
                 >
                     {/* Logo row */}
@@ -170,7 +176,7 @@ function RootLayout() {
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                flexShrink: 0,
+                                flexShrink: 0
                             }}
                         >
                             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -197,7 +203,7 @@ function RootLayout() {
                                 cursor: "pointer",
                                 border: "none",
                                 background: isLedgerActive ? "#ebe3d0" : "transparent",
-                                color: "#1f1b16",
+                                color: "#1f1b16"
                             }}
                         >
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -220,7 +226,7 @@ function RootLayout() {
                                 cursor: "pointer",
                                 border: "none",
                                 background: isSettingsActive ? "#ebe3d0" : "transparent",
-                                color: "#1f1b16",
+                                color: "#1f1b16"
                             }}
                         >
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -242,7 +248,7 @@ function RootLayout() {
                                 fontWeight: 700,
                                 letterSpacing: "0.12em",
                                 textTransform: "uppercase",
-                                color: "#8e8270",
+                                color: "#8e8270"
                             }}
                         >
                             Chats
@@ -261,7 +267,7 @@ function RootLayout() {
                                 alignItems: "center",
                                 justifyContent: "center",
                                 cursor: "pointer",
-                                padding: 0,
+                                padding: 0
                             }}
                         >
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -289,10 +295,20 @@ function RootLayout() {
                                         color: "#1f1b16",
                                         cursor: "pointer",
                                         textAlign: "left",
-                                        fontSize: 13,
+                                        fontSize: 13
                                     }}
                                 >
-                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, opacity: 0.7 }}>
+                                    <svg
+                                        width="15"
+                                        height="15"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.6"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        style={{ flexShrink: 0, opacity: 0.7 }}
+                                    >
                                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                                     </svg>
                                     <span style={{ flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{chat.title}</span>
@@ -313,7 +329,7 @@ function RootLayout() {
                             borderTop: "1px solid #ece5d3",
                             display: "flex",
                             alignItems: "center",
-                            gap: 10,
+                            gap: 10
                         }}
                     >
                         <div
@@ -328,7 +344,7 @@ function RootLayout() {
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                flexShrink: 0,
+                                flexShrink: 0
                             }}
                         >
                             AB
@@ -341,7 +357,7 @@ function RootLayout() {
                                     color: "#1f1b16",
                                     overflow: "hidden",
                                     textOverflow: "ellipsis",
-                                    whiteSpace: "nowrap",
+                                    whiteSpace: "nowrap"
                                 }}
                             >
                                 Avery Brooks
@@ -352,7 +368,7 @@ function RootLayout() {
                                     color: "#8e8270",
                                     overflow: "hidden",
                                     textOverflow: "ellipsis",
-                                    whiteSpace: "nowrap",
+                                    whiteSpace: "nowrap"
                                 }}
                             >
                                 you@gmail.com

@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
-import { getLedgaAPI } from './apiClient'
-import type { Transaction, TransactionQueryParams, TransactionSummary } from '@/common/types/Transaction'
+import { useState, useEffect, useCallback } from "react"
+import { getLedgaAPI } from "./apiClient"
+import type { Transaction, TransactionQueryParams, TransactionSummary } from "@/common/types/Transaction"
 
 const EMPTY_SUMMARY: TransactionSummary = { balance: 0, moneyIn: 0, moneyOut: 0, incomeCount: 0, expenseCount: 0 }
 
@@ -14,7 +14,7 @@ export function useTransactions(params: TransactionQueryParams) {
     const refetch = useCallback(async () => {
         setIsLoading(true)
         const result = await getLedgaAPI().transactions.query({ from, to, categoryId, search })
-        if (result.kind === 'success') {
+        if (result.kind === "success") {
             setTransactions(result.value.transactions)
             setSummary(result.value.summary)
         }
@@ -34,7 +34,7 @@ export function useTransactions(params: TransactionQueryParams) {
 
     const updateCategory = useCallback(async (id: string, categoryId: string | null) => {
         const result = await getLedgaAPI().transactions.updateCategory(id, categoryId)
-        if (result.kind === 'success') {
+        if (result.kind === "success") {
             setTransactions(prev => prev.map(t => (t.id === id ? { ...t, category_id: categoryId } : t)))
         }
         return result

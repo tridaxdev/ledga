@@ -1,13 +1,13 @@
-import { randomUUID } from 'node:crypto'
-import { AllowedChannelIpc } from '@/common/types/AllowedChannelIpc'
-import { ResultFactory } from '@/common/types/Result'
-import type { ConnectionRepository } from './ConnectionRepository'
-import type { OAuthResult, GoogleOAuthService } from './GoogleOAuthService'
-import type { TokenStorageService } from '../encryption/TokenStorageService'
-import type { MainWindowNotificationService } from '../windowManagement/MainWindowNotification'
-import type { Logger } from '../logging/FileLogger'
-import { registerIpcHandler } from '../ipc/registerIpcHandler'
-import type { EmailService } from '../email/emailService'
+import { randomUUID } from "node:crypto"
+import type { TokenStorageService } from "../encryption/TokenStorageService"
+import type { MainWindowNotificationService } from "../windowManagement/MainWindowNotification"
+import type { Logger } from "../logging/FileLogger"
+import { registerIpcHandler } from "../ipc/registerIpcHandler"
+import type { EmailService } from "../email/emailService"
+import type { OAuthResult, GoogleOAuthService } from "./GoogleOAuthService"
+import type { ConnectionRepository } from "./ConnectionRepository"
+import { ResultFactory } from "@/common/types/Result"
+import { AllowedChannelIpc } from "@/common/types/AllowedChannelIpc"
 
 const SYNC_NOW_LOOKBACK_DAYS = 30
 
@@ -43,7 +43,7 @@ export function setupIpcHandlersForConnections(
             pendingFlows.set(flowId, oauthResult)
             return ResultFactory.success({ flowId, email: oauthResult.email })
         } catch (error) {
-            logger.error('OAuth flow failed', error)
+            logger.error("OAuth flow failed", error)
             return ResultFactory.error(error instanceof Error ? error : new Error(String(error)))
         }
     })
@@ -65,7 +65,7 @@ export function setupIpcHandlersForConnections(
         const autoSync = args[1] as boolean
         const pending = pendingFlows.get(flowId)
         if (!pending) {
-            return ResultFactory.error(new Error('OAuth flow expired or was already finalized'))
+            return ResultFactory.error(new Error("OAuth flow expired or was already finalized"))
         }
         pendingFlows.delete(flowId)
 
@@ -91,7 +91,7 @@ export function setupIpcHandlersForConnections(
             const result = await emailService.fetchAndStoreEmails(connectionId, startDate, endDate)
             return ResultFactory.success(result)
         } catch (error) {
-            logger.error('Manual sync failed', { connectionId, error })
+            logger.error("Manual sync failed", { connectionId, error })
             return ResultFactory.error(error instanceof Error ? error : new Error(String(error)))
         }
     })

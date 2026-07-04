@@ -1,15 +1,9 @@
+import { registerIpcHandler } from "../ipc/registerIpcHandler"
+import type { CategoryRepository } from "../categories/CategoryRepository"
+import type { TransactionRepository, TransactionRow } from "./TransactionRepository"
 import { AllowedChannelIpc } from "@/common/types/AllowedChannelIpc"
 import { ResultFactory } from "@/common/types/Result"
-import type {
-    CategoryQueryParams,
-    FlaggedTransaction,
-    Transaction,
-    TransactionQueryParams,
-    TransactionSummary
-} from "@/common/types/Transaction"
-import { registerIpcHandler } from "../ipc/registerIpcHandler"
-import type { TransactionRepository, TransactionRow } from "./TransactionRepository"
-import type { CategoryRepository } from "../categories/CategoryRepository"
+import type { CategoryQueryParams, FlaggedTransaction, Transaction, TransactionQueryParams, TransactionSummary } from "@/common/types/Transaction"
 
 const SUGGESTED_CATEGORY_NAME = "Other"
 
@@ -17,10 +11,7 @@ function toTransaction(row: TransactionRow): Transaction {
     return { ...row, needs_review: row.needs_review === 1 }
 }
 
-export function setupIpcHandlersForTransactions(
-    transactionRepository: TransactionRepository,
-    categoryRepository: CategoryRepository
-): void {
+export function setupIpcHandlersForTransactions(transactionRepository: TransactionRepository, categoryRepository: CategoryRepository): void {
     registerIpcHandler(AllowedChannelIpc.TransactionsQuery, (_, ...args) => {
         const params = (args[0] ?? {}) as TransactionQueryParams
         const rows = transactionRepository.findAll(params)
@@ -33,21 +24,17 @@ export function setupIpcHandlersForTransactions(
 
     registerIpcHandler(AllowedChannelIpc.TransactionsQueryByCategory, (_, ...args) => {
         const params = args[0] as CategoryQueryParams
-        const transactions = transactionRepository
-            .findAll({ categoryId: params.categoryId, from: params.from, to: params.to })
-            .map(toTransaction)
+        const transactions = transactionRepository.findAll({ categoryId: params.categoryId, from: params.from, to: params.to }).map(toTransaction)
         const aggregate = transactionRepository.aggregateByCategory(params.categoryId, { from: params.from, to: params.to })
 
         // Don't suggest the category the user is already looking at -- viewing "Other" itself
         // shouldn't render an "Other -> Other" no-op suggestion.
         const suggested = categoryRepository.findAll().find(c => c.name === SUGGESTED_CATEGORY_NAME && c.id !== params.categoryId)
-        const flagged: FlaggedTransaction[] = transactionRepository
-            .findFlaggedByCategory(params.categoryId)
-            .map(row => ({
-                ...toTransaction(row),
-                suggestedCategoryId: suggested?.id ?? null,
-                suggestedCategoryName: suggested?.name ?? null
-            }))
+        const flagged: FlaggedTransaction[] = transactionRepository.findFlaggedByCategory(params.categoryId).map(row => ({
+            ...toTransaction(row),
+            suggestedCategoryId: suggested?.id ?? null,
+            suggestedCategoryName: suggested?.name ?? null
+        }))
 
         return ResultFactory.success({ transactions, aggregate, flagged })
     })

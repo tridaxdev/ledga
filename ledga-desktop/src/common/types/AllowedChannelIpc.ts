@@ -19,7 +19,7 @@ export enum AllowedChannelIpc {
     ConversationToolApprovalResponse = "conversation:tool-approval-response",
     ConversationGetReferences = "conversation:get-references",
     ConversationReferencesUpdatedStream = "conversation:references-updated-stream",
-    
+
     AssetCreateStream = "asset:create-stream",
     AssetUpdateStream = "asset:update-stream",
     AssetDeleteStream = "asset:delete-stream",
@@ -83,7 +83,7 @@ export enum AllowedChannelIpc {
     AssistantStreamChunk = "assistant:stream-chunk",
     AssistantStreamDone = "assistant:stream-done",
     AssistantStreamError = "assistant:stream-error",
-    AssistantStop = "assistant:stop",
+    AssistantStop = "assistant:stop"
 }
 
 export function isAllowedChannel(channel: string): channel is AllowedChannelIpc {

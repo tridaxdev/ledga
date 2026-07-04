@@ -1,12 +1,12 @@
-import { safeStorage } from 'electron'
-import Store from 'electron-store'
-import type { Logger } from '../logging/FileLogger'
+import { safeStorage } from "electron"
+import Store from "electron-store"
+import type { Logger } from "../logging/FileLogger"
 
 export class TokenStorageService {
     private readonly store: Store<Record<string, string>>
 
     constructor(private readonly logger: Logger) {
-        this.store = new Store<Record<string, string>>({ name: 'tokens' })
+        this.store = new Store<Record<string, string>>({ name: "tokens" })
     }
 
     async getAccessToken(connectionId: string): Promise<string | null> {
@@ -23,20 +23,20 @@ export class TokenStorageService {
     }
 
     async deleteTokens(connectionId: string): Promise<void> {
-        this.store.delete(`tokens_${connectionId}_access` as keyof Record<string, string>)
-        this.store.delete(`tokens_${connectionId}_refresh` as keyof Record<string, string>)
+        this.store.delete(`tokens_${connectionId}_access`)
+        this.store.delete(`tokens_${connectionId}_refresh`)
     }
 
     private async getToken(key: string): Promise<string | null> {
-        const stored = this.store.get(key as keyof Record<string, string>) as string | undefined
+        const stored = this.store.get(key) as string | undefined
         if (!stored) return null
 
         if (safeStorage.isEncryptionAvailable()) {
             try {
-                const buffer = Buffer.from(stored, 'base64')
+                const buffer = Buffer.from(stored, "base64")
                 return safeStorage.decryptString(buffer)
             } catch (error) {
-                this.logger.error('Failed to decrypt token', error)
+                this.logger.error("Failed to decrypt token", error)
                 return null
             }
         }
@@ -47,10 +47,10 @@ export class TokenStorageService {
     private async setToken(key: string, value: string): Promise<void> {
         if (safeStorage.isEncryptionAvailable()) {
             const encrypted = safeStorage.encryptString(value)
-            this.store.set(key as keyof Record<string, string>, encrypted.toString('base64'))
+            this.store.set(key, encrypted.toString("base64"))
         } else {
-            this.logger.warn('safeStorage encryption not available, storing token as plaintext')
-            this.store.set(key as keyof Record<string, string>, value)
+            this.logger.warn("safeStorage encryption not available, storing token as plaintext")
+            this.store.set(key, value)
         }
     }
 }

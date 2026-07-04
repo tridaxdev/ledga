@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
-import { getLedgaAPI } from './apiClient'
-import type { Chat } from '@/common/types/ChatTypes'
+import { useState, useEffect, useCallback } from "react"
+import { getLedgaAPI } from "./apiClient"
+import type { Chat } from "@/common/types/ChatTypes"
 
 export function useChats() {
     const [chats, setChats] = useState<Chat[]>([])
@@ -9,7 +9,7 @@ export function useChats() {
     const refetch = useCallback(async () => {
         setIsLoading(true)
         const result = await getLedgaAPI().chats.getAll()
-        if (result.kind === 'success') setChats(result.value)
+        if (result.kind === "success") setChats(result.value)
         setIsLoading(false)
     }, [])
 
@@ -23,7 +23,7 @@ export function useChats() {
 
     const createChat = useCallback(async () => {
         const result = await getLedgaAPI().chats.create()
-        if (result.kind === 'success') setChats(prev => [result.value, ...prev])
+        if (result.kind === "success") setChats(prev => [result.value, ...prev])
         return result
     }, [])
 
