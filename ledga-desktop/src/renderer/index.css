@@ -1,3 +1,24 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @plugin '@tailwindcss/typography';
+
+@theme {
+    --color-ledga-bg: #fcf9f1;
+    --color-ledga-sidebar: #f7f3ea;
+    --color-ledga-border: #e5dfcc;
+    --color-ledga-border-subtle: #ece5d3;
+    --color-ledga-text: #1f1b16;
+    --color-ledga-text-secondary: #6e6354;
+    --color-ledga-text-muted: #8e8270;
+    --color-ledga-brand: #037b68;
+    --color-ledga-brand-bg: #ebf3e9;
+    --color-ledga-brand-border: #b8dcc6;
+    --color-ledga-nav-active: #ebe3d0;
+    --color-ledga-amber: #fbf1da;
+    --color-ledga-amber-border: #ecd9ab;
+    --color-ledga-danger: #b05a3c;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

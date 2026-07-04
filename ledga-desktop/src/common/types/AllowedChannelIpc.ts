@@ -8,6 +8,16 @@ export enum AllowedChannelIpc {
     DatabaseGetStats = "database:get-stats",
     DatabaseDelete = "database:delete",
     DatabaseDownloadBackup = "database:download-backup",
+    ConnectionsGetAll = "connections:get-all",
+    ConnectionsCreate = "connections:create",
+    ConnectionsDelete = "connections:delete",
+    ConnectionsStartOAuth = "connections:start-oauth",
+    ConnectionsOAuthCompleted = "connections:oauth-completed",
+    EmailsFetch = "emails:fetch",
+    EmailsWaitFor = "emails:wait-for",
+    EmailsGetProcessingCounts = "emails:get-processing-counts",
+    EmailsPulled = "emails:pulled",
+    EmailsProcessingUpdate = "emails:processing-update",
 }
 
 export function isAllowedChannel(channel: string): channel is AllowedChannelIpc {

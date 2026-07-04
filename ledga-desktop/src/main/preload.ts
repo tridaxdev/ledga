@@ -1,5 +1,6 @@
 import { AllowedChannelIpc } from "@/common/types/AllowedChannelIpc";
 import type { LedgaAPI } from "@/common/types/LedgaAPI";
+import type { Connection } from "@/common/types/Connection";
 import { contextBridge, ipcRenderer } from "electron";
 
 const ledgaAPI: LedgaAPI = {
@@ -16,6 +17,24 @@ const ledgaAPI: LedgaAPI = {
             }
             ipcRenderer.on("language-changed", listener)
             return () => ipcRenderer.removeListener("language-changed", listener)
+        }
+    },
+    connections: {
+        getAll: () => {
+            return ipcRenderer.invoke(AllowedChannelIpc.ConnectionsGetAll)
+        },
+        connect: () => {
+            return ipcRenderer.invoke(AllowedChannelIpc.ConnectionsStartOAuth)
+        },
+        disconnect: (id: string) => {
+            return ipcRenderer.invoke(AllowedChannelIpc.ConnectionsDelete, id)
+        },
+        onOAuthCompleted: (callback: (connection: Connection) => void) => {
+            const listener = (_: Electron.IpcRendererEvent, connection: Connection) => {
+                callback(connection)
+            }
+            ipcRenderer.on(AllowedChannelIpc.ConnectionsOAuthCompleted, listener)
+            return () => ipcRenderer.removeListener(AllowedChannelIpc.ConnectionsOAuthCompleted, listener)
         }
     }
 }
