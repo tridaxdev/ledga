@@ -206,11 +206,64 @@ export class TransactionRepository {
         return Array.isArray(rows) ? rows : []
     }
 
-    updateCategory(id: string, categoryId: string | null): void {
-        this.db.executeQuery(
-            "UPDATE transactions SET category_id = ? WHERE id = ?",
-            [categoryId, id]
-        )
+    findFlaggedByCategory(categoryId: string): TransactionRow[] {
+        const rows = this.db.executeQuery(
+            "SELECT * FROM transactions WHERE needs_review = 1 AND category_id = ? ORDER BY timestamp DESC",
+            [categoryId]
+        ) as TransactionRow[] | unknown
+        return Array.isArray(rows) ? rows : []
+    }
+
+    // total/count are scoped to the given period; priorMonthTotal is the same category's total for
+    // the calendar month immediately before `from`, used to render the "vs last month" trend card.
+    aggregateByCategory(categoryId: string, opts?: { from?: number; to?: number }): {
+        total: number
+        count: number
+        priorMonthTotal: number
+    } {
+        const { where, params } = this.buildFilter({ categoryId, from: opts?.from, to: opts?.to })
+        const sql = `SELECT COALESCE(SUM(amount), 0) AS total, COUNT(*) AS count FROM transactions ${where}`.trimEnd()
+        const rows = this.db.executeQuery(sql, params) as unknown
+        const list = Array.isArray(rows) ? rows : []
+        const row = list[0] as { total: number; count: number } | undefined
+
+        let priorMonthTotal = 0
+        if (opts?.from !== undefined) {
+            const fromDate = new Date(opts.from * 1000)
+            const priorFrom = Math.floor(Date.UTC(fromDate.getUTCFullYear(), fromDate.getUTCMonth() - 1, 1) / 1000)
+            const priorTo = Math.floor(Date.UTC(fromDate.getUTCFullYear(), fromDate.getUTCMonth(), 1) / 1000) - 1
+            const priorFilter = this.buildFilter({ categoryId, from: priorFrom, to: priorTo })
+            const priorRows = this.db.executeQuery(
+                `SELECT COALESCE(SUM(amount), 0) AS total FROM transactions ${priorFilter.where}`.trimEnd(),
+                priorFilter.params
+            ) as unknown
+            const priorList = Array.isArray(priorRows) ? priorRows : []
+            priorMonthTotal = (priorList[0] as { total: number } | undefined)?.total ?? 0
+        }
+
+        return { total: row?.total ?? 0, count: row?.count ?? 0, priorMonthTotal }
+    }
+
+    // clearNeedsReview is true when a human picked the category (the "Move to" dropdown / a Move
+    // action on a flagged row) -- that counts as reviewing it. It stays false for rule-driven
+    // updates (RulesService.applyRulesRetroactively calls this directly, in-process, not through
+    // the IPC handler) so an automatic recategorisation never silently dismisses a real flag.
+    updateCategory(id: string, categoryId: string | null, clearNeedsReview = false): void {
+        if (clearNeedsReview) {
+            this.db.executeQuery(
+                "UPDATE transactions SET category_id = ?, needs_review = 0 WHERE id = ?",
+                [categoryId, id]
+            )
+        } else {
+            this.db.executeQuery(
+                "UPDATE transactions SET category_id = ? WHERE id = ?",
+                [categoryId, id]
+            )
+        }
+    }
+
+    markReviewed(id: string): void {
+        this.db.executeQuery("UPDATE transactions SET needs_review = 0 WHERE id = ?", [id])
     }
 
     delete(id: string): void {

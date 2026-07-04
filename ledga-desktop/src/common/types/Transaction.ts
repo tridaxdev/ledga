@@ -46,3 +46,20 @@ export interface TransactionQueryParams {
     limit?: number
     offset?: number
 }
+
+export interface CategoryAggregate {
+    total: number
+    count: number
+    priorMonthTotal: number
+}
+
+export interface FlaggedTransaction extends Transaction {
+    suggestedCategoryId: string | null
+    suggestedCategoryName: string | null
+}
+
+export interface CategoryQueryParams {
+    categoryId: string
+    from?: number
+    to?: number
+}

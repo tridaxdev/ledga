@@ -1,7 +1,8 @@
 import { AllowedChannelIpc } from "@/common/types/AllowedChannelIpc";
 import type { LedgaAPI } from "@/common/types/LedgaAPI";
 import type { Connection } from "@/common/types/Connection";
-import type { TransactionQueryParams } from "@/common/types/Transaction";
+import type { CategoryQueryParams, TransactionQueryParams } from "@/common/types/Transaction";
+import type { RuleInput } from "@/common/types/Rule";
 import { contextBridge, ipcRenderer } from "electron";
 
 const ledgaAPI: LedgaAPI = {
@@ -47,10 +48,24 @@ const ledgaAPI: LedgaAPI = {
     },
     transactions: {
         query: (params: TransactionQueryParams) => ipcRenderer.invoke(AllowedChannelIpc.TransactionsQuery, params),
-        updateCategory: (id: string, categoryId: string | null) => ipcRenderer.invoke(AllowedChannelIpc.TransactionsUpdateCategory, id, categoryId)
+        queryByCategory: (params: CategoryQueryParams) => ipcRenderer.invoke(AllowedChannelIpc.TransactionsQueryByCategory, params),
+        updateCategory: (id: string, categoryId: string | null) => ipcRenderer.invoke(AllowedChannelIpc.TransactionsUpdateCategory, id, categoryId),
+        updateMerchant: (id: string, merchant: string) => ipcRenderer.invoke(AllowedChannelIpc.TransactionsUpdateMerchant, id, merchant),
+        markReviewed: (id: string) => ipcRenderer.invoke(AllowedChannelIpc.TransactionsMarkReviewed, id),
+        onInvalidated: (callback: () => void) => {
+            const listener = () => callback()
+            ipcRenderer.on(AllowedChannelIpc.TransactionsInvalidated, listener)
+            return () => ipcRenderer.removeListener(AllowedChannelIpc.TransactionsInvalidated, listener)
+        }
     },
     categories: {
         getAll: () => ipcRenderer.invoke(AllowedChannelIpc.CategoriesGetAll)
+    },
+    rules: {
+        getAll: () => ipcRenderer.invoke(AllowedChannelIpc.RulesGetAll),
+        create: (input: RuleInput) => ipcRenderer.invoke(AllowedChannelIpc.RulesCreate, input),
+        update: (id: string, input: Partial<RuleInput>) => ipcRenderer.invoke(AllowedChannelIpc.RulesUpdate, id, input),
+        delete: (id: string) => ipcRenderer.invoke(AllowedChannelIpc.RulesDelete, id)
     }
 }
 

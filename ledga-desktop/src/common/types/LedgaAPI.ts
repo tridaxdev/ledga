@@ -2,8 +2,9 @@ import type { Alert } from "@/renderer/AlertFeature/types/Alert"
 import type { AppInstallation, UpdateCheckResult, UpdateProgressCallback } from "./AppTypes"
 import type { Result } from "./Result"
 import type { Connection } from "./Connection"
-import type { Transaction, TransactionQueryParams, TransactionSummary } from "./Transaction"
+import type { CategoryAggregate, CategoryQueryParams, FlaggedTransaction, Transaction, TransactionQueryParams, TransactionSummary } from "./Transaction"
 import type { Category } from "./Category"
+import type { Rule, RuleInput } from "./Rule"
 import type { Conversation, ConversationCreatedEvent, ConversationDeletedEvent, ConversationReferencesUpdatedEvent, ConversationStreamEvent, ConversationUpdatedEvent, ConversationWithMessages, CreateConversationRequest, CreateMessageRequest, DeleteConversationRequest, EditUserMessageRequest, GetConversationRequest, GetConversationsByProjectRequest, Message, RetryFromMessageRequest, StopConversationStreamRequest, ToolApprovalDecision, UpdateConversationRequest } from "./BaseTypes"
 import type { GetFileRequest, GetFilesByFolderRequest, GetFilesByProjectRequest, GetFilesByConversationRequest, ImportFilesRequest, RetryImportRequest, OpenFileRequest, RetryFileProcessingRequest, DeleteAssetsRequest } from "./FileImportTypes"
 import type { PyleHoundAsset, PyleHoundFile, AssetUpsertedEvent, AssetDeletedEvent } from "./ProjectTypes"
@@ -89,9 +90,19 @@ export interface LedgaAPI {
     }
     readonly transactions: {
         readonly query: (params: TransactionQueryParams) => Promise<Result<{ transactions: Transaction[]; summary: TransactionSummary }, Error>>
+        readonly queryByCategory: (params: CategoryQueryParams) => Promise<Result<{ transactions: Transaction[]; aggregate: CategoryAggregate; flagged: FlaggedTransaction[] }, Error>>
         readonly updateCategory: (id: string, categoryId: string | null) => Promise<Result<void, Error>>
+        readonly updateMerchant: (id: string, merchant: string) => Promise<Result<void, Error>>
+        readonly markReviewed: (id: string) => Promise<Result<void, Error>>
+        readonly onInvalidated: (callback: () => void) => () => void
     }
     readonly categories: {
         readonly getAll: () => Promise<Result<Category[], Error>>
+    }
+    readonly rules: {
+        readonly getAll: () => Promise<Result<Rule[], Error>>
+        readonly create: (input: RuleInput) => Promise<Result<Rule, Error>>
+        readonly update: (id: string, input: Partial<RuleInput>) => Promise<Result<void, Error>>
+        readonly delete: (id: string) => Promise<Result<void, Error>>
     }
 }

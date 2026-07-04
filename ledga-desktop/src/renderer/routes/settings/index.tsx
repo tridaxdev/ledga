@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useConnections } from '../../hooks/useConnections'
 import { ConnectGmailModal } from '../../components/ConnectGmailModal'
+import { RulesSection } from '../../components/RulesSection'
 import type { Connection } from '@/common/types/Connection'
 
 export const Route = createFileRoute('/settings/')({ component: SettingsScreen })
@@ -94,6 +95,8 @@ function SettingsScreen() {
                     </ul>
                 )}
             </section>
+
+            <RulesSection />
 
             <ConnectGmailModal
                 isOpen={modalOpen}
