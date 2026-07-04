@@ -31,15 +31,6 @@ export interface WorkerResultMessage<TResult = unknown> {
     error?: string
 }
 
-export interface WorkerLogMessage {
-    type: "LOG"
-    level: "debug" | "info" | "warn" | "error"
-    message: string
-    meta?: unknown
-    timestamp: string
-    contextId?: string
-}
-
 export interface AIResponse<T = unknown> {
     requestId: string
     success: boolean
@@ -52,7 +43,7 @@ export interface AIResponse<T = unknown> {
     error?: string
 }
 
-export const WorkerTaskTypeSchema = z.enum(["db_query"])
+export const WorkerTaskTypeSchema = z.enum(["db_query", "email_processing", "email_metadata"])
 export type WorkerTaskType = z.infer<typeof WorkerTaskTypeSchema>
 
 export interface WorkerTaskMessage<TPayload = unknown> {
@@ -66,5 +57,11 @@ export interface WorkerCancelMessage {
     type: "CANCEL"
 }
 
-export type MainToWorkerMessage = WorkerTaskMessage<unknown>  | WorkerCancelMessage
-export type WorkerToMainMessage = WorkerResultMessage<unknown> | WorkerLogMessage 
+export interface WorkerEmailMetadataRequestMessage {
+    type: "EMAIL_METADATA_REQUEST"
+    connectionId: string
+    providerMessageId: string
+}
+
+export type MainToWorkerMessage = WorkerTaskMessage<unknown> | WorkerCancelMessage
+export type WorkerToMainMessage = WorkerResultMessage<unknown> | WorkerLogMessage | WorkerEmailMetadataRequestMessage
