@@ -1,11 +1,18 @@
+import * as fs from "node:fs"
+import * as path from "node:path"
 import { parentPort, workerData } from "worker_threads"
 import { CANCELLED_EXIT_CODE, type DbQueryTaskPayload, type MainToWorkerMessage } from "../../common/types/WorkerTypes"
 import { WorkerLogger } from "../logging/WorkerLogger"
 import { WorkerDatabaseManager } from "../Database/WorkerDatabaseManager"
+import type { EmailProcessingTaskPayload, EmailProcessingWorkerResult } from "@/common/types/FileProcessingTypes"
+import type { CsvImportTaskPayload, CsvImportWorkerResult } from "@/common/types/CsvImportTypes"
+import { createScrapingManager } from "../scraping/createScrapingManager"
+import { parseCsvStatement } from "../csvImport/CsvStatementParser"
 
 const logger = new WorkerLogger()
 const { dbPath } = workerData as { dbPath: string; appStorageDir: string }
 const workerDb = new WorkerDatabaseManager(dbPath)
+const scrapingManager = createScrapingManager()
 
 if (!parentPort) {
     logger.error("BackgroundWorker must run in worker thread")
@@ -58,6 +65,60 @@ async function handleTaskMessage(message: MainToWorkerMessage): Promise<void> {
                     success: true,
                     result: results
                 })
+                break
+            }
+
+            case "email_processing": {
+                const { emailId, appStorageDir: emailsDir } = message.payload as EmailProcessingTaskPayload
+                const filePath = path.join(emailsDir, `${emailId}.eml`)
+                let result: EmailProcessingWorkerResult
+                try {
+                    const raw = fs.readFileSync(filePath, "utf-8")
+                    const transaction = await scrapingManager.scrape(raw)
+                    result = transaction
+                        ? { success: true, transaction }
+                        : { success: false, error: "No matching bank scraper for this email" }
+                } catch (error) {
+                    result = { success: false, error: error instanceof Error ? error.message : String(error) }
+                }
+                parentPort?.postMessage({
+                    type: "RESULT",
+                    taskId: message.taskId,
+                    success: result.success,
+                    result,
+                    error: result.success ? undefined : result.error
+                })
+                break
+            }
+
+            case "csv_import": {
+                const { filePath } = message.payload as CsvImportTaskPayload
+                try {
+                    const content = fs.readFileSync(filePath, "utf-8")
+                    const rows = parseCsvStatement(content)
+                    const totalRows = rows.length
+                    for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+                        parentPort?.postMessage({
+                            type: "PROGRESS",
+                            taskId: message.taskId,
+                            progress: { rowIndex, totalRows, row: rows[rowIndex] }
+                        })
+                    }
+                    const result: CsvImportWorkerResult = { totalRows }
+                    parentPort?.postMessage({
+                        type: "RESULT",
+                        taskId: message.taskId,
+                        success: true,
+                        result
+                    })
+                } catch (error) {
+                    parentPort?.postMessage({
+                        type: "RESULT",
+                        taskId: message.taskId,
+                        success: false,
+                        error: error instanceof Error ? error.message : String(error)
+                    })
+                }
                 break
             }
 

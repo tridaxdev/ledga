@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
+<style>*{box-sizing:border-box}html,body{margin:0}body{background:#e3e0d8}</style>
+</helmet>
+
+<div id="ledga-root" style="width:max-content;min-width:100%;min-height:100vh;box-sizing:border-box;padding:40px 48px 64px;background:#e3e0d8;font-family:'Kalam',cursive;">
+
+  <!-- ===== HEADER ===== -->
+  <div style="display:flex;align-items:flex-end;gap:14px;margin-bottom:6px;">
+    <div style="width:40px;height:40px;border:2px solid #2a2723;border-radius:9px;background:#EBF3E9;display:flex;align-items:center;justify-content:center;">
+      <span style="font:700 22px 'Kalam',cursive;color:#037B68;">L</span>
+    </div>
+    <div style="font:700 32px 'Kalam',cursive;color:#2a2723;line-height:1;">Ledga</div>
+    <div style="font:400 18px 'Kalam',cursive;color:#6b665c;padding-bottom:3px;">flow wireframes</div>
+  </div>
+  <div style="font:400 15px 'Kalam',cursive;color:#7a756b;margin-bottom:22px;">Low-fidelity — exploring structure &amp; flow, not final visuals. Greens / clay are stand-ins for the WritingPal palette.</div>
+
+  <!-- ===== TAB BAR ===== -->
+  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:30px;">
+    <button onClick="{{ goOnb }}" style="{{ obTab }}">1 · Onboarding</button>
+    <button onClick="{{ goGm }}" style="{{ gmTab }}">2 · Connect Gmail</button>
+    <button onClick="{{ goImp }}" style="{{ imTab }}">3 · Import statement</button>
+    <button onClick="{{ goDash }}" style="{{ dbTab }}">4 · Dashboard ×3</button>
+    <button onClick="{{ goChat }}" style="{{ chTab }}">5 · Chatbot ×2</button>
+    <button onClick="{{ goSet }}" style="{{ stTab }}">6 · Settings</button>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- SECTION 1 — ONBOARDING -->
+  <!-- ============================================================= -->
+  <sc-if value="{{ isOnboarding }}" hint-placeholder-val="{{ true }}">
+  <div>
+    <div style="font:700 24px 'Kalam',cursive;color:#2a2723;margin-bottom:4px;">First run — onboarding</div>
+    <div style="font:400 15px 'Kalam',cursive;color:#7a756b;margin-bottom:22px;">What a brand-new writer sees. Sets the privacy promise, then branches to a first source.</div>
+    <div style="display:flex;gap:28px;align-items:flex-start;">
+
+      <!-- O1 welcome -->
+      <div style="flex:none;width:420px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font:700 16px 'Kalam',cursive;color:#2a2723;display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:2px solid #2a2723;border-radius:50%;font:700 13px 'Kalam',cursive;">1</span>Welcome</div>
+        <div style="width:100%;height:360px;background:#fbfaf6;border:2px solid #2a2723;border-radius:8px;box-shadow:4px 4px 0 rgba(42,39,35,.10);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:28px;flex:none;border-bottom:2px solid #2a2723;background:#efece4;display:flex;align-items:center;padding:0 10px;gap:6px;"><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;padding:24px;text-align:center;">
+            <div style="width:54px;height:54px;border:2px solid #2a2723;border-radius:11px;background:#EBF3E9;display:flex;align-items:center;justify-content:center;"><span style="font:700 26px 'Kalam',cursive;color:#037B68;">L</span></div>
+            <div style="font:700 34px 'Kalam',cursive;color:#2a2723;line-height:1;">Ledga</div>
+            <div style="font:400 16px 'Kalam',cursive;color:#5C5246;max-width:250px;">Your bank inbox, sorted into a ledger you actually own.</div>
+            <div style="display:flex;align-items:center;gap:6px;font:400 13px 'Kalam',cursive;color:#C97B5C;"><span>↳</span><span>nothing leaves your computer</span></div>
+            <button style="background:#037B68;color:#fff;border:none;border-radius:6px;padding:9px 20px;font:700 15px 'Kalam',cursive;margin-top:6px;">Get started</button>
+          </div>
+        </div>
+        <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}"><div style="font:400 14px 'Kalam',cursive;color:#6b665c;">Splash on first launch — name + promise.</div></sc-if>
+      </div>
+
+      <!-- O2 how it works -->
+      <div style="flex:none;width:420px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font:700 16px 'Kalam',cursive;color:#2a2723;display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:2px solid #2a2723;border-radius:50%;font:700 13px 'Kalam',cursive;">2</span>How it works</div>
+        <div style="width:100%;height:360px;background:#fbfaf6;border:2px solid #2a2723;border-radius:8px;box-shadow:4px 4px 0 rgba(42,39,35,.10);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:28px;flex:none;border-bottom:2px solid #2a2723;background:#efece4;display:flex;align-items:center;padding:0 10px;gap:6px;"><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span></div>
+          <div style="flex:1;padding:20px;display:flex;flex-direction:column;gap:14px;">
+            <div style="font:700 19px 'Kalam',cursive;color:#2a2723;">Three things Ledga does</div>
+            <div style="display:flex;gap:12px;align-items:flex-start;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2a2723" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><div style="flex:1;"><div style="font:700 15px 'Kalam',cursive;color:#2a2723;">Reads bank emails</div><div style="height:8px;border-radius:5px;background:#dcd9d0;margin-top:5px;width:90%;"></div></div></div>
+            <div style="display:flex;gap:12px;align-items:flex-start;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2a2723" stroke-width="2"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></svg><div style="flex:1;"><div style="font:700 15px 'Kalam',cursive;color:#2a2723;">Or imports a statement</div><div style="height:8px;border-radius:5px;background:#dcd9d0;margin-top:5px;width:80%;"></div></div></div>
+            <div style="display:flex;gap:12px;align-items:flex-start;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2a2723" stroke-width="2"><path d="M4 4h16v4H4z"/><path d="M4 12h16M4 16h16M4 20h10"/></svg><div style="flex:1;"><div style="font:700 15px 'Kalam',cursive;color:#2a2723;">Parses it into a local ledger</div><div style="height:8px;border-radius:5px;background:#dcd9d0;margin-top:5px;width:70%;"></div></div></div>
+            <button style="align-self:flex-start;background:#037B68;color:#fff;border:none;border-radius:6px;padding:8px 18px;font:700 14px 'Kalam',cursive;margin-top:auto;">Next</button>
+          </div>
+        </div>
+        <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}"><div style="font:400 14px 'Kalam',cursive;color:#6b665c;">Plain explainer — builds trust before any auth.</div></sc-if>
+      </div>
+
+      <!-- O3 choose source -->
+      <div style="flex:none;width:460px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font:700 16px 'Kalam',cursive;color:#2a2723;display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:2px solid #2a2723;border-radius:50%;font:700 13px 'Kalam',cursive;">3</span>Choose your first source</div>
+        <div style="width:100%;height:360px;background:#fbfaf6;border:2px solid #2a2723;border-radius:8px;box-shadow:4px 4px 0 rgba(42,39,35,.10);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:28px;flex:none;border-bottom:2px solid #2a2723;background:#efece4;display:flex;align-items:center;padding:0 10px;gap:6px;"><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span></div>
+          <div style="flex:1;padding:22px;display:flex;flex-direction:column;gap:16px;">
+            <div style="font:700 19px 'Kalam',cursive;color:#2a2723;">Where should we start?</div>
+            <div style="display:flex;gap:14px;flex:1;">
+              <div style="flex:1;border:2px solid #037B68;border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:8px;background:#EBF3E9;position:relative;">
+                <div style="position:absolute;top:10px;right:10px;font:700 10px 'Kalam',cursive;color:#037B68;border:1.5px solid #037B68;border-radius:999px;padding:2px 8px;">recommended</div>
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#037B68" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+                <div style="font:700 16px 'Kalam',cursive;color:#2a2723;">Connect Gmail</div>
+                <div style="height:8px;border-radius:5px;background:#cfdccb;width:90%;"></div>
+                <div style="height:8px;border-radius:5px;background:#cfdccb;width:70%;"></div>
+              </div>
+              <div style="flex:1;border:2px dashed #9a9488;border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:8px;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2a2723" stroke-width="2"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></svg>
+                <div style="font:700 16px 'Kalam',cursive;color:#2a2723;">Import a statement</div>
+                <div style="height:8px;border-radius:5px;background:#dcd9d0;width:90%;"></div>
+                <div style="height:8px;border-radius:5px;background:#dcd9d0;width:60%;"></div>
+              </div>
+            </div>
+            <div style="font:400 14px 'Kalam',cursive;color:#7a756b;text-decoration:underline;align-self:center;">Skip for now</div>
+          </div>
+        </div>
+        <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}"><div style="font:400 14px 'Kalam',cursive;color:#6b665c;">Branches into flow 2 (Gmail) or flow 3 (import).</div></sc-if>
+      </div>
+
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============================================================= -->
+  <!-- SECTION 2 — CONNECT GMAIL -->
+  <!-- ============================================================= -->
+  <sc-if value="{{ isGmail }}" hint-placeholder-val="{{ true }}">
+  <div>
+    <div style="font:700 24px 'Kalam',cursive;color:#2a2723;margin-bottom:4px;">Connect Gmail</div>
+    <div style="font:400 15px 'Kalam',cursive;color:#7a756b;margin-bottom:22px;">Explain → enter email → Google authorizes in a popup → choose auto-sync → confirmed &amp; watching.</div>
+    <div style="display:flex;gap:24px;align-items:flex-start;">
+
+      <!-- G1 explainer -->
+      <div style="flex:none;width:380px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font:700 16px 'Kalam',cursive;color:#2a2723;display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:2px solid #2a2723;border-radius:50%;font:700 13px 'Kalam',cursive;">1</span>What happens</div>
+        <div style="width:100%;height:380px;background:#fbfaf6;border:2px solid #2a2723;border-radius:8px;box-shadow:4px 4px 0 rgba(42,39,35,.10);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:28px;flex:none;border-bottom:2px solid #2a2723;background:#efece4;display:flex;align-items:center;padding:0 10px;gap:6px;"><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span></div>
+          <div style="flex:1;padding:20px;display:flex;flex-direction:column;gap:13px;">
+            <div style="font:700 19px 'Kalam',cursive;color:#2a2723;">Connect your Gmail</div>
+            <div style="display:flex;gap:9px;align-items:flex-start;"><span style="color:#037B68;font:700 15px 'Kalam',cursive;">·</span><div style="height:8px;border-radius:5px;background:#dcd9d0;flex:1;margin-top:6px;"></div></div>
+            <div style="display:flex;gap:9px;align-items:flex-start;"><span style="color:#037B68;font:700 15px 'Kalam',cursive;">·</span><div style="font:400 14px 'Kalam',cursive;color:#5C5246;flex:1;">We only read emails from bank senders.</div></div>
+            <div style="display:flex;gap:9px;align-items:flex-start;"><span style="color:#037B68;font:700 15px 'Kalam',cursive;">·</span><div style="font:400 14px 'Kalam',cursive;color:#5C5246;flex:1;">Amounts, dates &amp; merchant are pulled out.</div></div>
+            <div style="display:flex;gap:9px;align-items:flex-start;"><span style="color:#037B68;font:700 15px 'Kalam',cursive;">·</span><div style="font:400 14px 'Kalam',cursive;color:#5C5246;flex:1;">Stored on this device only.</div></div>
+            <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}"><div style="display:flex;align-items:center;gap:6px;font:400 13px 'Kalam',cursive;color:#C97B5C;margin-top:2px;"><span>↳</span><span>read-only scope · bank senders only</span></div></sc-if>
+            <button style="align-self:flex-start;background:#037B68;color:#fff;border:none;border-radius:6px;padding:8px 18px;font:700 14px 'Kalam',cursive;margin-top:auto;">Continue</button>
+          </div>
+        </div>
+        <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}"><div style="font:400 14px 'Kalam',cursive;color:#6b665c;">Process + privacy, before asking for anything.</div></sc-if>
+      </div>
+
+      <!-- G2 enter email -->
+      <div style="flex:none;width:380px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font:700 16px 'Kalam',cursive;color:#2a2723;display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:2px solid #2a2723;border-radius:50%;font:700 13px 'Kalam',cursive;">2</span>Enter email</div>
+        <div style="width:100%;height:380px;background:#fbfaf6;border:2px solid #2a2723;border-radius:8px;box-shadow:4px 4px 0 rgba(42,39,35,.10);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:28px;flex:none;border-bottom:2px solid #2a2723;background:#efece4;display:flex;align-items:center;padding:0 10px;gap:6px;"><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span></div>
+          <div style="flex:1;padding:20px;display:flex;flex-direction:column;gap:14px;justify-content:center;">
+            <div style="font:700 19px 'Kalam',cursive;color:#2a2723;">Which mailbox?</div>
+            <div style="font:400 12px 'Kalam',cursive;color:#7a756b;text-transform:uppercase;letter-spacing:1px;">Gmail address</div>
+            <div style="border:2px solid #2a2723;border-radius:6px;padding:11px 12px;background:#fff;font:400 15px 'Kalam',cursive;color:#9a9488;">you@gmail.com</div>
+            <div style="font:400 14px 'Kalam',cursive;color:#7a756b;">We'll ask Google to authorize Ledga in the next step.</div>
+            <button style="background:#037B68;color:#fff;border:none;border-radius:6px;padding:10px 18px;font:700 15px 'Kalam',cursive;display:flex;align-items:center;justify-content:center;gap:8px;"><span style="width:16px;height:16px;border:2px solid #fff;border-radius:50%;display:inline-block;"></span>Connect with Google</button>
+          </div>
+        </div>
+        <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}"><div style="font:400 14px 'Kalam',cursive;color:#6b665c;">Single field — the only thing the user types.</div></sc-if>
+      </div>
+
+      <!-- G3 oauth popup -->
+      <div style="flex:none;width:420px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font:700 16px 'Kalam',cursive;color:#2a2723;display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:2px solid #2a2723;border-radius:50%;font:700 13px 'Kalam',cursive;">3</span>Google authorization</div>
+        <div style="width:100%;height:380px;background:#fbfaf6;border:2px solid #2a2723;border-radius:8px;box-shadow:4px 4px 0 rgba(42,39,35,.10);overflow:hidden;display:flex;flex-direction:column;position:relative;">
+          <div style="height:28px;flex:none;border-bottom:2px solid #2a2723;background:#efece4;display:flex;align-items:center;padding:0 10px;gap:6px;"><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span></div>
+          <div style="flex:1;padding:20px;opacity:.4;"><div style="font:700 18px 'Kalam',cursive;color:#2a2723;">Which mailbox?</div><div style="height:9px;border-radius:5px;background:#dcd9d0;width:80%;margin-top:14px;"></div><div style="height:9px;border-radius:5px;background:#dcd9d0;width:60%;margin-top:10px;"></div></div>
+          <div style="position:absolute;inset:28px 0 0 0;background:rgba(42,39,35,.32);display:flex;align-items:center;justify-content:center;">
+            <div style="width:78%;background:#fff;border:2px solid #2a2723;border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:11px;box-shadow:6px 6px 0 rgba(42,39,35,.18);">
+              <div style="display:flex;gap:5px;align-items:center;"><span style="width:11px;height:11px;border-radius:50%;background:#4285F4;"></span><span style="width:11px;height:11px;border-radius:50%;background:#EA4335;"></span><span style="width:11px;height:11px;border-radius:50%;background:#FBBC05;"></span><span style="font:700 14px 'Kalam',cursive;color:#5f6368;margin-left:4px;">Sign in with Google</span></div>
+              <div style="font:700 16px 'Kalam',cursive;color:#2a2723;">Ledga wants access to your Google account</div>
+              <div style="display:flex;align-items:center;gap:8px;border:1.5px solid #dcd9d0;border-radius:6px;padding:7px 9px;"><span style="width:22px;height:22px;border-radius:50%;background:#EBF3E9;"></span><div style="font:400 13px 'Kalam',cursive;color:#5C5246;">you@gmail.com</div></div>
+              <div style="display:flex;gap:8px;align-items:flex-start;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5f6368" stroke-width="2" style="margin-top:2px;"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><div style="font:400 13px 'Kalam',cursive;color:#5C5246;">View your email messages and settings</div></div>
+              <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:2px;"><button style="background:transparent;color:#1a73e8;border:none;font:700 13px 'Kalam',cursive;">Cancel</button><button style="background:#1a73e8;color:#fff;border:none;border-radius:5px;padding:7px 16px;font:700 13px 'Kalam',cursive;">Allow</button></div>
+            </div>
+          </div>
+        </div>
+        <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}"><div style="display:flex;align-items:center;gap:6px;font:400 13px 'Kalam',cursive;color:#C97B5C;"><span>↳</span><span>system OAuth window — Google's UI, not ours</span></div></sc-if>
+        <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}"><div style="font:400 14px 'Kalam',cursive;color:#6b665c;">Consent happens entirely inside Google.</div></sc-if>
+      </div>
+
+      <!-- G4 auto sync -->
+      <div style="flex:none;width:400px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font:700 16px 'Kalam',cursive;color:#2a2723;display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:2px solid #2a2723;border-radius:50%;font:700 13px 'Kalam',cursive;">4</span>Automatic sync?</div>
+        <div style="width:100%;height:380px;background:#fbfaf6;border:2px solid #2a2723;border-radius:8px;box-shadow:4px 4px 0 rgba(42,39,35,.10);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:28px;flex:none;border-bottom:2px solid #2a2723;background:#efece4;display:flex;align-items:center;padding:0 10px;gap:6px;"><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span></div>
+          <div style="flex:1;padding:20px;display:flex;flex-direction:column;gap:13px;">
+            <div style="font:700 19px 'Kalam',cursive;color:#2a2723;">Keep Ledga up to date?</div>
+            <div style="border:2px solid #037B68;border-radius:8px;padding:13px;background:#EBF3E9;display:flex;gap:11px;align-items:flex-start;">
+              <div style="width:42px;height:24px;border-radius:999px;background:#037B68;flex:none;position:relative;"><span style="position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;background:#fff;"></span></div>
+              <div><div style="font:700 15px 'Kalam',cursive;color:#2a2723;">Automatic sync</div><div style="font:400 13px 'Kalam',cursive;color:#5C5246;margin-top:3px;">Ledga is notified the moment a bank email arrives — no polling.</div></div>
+            </div>
+            <div style="border:2px solid #dcd9d0;border-radius:8px;padding:13px;display:flex;gap:11px;align-items:flex-start;">
+              <span style="width:18px;height:18px;border:2px solid #9a9488;border-radius:50%;flex:none;margin-top:2px;"></span>
+              <div><div style="font:700 15px 'Kalam',cursive;color:#2a2723;">Manual only</div><div style="font:400 13px 'Kalam',cursive;color:#5C5246;margin-top:3px;">Sync when I click the button.</div></div>
+            </div>
+            <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}"><div style="display:flex;align-items:center;gap:6px;font:400 13px 'Kalam',cursive;color:#C97B5C;"><span>↳</span><span>auto = Gmail watch → push notifies the local app</span></div></sc-if>
+            <button style="align-self:flex-start;background:#037B68;color:#fff;border:none;border-radius:6px;padding:8px 18px;font:700 14px 'Kalam',cursive;margin-top:auto;">Enable auto-sync</button>
+          </div>
+        </div>
+        <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}"><div style="font:400 14px 'Kalam',cursive;color:#6b665c;">Watch process vs. manual — user's choice.</div></sc-if>
+      </div>
+
+      <!-- G5 connected -->
+      <div style="flex:none;width:380px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font:700 16px 'Kalam',cursive;color:#2a2723;display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:2px solid #2a2723;border-radius:50%;font:700 13px 'Kalam',cursive;">5</span>Connected</div>
+        <div style="width:100%;height:380px;background:#fbfaf6;border:2px solid #2a2723;border-radius:8px;box-shadow:4px 4px 0 rgba(42,39,35,.10);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:28px;flex:none;border-bottom:2px solid #2a2723;background:#efece4;display:flex;align-items:center;padding:0 10px;gap:6px;"><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span></div>
+          <div style="flex:1;padding:22px;display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center;">
+            <div style="width:50px;height:50px;border-radius:50%;background:#EBF3E9;border:2px solid #037B68;display:flex;align-items:center;justify-content:center;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#037B68" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div style="font:700 20px 'Kalam',cursive;color:#2a2723;">Gmail connected</div>
+            <div style="display:flex;align-items:center;gap:7px;font:400 14px 'Kalam',cursive;color:#037B68;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#037B68" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>Watching for bank emails</div>
+            <div style="width:100%;border:2px solid #dcd9d0;border-radius:8px;padding:11px;text-align:left;display:flex;flex-direction:column;gap:8px;">
+              <div style="font:400 12px 'Kalam',cursive;color:#7a756b;text-transform:uppercase;letter-spacing:1px;">Found just now</div>
+              <div style="display:flex;justify-content:space-between;"><div style="height:8px;width:55%;border-radius:5px;background:#dcd9d0;"></div><div style="height:8px;width:20%;border-radius:5px;background:#c4c0b4;"></div></div>
+              <div style="display:flex;justify-content:space-between;"><div style="height:8px;width:45%;border-radius:5px;background:#dcd9d0;"></div><div style="height:8px;width:20%;border-radius:5px;background:#c4c0b4;"></div></div>
+              <div style="display:flex;justify-content:space-between;"><div style="height:8px;width:60%;border-radius:5px;background:#dcd9d0;"></div><div style="height:8px;width:20%;border-radius:5px;background:#c4c0b4;"></div></div>
+            </div>
+            <button style="background:#037B68;color:#fff;border:none;border-radius:6px;padding:9px 18px;font:700 15px 'Kalam',cursive;margin-top:auto;">Go to dashboard</button>
+          </div>
+        </div>
+        <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}"><div style="font:400 14px 'Kalam',cursive;color:#6b665c;">Confirmation + first transactions stream in. Ongoing sync runs in the background.</div></sc-if>
+      </div>
+
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============================================================= -->
+  <!-- SECTION 3 — IMPORT STATEMENT -->
+  <!-- ============================================================= -->
+  <sc-if value="{{ isImport }}" hint-placeholder-val="{{ true }}">
+  <div>
+    <div style="font:700 24px 'Kalam',cursive;color:#2a2723;margin-bottom:4px;">Import a statement</div>
+    <div style="font:400 15px 'Kalam',cursive;color:#7a756b;margin-bottom:22px;">Upload → parsing runs in the background → transactions land in the ledger as they're parsed → review only the flagged ones, whenever. Nothing blocks the user.</div>
+    <div style="display:flex;gap:24px;align-items:flex-start;">
+
+      <!-- I1 upload -->
+      <div style="flex:none;width:380px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font:700 16px 'Kalam',cursive;color:#2a2723;display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:2px solid #2a2723;border-radius:50%;font:700 13px 'Kalam',cursive;">1</span>Upload</div>
+        <div style="width:100%;height:360px;background:#fbfaf6;border:2px solid #2a2723;border-radius:8px;box-shadow:4px 4px 0 rgba(42,39,35,.10);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:28px;flex:none;border-bottom:2px solid #2a2723;background:#efece4;display:flex;align-items:center;padding:0 10px;gap:6px;"><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span></div>
+          <div style="flex:1;padding:20px;display:flex;flex-direction:column;gap:14px;">
+            <div style="font:700 19px 'Kalam',cursive;color:#2a2723;">Add a statement</div>
+            <div style="flex:1;border:2px dashed #9a9488;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;background:#f4f1e8;">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#6b665c" stroke-width="2"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></svg>
+              <div style="font:700 16px 'Kalam',cursive;color:#2a2723;">Drop a PDF or CSV here</div>
+              <button style="background:transparent;color:#2a2723;border:2px solid #2a2723;border-radius:6px;padding:6px 14px;font:700 13px 'Kalam',cursive;">Browse files</button>
+              <div style="font:400 12px 'Kalam',cursive;color:#7a756b;">Most banks supported · PDF, CSV, OFX</div>
+            </div>
+          </div>
+        </div>
+        <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}"><div style="font:400 14px 'Kalam',cursive;color:#6b665c;">Drag-drop or browse — the only input.</div></sc-if>
+      </div>
+
+      <!-- I2 import started -->
+      <div style="flex:none;width:380px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font:700 16px 'Kalam',cursive;color:#2a2723;display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:2px solid #2a2723;border-radius:50%;font:700 13px 'Kalam',cursive;">2</span>Import started</div>
+        <div style="width:100%;height:360px;background:#fbfaf6;border:2px solid #2a2723;border-radius:8px;box-shadow:4px 4px 0 rgba(42,39,35,.10);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:28px;flex:none;border-bottom:2px solid #2a2723;background:#efece4;display:flex;align-items:center;padding:0 10px;gap:6px;"><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span></div>
+          <div style="flex:1;padding:20px;display:flex;flex-direction:column;gap:13px;">
+            <div style="display:flex;align-items:center;gap:9px;border:2px solid #dcd9d0;border-radius:6px;padding:9px 11px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2a2723" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><div style="font:400 14px 'Kalam',cursive;color:#2a2723;">statement-may.pdf</div><span style="margin-left:auto;font:400 11px 'Kalam',cursive;color:#037B68;">First National · PDF</span></div>
+            <div style="font:700 18px 'Kalam',cursive;color:#2a2723;">Importing in the background</div>
+            <div style="height:10px;border-radius:6px;background:#e3e0d8;overflow:hidden;"><div style="height:100%;width:64%;background:#037B68;border-radius:6px;"></div></div>
+            <div style="display:flex;justify-content:space-between;font:400 13px 'Kalam',cursive;color:#5C5246;"><span>91 / 142 rows parsed</span><span>added so far: 88</span></div>
+            <div style="font:400 14px 'Kalam',cursive;color:#5C5246;">You can keep working — transactions appear in your ledger as they're parsed.</div>
+            <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}"><div style="display:flex;align-items:center;gap:6px;font:400 13px 'Kalam',cursive;color:#C97B5C;"><span>↳</span><span>non-blocking job · writes to SQLite asynchronously</span></div></sc-if>
+            <div style="display:flex;gap:9px;margin-top:auto;"><button style="background:#037B68;color:#fff;border:none;border-radius:6px;padding:8px 16px;font:700 14px 'Kalam',cursive;">Go to dashboard</button><button style="background:transparent;color:#2a2723;border:2px solid #2a2723;border-radius:6px;padding:7px 15px;font:700 14px 'Kalam',cursive;">View status</button></div>
+          </div>
+        </div>
+        <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}"><div style="font:400 14px 'Kalam',cursive;color:#6b665c;">Kicks off a background job — the user is never made to wait.</div></sc-if>
+      </div>
+
+      <!-- I3 background activity -->
+      <div style="flex:none;width:400px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font:700 16px 'Kalam',cursive;color:#2a2723;display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:2px solid #2a2723;border-radius:50%;font:700 13px 'Kalam',cursive;">3</span>Background activity</div>
+        <div style="width:100%;height:360px;background:#fbfaf6;border:2px solid #2a2723;border-radius:8px;box-shadow:4px 4px 0 rgba(42,39,35,.10);overflow:hidden;display:flex;flex-direction:column;position:relative;">
+          <div style="height:28px;flex:none;border-bottom:2px solid #2a2723;background:#efece4;display:flex;align-items:center;padding:0 10px;gap:6px;"><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;font:600 10px 'Kalam',cursive;color:#037B68;border:1.5px solid #6DB78C;border-radius:999px;padding:2px 8px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#037B68" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>2 running</span></div>
+          <div style="position:absolute;top:34px;right:12px;width:300px;background:#fff;border:2px solid #2a2723;border-radius:8px;box-shadow:5px 5px 0 rgba(42,39,35,.14);overflow:hidden;">
+            <div style="padding:9px 12px;border-bottom:1.5px solid #dcd9d0;font:700 11px 'Kalam',cursive;color:#7a756b;text-transform:uppercase;letter-spacing:1px;">Activity</div>
+            <div style="padding:11px 12px;border-bottom:1px solid #ece8dd;display:flex;flex-direction:column;gap:6px;"><div style="display:flex;justify-content:space-between;align-items:center;"><span style="font:700 13px 'Kalam',cursive;color:#2a2723;">Parsing statement-may.pdf</span><span style="font:400 12px 'Kalam',cursive;color:#037B68;">64%</span></div><div style="height:7px;border-radius:5px;background:#e3e0d8;overflow:hidden;"><div style="height:100%;width:64%;background:#037B68;"></div></div><span style="font:400 11px 'Kalam',cursive;color:#7a756b;">88 added · 4 to review</span></div>
+            <div style="padding:11px 12px;border-bottom:1px solid #ece8dd;display:flex;flex-direction:column;gap:6px;"><div style="display:flex;justify-content:space-between;align-items:center;"><span style="font:700 13px 'Kalam',cursive;color:#2a2723;">Gmail sync</span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#037B68" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div><span style="font:400 11px 'Kalam',cursive;color:#7a756b;">watching · 3 new transactions added</span></div>
+            <div style="padding:11px 12px;display:flex;align-items:center;gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#037B68" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg><span style="font:400 12px 'Kalam',cursive;color:#5C5246;">Imported april.csv — done</span></div>
+          </div>
+          <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}"><div style="position:absolute;left:14px;bottom:14px;display:flex;align-items:center;gap:6px;font:400 13px 'Kalam',cursive;color:#C97B5C;"><span>↳</span><span>one tray for imports + email sync</span></div></sc-if>
+        </div>
+        <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}"><div style="font:400 14px 'Kalam',cursive;color:#6b665c;">Opened from the header pill — check progress anytime, or ignore it.</div></sc-if>
+      </div>
+
+      <!-- I4 needs review -->
+      <div style="flex:none;width:560px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font:700 16px 'Kalam',cursive;color:#2a2723;display:flex;align-items:center;gap:8px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border:2px solid #2a2723;border-radius:50%;font:700 13px 'Kalam',cursive;">4</span>Needs review</div>
+        <div style="width:100%;height:360px;background:#fbfaf6;border:2px solid #2a2723;border-radius:8px;box-shadow:4px 4px 0 rgba(42,39,35,.10);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:28px;flex:none;border-bottom:2px solid #2a2723;background:#efece4;display:flex;align-items:center;padding:0 10px;gap:6px;"><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span></div>
+          <div style="flex:1;padding:16px;display:flex;flex-direction:column;gap:11px;min-height:0;">
+            <div style="display:flex;justify-content:space-between;align-items:center;"><div style="font:700 17px 'Kalam',cursive;color:#2a2723;">4 transactions to check</div><div style="font:400 12px 'Kalam',cursive;color:#037B68;">already in your ledger</div></div>
+            <div style="font:400 13px 'Kalam',cursive;color:#5C5246;">Low-confidence rows are saved but flagged — fix or accept them whenever.</div>
+            <div style="display:grid;grid-template-columns:64px 1fr 72px 84px 56px;gap:8px;font:700 10px 'Kalam',cursive;color:#7a756b;text-transform:uppercase;letter-spacing:.5px;border-bottom:1.5px solid #dcd9d0;padding-bottom:6px;"><span>Date</span><span>Merchant</span><span>Amount</span><span>Category</span><span></span></div>
+            <div style="display:flex;flex-direction:column;gap:7px;overflow:hidden;">
+              <div style="display:grid;grid-template-columns:64px 1fr 72px 84px 56px;gap:8px;align-items:center;background:#FBF3E2;border-radius:5px;padding:4px 5px;margin:0 -5px;"><span style="font:400 13px 'Kalam',cursive;color:#5C5246;">May 04</span><span style="font:400 13px 'Kalam',cursive;color:#2a2723;">SQ *UNKNOWN 1142</span><span style="font:400 13px 'Kalam',cursive;color:#2a2723;">-$18.00</span><span style="font:400 11px 'Kalam',cursive;color:#9a7a1a;border:1.5px solid #D9A24C;border-radius:999px;padding:1px 8px;justify-self:start;">category?</span><span style="justify-self:end;display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border:1.5px solid #6DB78C;border-radius:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#037B68" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg></span></div>
+              <div style="display:grid;grid-template-columns:64px 1fr 72px 84px 56px;gap:8px;align-items:center;background:#FBF3E2;border-radius:5px;padding:4px 5px;margin:0 -5px;"><span style="font:400 13px 'Kalam',cursive;color:#5C5246;">May 07</span><span style="font:400 13px 'Kalam',cursive;color:#2a2723;">AMZN mktp *2K8…</span><span style="font:400 13px 'Kalam',cursive;color:#2a2723;">-$31.99</span><span style="font:400 11px 'Kalam',cursive;color:#9a7a1a;border:1.5px solid #D9A24C;border-radius:999px;padding:1px 8px;justify-self:start;">category?</span><span style="justify-self:end;display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border:1.5px solid #6DB78C;border-radius:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#037B68" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg></span></div>
+              <div style="display:grid;grid-template-columns:64px 1fr 72px 84px 56px;gap:8px;align-items:center;background:#FBF3E2;border-radius:5px;padding:4px 5px;margin:0 -5px;"><span style="font:400 13px 'Kalam',cursive;color:#5C5246;">May 09</span><span style="font:400 13px 'Kalam',cursive;color:#2a2723;">POS 4471 ——</span><span style="font:400 13px 'Kalam',cursive;color:#2a2723;">-$9.50</span><span style="font:400 11px 'Kalam',cursive;color:#9a7a1a;border:1.5px solid #D9A24C;border-radius:999px;padding:1px 8px;justify-self:start;">merchant?</span><span style="justify-self:end;display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border:1.5px solid #6DB78C;border-radius:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#037B68" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg></span></div>
+            </div>
+            <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}"><div style="display:flex;align-items:center;gap:6px;font:400 13px 'Kalam',cursive;color:#C97B5C;margin-top:auto;"><span>↳</span><span>amber = low confidence · accept (✓) or edit inline, no blocking save</span></div></sc-if>
+          </div>
+        </div>
+        <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}"><div style="font:400 14px 'Kalam',cursive;color:#6b665c;">Optional cleanup queue — the ledger is already usable.</div></sc-if>
+      </div>
+
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============================================================= -->
+  <!-- SECTION 4 — DASHBOARD VARIATIONS -->
+  <!-- ============================================================= -->
+  <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+  <div>
+    <div style="font:700 24px 'Kalam',cursive;color:#2a2723;margin-bottom:4px;">Dashboard — three layout options</div>
+    <div style="font:400 15px 'Kalam',cursive;color:#7a756b;margin-bottom:22px;">Same data, three ways to weight it. Pick a direction to take to higher fidelity.</div>
+    <div style="display:flex;gap:30px;align-items:flex-start;">
+
+      <!-- Var A table-first -->
+      <div style="flex:none;width:680px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font:700 16px 'Kalam',cursive;color:#2a2723;">Option A — transactions table dominant</div>
+        <div style="width:100%;height:470px;background:#fbfaf6;border:2px solid #2a2723;border-radius:8px;box-shadow:4px 4px 0 rgba(42,39,35,.10);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:28px;flex:none;border-bottom:2px solid #2a2723;background:#efece4;display:flex;align-items:center;padding:0 10px;gap:6px;"><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="margin-left:8px;font:600 11px 'Kalam',cursive;color:#6b665c;">Ledga</span><span style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;font:600 10px 'Kalam',cursive;color:#037B68;border:1.5px solid #6DB78C;border-radius:999px;padding:2px 8px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#037B68" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>Parsing 64%</span></div>
+          <div style="flex:1;display:flex;min-height:0;">
+            <!-- nav -->
+            <div style="width:130px;flex:none;border-right:2px solid #dcd9d0;background:#f4f1e8;padding:12px 10px;display:flex;flex-direction:column;gap:9px;">
+              <div style="display:flex;align-items:center;gap:7px;"><span style="width:22px;height:22px;border:2px solid #2a2723;border-radius:6px;background:#EBF3E9;display:flex;align-items:center;justify-content:center;font:700 12px 'Kalam',cursive;color:#037B68;">L</span><span style="font:700 14px 'Kalam',cursive;color:#2a2723;">Ledga</span></div>
+              <div style="height:1.5px;background:#dcd9d0;margin:4px 0;"></div>
+              <div style="font:700 13px 'Kalam',cursive;color:#037B68;background:#EBF3E9;border-radius:5px;padding:5px 7px;">Transactions</div>
+              <div style="font:400 13px 'Kalam',cursive;color:#5C5246;padding:5px 7px;">Accounts</div>
+              <div style="font:400 13px 'Kalam',cursive;color:#5C5246;padding:5px 7px;">Assistant</div>
+              <div style="font:400 13px 'Kalam',cursive;color:#5C5246;padding:5px 7px;">Settings</div>
+              <div style="margin-top:auto;display:flex;align-items:center;gap:6px;font:400 11px 'Kalam',cursive;color:#037B68;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#037B68" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>Synced 2m ago</div>
+            </div>
+            <!-- main -->
+            <div style="flex:1;padding:16px;display:flex;flex-direction:column;gap:13px;min-width:0;">
+              <div style="display:flex;gap:11px;">
+                <div style="flex:1;border:2px solid #dcd9d0;border-radius:8px;padding:10px;"><div style="font:400 11px 'Kalam',cursive;color:#7a756b;text-transform:uppercase;letter-spacing:.5px;">Balance</div><div style="font:700 22px 'Kalam',cursive;color:#2a2723;">$8,412</div></div>
+                <div style="flex:1;border:2px solid #dcd9d0;border-radius:8px;padding:10px;"><div style="font:400 11px 'Kalam',cursive;color:#7a756b;text-transform:uppercase;letter-spacing:.5px;">In · May</div><div style="font:700 22px 'Kalam',cursive;color:#037B68;">+$4,260</div></div>
+                <div style="flex:1;border:2px solid #dcd9d0;border-radius:8px;padding:10px;"><div style="font:400 11px 'Kalam',cursive;color:#7a756b;text-transform:uppercase;letter-spacing:.5px;">Out · May</div><div style="font:700 22px 'Kalam',cursive;color:#B05A3C;">-$3,118</div></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;"><div style="font:700 16px 'Kalam',cursive;color:#2a2723;">Recent activity</div><div style="font:400 12px 'Kalam',cursive;color:#5C5246;border:1.5px solid #dcd9d0;border-radius:999px;padding:2px 9px;">All accounts ▾</div></div>
+              <div style="flex:1;border:2px solid #dcd9d0;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;">
+                <div style="display:grid;grid-template-columns:60px 1fr 80px;gap:8px;padding:7px 11px;background:#f4f1e8;border-bottom:1.5px solid #dcd9d0;font:700 10px 'Kalam',cursive;color:#7a756b;text-transform:uppercase;letter-spacing:.5px;"><span>Date</span><span>Merchant</span><span>Amount</span></div>
+                <div style="display:grid;grid-template-columns:60px 1fr 80px;gap:8px;padding:7px 11px;border-bottom:1px solid #ece8dd;font:400 13px 'Kalam',cursive;"><span style="color:#5C5246;">May 07</span><span style="color:#2a2723;">Amazon</span><span style="color:#2a2723;">-$31.99</span></div>
+                <div style="display:grid;grid-template-columns:60px 1fr 80px;gap:8px;padding:7px 11px;border-bottom:1px solid #ece8dd;font:400 13px 'Kalam',cursive;"><span style="color:#5C5246;">May 06</span><span style="color:#2a2723;">Payroll deposit</span><span style="color:#037B68;">+$2,140</span></div>
+                <div style="display:grid;grid-template-columns:60px 1fr 80px;gap:8px;padding:7px 11px;border-bottom:1px solid #ece8dd;font:400 13px 'Kalam',cursive;"><span style="color:#5C5246;">May 05</span><span style="color:#2a2723;">Shell</span><span style="color:#2a2723;">-$44.10</span></div>
+                <div style="display:grid;grid-template-columns:60px 1fr 80px;gap:8px;padding:7px 11px;border-bottom:1px solid #ece8dd;font:400 13px 'Kalam',cursive;"><span style="color:#5C5246;">May 04</span><span style="color:#2a2723;">Square</span><span style="color:#2a2723;">-$18.00</span></div>
+                <div style="display:grid;grid-template-columns:60px 1fr 80px;gap:8px;padding:7px 11px;font:400 13px 'Kalam',cursive;"><span style="color:#5C5246;">May 03</span><span style="color:#2a2723;">Whole Foods</span><span style="color:#2a2723;">-$62.40</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}"><div style="font:400 14px 'Kalam',cursive;color:#6b665c;">Ledger-first. A header pill shows background sync/parse status (see flow 3).</div></sc-if>
+      </div>
+
+      <!-- Var B AI dock -->
+      <div style="flex:none;width:680px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font:700 16px 'Kalam',cursive;color:#2a2723;">Option B — assistant docked alongside</div>
+        <div style="width:100%;height:470px;background:#fbfaf6;border:2px solid #2a2723;border-radius:8px;box-shadow:4px 4px 0 rgba(42,39,35,.10);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:28px;flex:none;border-bottom:2px solid #2a2723;background:#efece4;display:flex;align-items:center;padding:0 10px;gap:6px;"><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span></div>
+          <div style="flex:1;display:flex;min-height:0;">
+            <div style="width:44px;flex:none;border-right:2px solid #dcd9d0;background:#f4f1e8;display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:12px;"><span style="width:24px;height:24px;border:2px solid #2a2723;border-radius:6px;background:#EBF3E9;display:flex;align-items:center;justify-content:center;font:700 12px 'Kalam',cursive;color:#037B68;">L</span><span style="width:18px;height:18px;border-radius:5px;background:#dcd9d0;"></span><span style="width:18px;height:18px;border-radius:5px;background:#dcd9d0;"></span></div>
+            <div style="flex:1;padding:14px;display:flex;flex-direction:column;gap:11px;min-width:0;">
+              <div style="font:700 15px 'Kalam',cursive;color:#2a2723;">Transactions</div>
+              <div style="flex:1;border:2px solid #dcd9d0;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;">
+                <div style="display:grid;grid-template-columns:55px 1fr 70px;gap:6px;padding:6px 9px;background:#f4f1e8;border-bottom:1.5px solid #dcd9d0;font:700 10px 'Kalam',cursive;color:#7a756b;text-transform:uppercase;"><span>Date</span><span>Merchant</span><span>Amt</span></div>
+                <div style="display:grid;grid-template-columns:55px 1fr 70px;gap:6px;padding:6px 9px;border-bottom:1px solid #ece8dd;font:400 12px 'Kalam',cursive;"><span style="color:#5C5246;">May 07</span><span style="color:#2a2723;">Amazon</span><span style="color:#2a2723;">-$32</span></div>
+                <div style="display:grid;grid-template-columns:55px 1fr 70px;gap:6px;padding:6px 9px;border-bottom:1px solid #ece8dd;font:400 12px 'Kalam',cursive;"><span style="color:#5C5246;">May 06</span><span style="color:#2a2723;">Payroll</span><span style="color:#037B68;">+2,140</span></div>
+                <div style="display:grid;grid-template-columns:55px 1fr 70px;gap:6px;padding:6px 9px;border-bottom:1px solid #ece8dd;font:400 12px 'Kalam',cursive;"><span style="color:#5C5246;">May 05</span><span style="color:#2a2723;">Shell</span><span style="color:#2a2723;">-$44</span></div>
+                <div style="display:grid;grid-template-columns:55px 1fr 70px;gap:6px;padding:6px 9px;font:400 12px 'Kalam',cursive;"><span style="color:#5C5246;">May 04</span><span style="color:#2a2723;">Square</span><span style="color:#2a2723;">-$18</span></div>
+              </div>
+            </div>
+            <!-- chat dock -->
+            <div style="width:210px;flex:none;border-left:2px solid #2a2723;background:#f7f3ea;display:flex;flex-direction:column;">
+              <div style="padding:9px 11px;border-bottom:1.5px solid #dcd9d0;font:700 12px 'Kalam',cursive;color:#2a2723;text-transform:uppercase;letter-spacing:1px;">Assistant</div>
+              <div style="flex:1;padding:11px;display:flex;flex-direction:column;gap:9px;">
+                <div style="align-self:flex-end;background:#037B68;color:#fff;border-radius:12px 12px 2px 12px;padding:6px 10px;font:400 12px 'Kalam',cursive;max-width:80%;">Spend on food in May?</div>
+                <div style="align-self:flex-start;background:#fff;border:1.5px solid #dcd9d0;border-radius:12px 12px 12px 2px;padding:6px 10px;font:400 12px 'Kalam',cursive;color:#2a2723;max-width:88%;">$418 across 11 visits — mostly Whole Foods.</div>
+              </div>
+              <div style="padding:9px;border-top:1.5px solid #dcd9d0;"><div style="border:2px solid #dcd9d0;border-radius:999px;padding:6px 11px;font:400 12px 'Kalam',cursive;color:#9a9488;">Ask about your money…</div></div>
+            </div>
+          </div>
+        </div>
+        <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}"><div style="font:400 14px 'Kalam',cursive;color:#6b665c;">Mirrors WritingPal's 3-column shell — chat always at hand.</div></sc-if>
+      </div>
+
+      <!-- Var C accounts-first -->
+      <div style="flex:none;width:680px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font:700 16px 'Kalam',cursive;color:#2a2723;">Option C — sources &amp; accounts up front</div>
+        <div style="width:100%;height:470px;background:#fbfaf6;border:2px solid #2a2723;border-radius:8px;box-shadow:4px 4px 0 rgba(42,39,35,.10);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:28px;flex:none;border-bottom:2px solid #2a2723;background:#efece4;display:flex;align-items:center;padding:0 10px;gap:6px;"><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span></div>
+          <div style="flex:1;padding:16px;display:flex;flex-direction:column;gap:13px;min-height:0;">
+            <div style="font:700 17px 'Kalam',cursive;color:#2a2723;">Your sources</div>
+            <div style="display:flex;gap:12px;">
+              <div style="flex:1;border:2px solid #dcd9d0;border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px;"><div style="display:flex;align-items:center;gap:7px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#037B68" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span style="font:700 14px 'Kalam',cursive;color:#2a2723;">Gmail</span></div><div style="font:700 22px 'Kalam',cursive;color:#2a2723;">$6,240</div><div style="font:400 11px 'Kalam',cursive;color:#037B68;">auto-sync · 2m ago</div></div>
+              <div style="flex:1;border:2px solid #dcd9d0;border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px;"><div style="display:flex;align-items:center;gap:7px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2a2723" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><span style="font:700 14px 'Kalam',cursive;color:#2a2723;">Statement</span></div><div style="font:700 22px 'Kalam',cursive;color:#2a2723;">$2,172</div><div style="font:400 11px 'Kalam',cursive;color:#7a756b;">139 txns · May</div></div>
+              <div style="flex:1;border:2px dashed #9a9488;border-radius:8px;padding:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b665c" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg><span style="font:400 12px 'Kalam',cursive;color:#5C5246;">Add source</span></div>
+            </div>
+            <div style="font:700 16px 'Kalam',cursive;color:#2a2723;margin-top:2px;">Recent activity</div>
+            <div style="flex:1;border:2px solid #dcd9d0;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;">
+              <div style="display:grid;grid-template-columns:60px 1fr 90px 80px;gap:8px;padding:7px 11px;border-bottom:1px solid #ece8dd;font:400 13px 'Kalam',cursive;"><span style="color:#5C5246;">May 07</span><span style="color:#2a2723;">Amazon</span><span style="color:#7a756b;">Gmail</span><span style="color:#2a2723;">-$31.99</span></div>
+              <div style="display:grid;grid-template-columns:60px 1fr 90px 80px;gap:8px;padding:7px 11px;border-bottom:1px solid #ece8dd;font:400 13px 'Kalam',cursive;"><span style="color:#5C5246;">May 06</span><span style="color:#2a2723;">Payroll</span><span style="color:#7a756b;">Gmail</span><span style="color:#037B68;">+$2,140</span></div>
+              <div style="display:grid;grid-template-columns:60px 1fr 90px 80px;gap:8px;padding:7px 11px;font:400 13px 'Kalam',cursive;"><span style="color:#5C5246;">May 05</span><span style="color:#2a2723;">Shell</span><span style="color:#7a756b;">Statement</span><span style="color:#2a2723;">-$44.10</span></div>
+            </div>
+          </div>
+        </div>
+        <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}"><div style="font:400 14px 'Kalam',cursive;color:#6b665c;">Leads with where money comes from + sync health.</div></sc-if>
+      </div>
+
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============================================================= -->
+  <!-- SECTION 5 — CHATBOT VARIATIONS -->
+  <!-- ============================================================= -->
+  <sc-if value="{{ isChat }}" hint-placeholder-val="{{ true }}">
+  <div>
+    <div style="font:700 24px 'Kalam',cursive;color:#2a2723;margin-bottom:4px;">AI assistant — two options</div>
+    <div style="font:400 15px 'Kalam',cursive;color:#7a756b;margin-bottom:22px;">Direction: <b>full conversation</b> (option A). Every answer shows its tool steps — exactly which transactions and which bank it pulled — so the user can trust the number.</div>
+    <div style="display:flex;gap:30px;align-items:flex-start;">
+
+      <!-- Chat A full -->
+      <div style="flex:none;width:560px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font:700 16px 'Kalam',cursive;color:#2a2723;">Option A — full conversation view <span style="font:400 13px 'Kalam',cursive;color:#037B68;">· chosen direction</span></div>
+        <div style="width:100%;height:500px;background:#fbfaf6;border:2px solid #2a2723;border-radius:8px;box-shadow:4px 4px 0 rgba(42,39,35,.10);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:28px;flex:none;border-bottom:2px solid #2a2723;background:#efece4;display:flex;align-items:center;padding:0 10px;gap:6px;"><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="margin-left:8px;font:600 11px 'Kalam',cursive;color:#6b665c;">Ledga — Assistant</span></div>
+          <div style="flex:1;padding:18px;display:flex;flex-direction:column;gap:12px;min-height:0;">
+            <div style="align-self:flex-start;background:#fff;border:1.5px solid #dcd9d0;border-radius:14px 14px 14px 3px;padding:9px 13px;font:400 14px 'Kalam',cursive;color:#2a2723;max-width:78%;">Ask anything about your money — I can see your ledger.</div>
+            <div style="align-self:flex-end;background:#037B68;color:#fff;border-radius:14px 14px 3px 14px;padding:9px 13px;font:400 14px 'Kalam',cursive;max-width:70%;">How much did I spend on food last month?</div>
+            <div style="align-self:flex-start;display:inline-flex;align-items:center;gap:7px;border:1.5px solid #dcd9d0;border-radius:999px;background:#f7f3ea;padding:5px 11px;max-width:90%;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5C5246" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+              <span style="font:700 11px 'Kalam',cursive;color:#5C5246;text-transform:uppercase;letter-spacing:.5px;">Used your ledger</span>
+              <span style="font:400 12px 'Kalam',cursive;color:#7a756b;">First National · Food · May → 11 txns</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7a756b" stroke-width="2" style="margin-left:2px;"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}"><div style="align-self:flex-start;display:flex;align-items:center;gap:6px;font:400 13px 'Kalam',cursive;color:#C97B5C;"><span>↳</span><span>collapsed by default — expands to each query step (filters + bank)</span></div></sc-if>
+            <div style="align-self:flex-start;background:#fff;border:1.5px solid #dcd9d0;border-radius:14px 14px 14px 3px;padding:11px 13px;font:400 14px 'Kalam',cursive;color:#2a2723;max-width:84%;display:flex;flex-direction:column;gap:8px;">
+              <span>You spent <b>$418</b> on food in May — 11 transactions at First National.</span>
+              <div style="border:1.5px solid #ece8dd;border-radius:6px;overflow:hidden;">
+                <div style="display:flex;justify-content:space-between;padding:4px 8px;border-bottom:1px solid #ece8dd;font:400 12px 'Kalam',cursive;"><span>Whole Foods</span><span>$262</span></div>
+                <div style="display:flex;justify-content:space-between;padding:4px 8px;border-bottom:1px solid #ece8dd;font:400 12px 'Kalam',cursive;"><span>Restaurants</span><span>$118</span></div>
+                <div style="display:flex;justify-content:space-between;padding:4px 8px;font:400 12px 'Kalam',cursive;"><span>Coffee</span><span>$38</span></div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;">
+              <span style="border:1.5px solid #6DB78C;color:#037B68;border-radius:999px;padding:4px 11px;font:400 12px 'Kalam',cursive;">Biggest expense?</span>
+              <span style="border:1.5px solid #6DB78C;color:#037B68;border-radius:999px;padding:4px 11px;font:400 12px 'Kalam',cursive;">Compare to April</span>
+              <span style="border:1.5px solid #6DB78C;color:#037B68;border-radius:999px;padding:4px 11px;font:400 12px 'Kalam',cursive;">Subscriptions</span>
+            </div>
+            <div style="border:2px solid #2a2723;border-radius:999px;padding:9px 14px;display:flex;align-items:center;justify-content:space-between;"><span style="font:400 14px 'Kalam',cursive;color:#9a9488;">Ask about your money…</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#037B68" stroke-width="2"><path d="m22 2-7 20-4-9-9-4z"/></svg></div>
+          </div>
+        </div>
+        <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}"><div style="font:400 14px 'Kalam',cursive;color:#6b665c;">Tool steps show the exact filters + bank queried; answers render small tables inline.</div></sc-if>
+      </div>
+
+      <!-- Chat B side panel -->
+      <div style="flex:none;width:640px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font:700 16px 'Kalam',cursive;color:#2a2723;">Option B — side panel over the ledger</div>
+        <div style="width:100%;height:470px;background:#fbfaf6;border:2px solid #2a2723;border-radius:8px;box-shadow:4px 4px 0 rgba(42,39,35,.10);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:28px;flex:none;border-bottom:2px solid #2a2723;background:#efece4;display:flex;align-items:center;padding:0 10px;gap:6px;"><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span></div>
+          <div style="flex:1;display:flex;min-height:0;">
+            <div style="flex:1;padding:14px;display:flex;flex-direction:column;gap:9px;opacity:.55;min-width:0;">
+              <div style="font:700 15px 'Kalam',cursive;color:#2a2723;">Transactions</div>
+              <div style="height:9px;border-radius:5px;background:#dcd9d0;width:90%;"></div>
+              <div style="height:9px;border-radius:5px;background:#dcd9d0;width:80%;"></div>
+              <div style="height:9px;border-radius:5px;background:#dcd9d0;width:85%;"></div>
+              <div style="height:9px;border-radius:5px;background:#dcd9d0;width:70%;"></div>
+              <div style="height:9px;border-radius:5px;background:#dcd9d0;width:88%;"></div>
+            </div>
+            <div style="width:300px;flex:none;border-left:2px solid #2a2723;background:#f7f3ea;display:flex;flex-direction:column;box-shadow:-6px 0 16px rgba(42,39,35,.10);">
+              <div style="padding:11px 13px;border-bottom:1.5px solid #dcd9d0;display:flex;justify-content:space-between;align-items:center;"><span style="font:700 12px 'Kalam',cursive;color:#2a2723;text-transform:uppercase;letter-spacing:1px;">Assistant</span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6b665c" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></div>
+              <div style="padding:9px 13px;"><span style="display:inline-flex;align-items:center;gap:6px;font:400 11px 'Kalam',cursive;color:#037B68;border:1.5px solid #6DB78C;border-radius:999px;padding:3px 9px;">Using: all transactions</span></div>
+              <div style="flex:1;padding:11px 13px;display:flex;flex-direction:column;gap:10px;">
+                <div style="align-self:flex-end;background:#037B68;color:#fff;border-radius:13px 13px 3px 13px;padding:7px 11px;font:400 13px 'Kalam',cursive;max-width:82%;">What's my biggest recurring charge?</div>
+                <div style="align-self:flex-start;background:#fff;border:1.5px solid #dcd9d0;border-radius:13px 13px 13px 3px;padding:7px 11px;font:400 13px 'Kalam',cursive;color:#2a2723;max-width:90%;">Rent — $1,650/mo. Next is a $52 gym charge on the 1st.</div>
+              </div>
+              <div style="padding:11px;border-top:1.5px solid #dcd9d0;"><div style="border:2px solid #2a2723;border-radius:999px;padding:7px 12px;font:400 12px 'Kalam',cursive;color:#9a9488;">Ask about your money…</div></div>
+            </div>
+          </div>
+        </div>
+        <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}"><div style="font:400 14px 'Kalam',cursive;color:#6b665c;">Context chip shows what the model can see. Pairs with dashboard option B.</div></sc-if>
+      </div>
+
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ============================================================= -->
+  <!-- SECTION 6 — SETTINGS -->
+  <!-- ============================================================= -->
+  <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ true }}">
+  <div>
+    <div style="font:700 24px 'Kalam',cursive;color:#2a2723;margin-bottom:4px;">Settings</div>
+    <div style="font:400 15px 'Kalam',cursive;color:#7a756b;margin-bottom:22px;">Manage connected sources and the local data — everything stays on-device.</div>
+    <div style="display:flex;gap:28px;align-items:flex-start;">
+
+      <!-- S1 accounts -->
+      <div style="flex:none;width:470px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font:700 16px 'Kalam',cursive;color:#2a2723;">Connected sources</div>
+        <div style="width:100%;height:380px;background:#fbfaf6;border:2px solid #2a2723;border-radius:8px;box-shadow:4px 4px 0 rgba(42,39,35,.10);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:28px;flex:none;border-bottom:2px solid #2a2723;background:#efece4;display:flex;align-items:center;padding:0 10px;gap:6px;"><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span></div>
+          <div style="flex:1;padding:18px;display:flex;flex-direction:column;gap:12px;">
+            <div style="border:2px solid #dcd9d0;border-radius:8px;padding:13px;display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;"><div style="display:flex;align-items:center;gap:9px;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#037B68" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><div><div style="font:700 14px 'Kalam',cursive;color:#2a2723;">you@gmail.com</div><div style="font:400 12px 'Kalam',cursive;color:#037B68;">auto-sync on · last sync 2m ago</div></div></div><div style="width:42px;height:24px;border-radius:999px;background:#037B68;position:relative;flex:none;"><span style="position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;background:#fff;"></span></div></div>
+              <div style="display:flex;gap:8px;"><button style="background:transparent;color:#037B68;border:2px solid #6DB78C;border-radius:6px;padding:5px 12px;font:700 12px 'Kalam',cursive;">Sync now</button><button style="background:transparent;color:#B05A3C;border:2px solid #d9b3a6;border-radius:6px;padding:5px 12px;font:700 12px 'Kalam',cursive;">Disconnect</button></div>
+            </div>
+            <div style="border:2px solid #dcd9d0;border-radius:8px;padding:13px;display:flex;justify-content:space-between;align-items:center;"><div style="display:flex;align-items:center;gap:9px;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#2a2723" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><div><div style="font:700 14px 'Kalam',cursive;color:#2a2723;">statement-may.pdf</div><div style="font:400 12px 'Kalam',cursive;color:#7a756b;">139 transactions · imported May 31</div></div></div></div>
+            <button style="align-self:flex-start;background:transparent;color:#2a2723;border:2px dashed #9a9488;border-radius:6px;padding:7px 14px;font:700 13px 'Kalam',cursive;display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2a2723" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Add source</button>
+          </div>
+        </div>
+        <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}"><div style="font:400 14px 'Kalam',cursive;color:#6b665c;">Toggle auto-sync, force a sync, or remove a source.</div></sc-if>
+      </div>
+
+      <!-- S2 data & privacy -->
+      <div style="flex:none;width:430px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font:700 16px 'Kalam',cursive;color:#2a2723;">Data &amp; privacy</div>
+        <div style="width:100%;height:380px;background:#fbfaf6;border:2px solid #2a2723;border-radius:8px;box-shadow:4px 4px 0 rgba(42,39,35,.10);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:28px;flex:none;border-bottom:2px solid #2a2723;background:#efece4;display:flex;align-items:center;padding:0 10px;gap:6px;"><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span><span style="width:9px;height:9px;border:1.5px solid #6b665c;border-radius:50%;"></span></div>
+          <div style="flex:1;padding:18px;display:flex;flex-direction:column;gap:13px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;border:2px solid #dcd9d0;border-radius:8px;padding:11px 13px;"><div><div style="font:400 11px 'Kalam',cursive;color:#7a756b;text-transform:uppercase;letter-spacing:1px;">Database</div><div style="font:400 14px 'Kalam',cursive;color:#2a2723;">~/Ledga/ledger.db</div></div><button style="background:transparent;color:#2a2723;border:2px solid #2a2723;border-radius:6px;padding:5px 11px;font:700 12px 'Kalam',cursive;">Reveal</button></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;"><div style="font:400 14px 'Kalam',cursive;color:#2a2723;">Sync frequency</div><div style="font:400 13px 'Kalam',cursive;color:#5C5246;border:1.5px solid #dcd9d0;border-radius:999px;padding:3px 11px;">Real-time (watch) ▾</div></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;"><div style="font:400 14px 'Kalam',cursive;color:#2a2723;">Export everything</div><button style="background:transparent;color:#037B68;border:2px solid #6DB78C;border-radius:6px;padding:5px 12px;font:700 12px 'Kalam',cursive;">Export CSV</button></div>
+            <sc-if value="{{ showAnnotations }}" hint-placeholder-val="{{ true }}"><div style="display:flex;align-items:center;gap:6px;font:400 13px 'Kalam',cursive;color:#C97B5C;"><span>↳</span><span>no cloud — all data lives in one local file</span></div></sc-if>
+            <div style="margin-top:auto;border-top:1.5px solid #dcd9d0;padding-top:13px;display:flex;justify-content:space-between;align-items:center;"><div><div style="font:700 14px 'Kalam',cursive;color:#B05A3C;">Clear all data</div><div style="font:400 12px 'Kalam',cursive;color:#7a756b;">Deletes the local ledger.</div></div><button style="background:transparent;color:#B05A3C;border:2px solid #d9b3a6;border-radius:6px;padding:6px 13px;font:700 12px 'Kalam',cursive;">Clear</button></div>
+          </div>
+        </div>
+        <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}"><div style="font:400 14px 'Kalam',cursive;color:#6b665c;">Reinforces the local-only promise; full data control.</div></sc-if>
+      </div>
+
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900},&quot;startTab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;onboarding&quot;,&quot;gmail&quot;,&quot;import&quot;,&quot;dashboard&quot;,&quot;chat&quot;,&quot;settings&quot;],&quot;default&quot;:&quot;onboarding&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showAnnotations&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = {};
+  renderVals() {
+    const t = this.state.tab || this.props.startTab || 'onboarding';
+    const set = (x) => () => this.setState({ tab: x });
+    const ts = (name) => ({
+      background: t === name ? '#2a2723' : 'transparent',
+      color: t === name ? '#fff' : '#2a2723',
+      border: '2px solid #2a2723',
+      borderRadius: '999px',
+      padding: '7px 16px',
+      font: "700 14px 'Kalam', cursive",
+      cursor: 'pointer',
+      whiteSpace: 'nowrap'
+    });
+    return {
+      isOnboarding: t === 'onboarding',
+      isGmail: t === 'gmail',
+      isImport: t === 'import',
+      isDashboard: t === 'dashboard',
+      isChat: t === 'chat',
+      isSettings: t === 'settings',
+      goOnb: set('onboarding'),
+      goGm: set('gmail'),
+      goImp: set('import'),
+      goDash: set('dashboard'),
+      goChat: set('chat'),
+      goSet: set('settings'),
+      obTab: ts('onboarding'),
+      gmTab: ts('gmail'),
+      imTab: ts('import'),
+      dbTab: ts('dashboard'),
+      chTab: ts('chat'),
+      stTab: ts('settings'),
+      showAnnotations: this.props.showAnnotations ?? true,
+      showCaptions: this.props.showCaptions ?? true
+    };
+  }
+}
+</script>
+</body>
+</html>

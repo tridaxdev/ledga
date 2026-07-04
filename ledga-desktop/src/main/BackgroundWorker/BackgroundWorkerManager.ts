@@ -22,7 +22,7 @@ export class BackgroundWorkerManager {
         this.pool = new WorkerPool("background", sizing.backgroundPoolSize, logger, factory)
     }
 
-    async executeTask<TPayload, TResult>(task: BackgroundTask<TPayload, TResult>): Promise<TResult> {
+    async executeTask<TPayload, TResult, TProgress = unknown>(task: BackgroundTask<TPayload, TResult, TProgress>): Promise<TResult> {
         return this.pool.execute(task)
     }
 

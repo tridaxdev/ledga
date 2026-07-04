@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@font-face{font-family:"Geist";font-display:swap;font-weight:100 900;src:url("./fonts/Geist-VariableFont_wght.ttf") format("truetype-variations");}
+@font-face{font-family:"Crimson Text";font-style:normal;font-weight:400;font-display:swap;src:url("./fonts/CrimsonText-Regular.ttf") format("truetype");}
+@font-face{font-family:"Crimson Text";font-style:italic;font-weight:400;font-display:swap;src:url("./fonts/CrimsonText-Italic.ttf") format("truetype");}
+@font-face{font-family:"Crimson Text";font-style:normal;font-weight:600;font-display:swap;src:url("./fonts/CrimsonText-SemiBold.ttf") format("truetype");}
+@font-face{font-family:"Crimson Text";font-style:normal;font-weight:700;font-display:swap;src:url("./fonts/CrimsonText-Bold.ttf") format("truetype");}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:#ddd2bb;min-height:100vh;font-family:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center;padding:28px;}
+@keyframes lg-blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes lg-spin{to{transform:rotate(360deg)}}
+@keyframes lg-fade{from{opacity:0}to{opacity:1}}
+@keyframes lg-pop{from{opacity:0;transform:translateY(6px) scale(.99)}to{opacity:1;transform:none}}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#d6ccb6;border-radius:6px;border:3px solid transparent;background-clip:content-box}::-webkit-scrollbar-track{background:transparent}
+</style>
+</helmet>
+
+<div style="width:1280px;height:824px;background:#fcf9f1;border:1px solid #d6ccb6;border-radius:14px;box-shadow:0 24px 60px -16px rgba(63,56,47,.34),0 8px 18px -6px rgba(63,56,47,.18);overflow:hidden;display:flex;flex-direction:column;position:relative;font-size:15px;color:#1f1b16;">
+
+  <!-- ===== TITLE BAR ===== -->
+  <div style="height:40px;flex:none;display:flex;align-items:center;padding:0 14px;background:#f7f3ea;border-bottom:1px solid #e5dfcc;position:relative;z-index:5;">
+    <div style="display:flex;gap:8px;align-items:center;">
+      <span style="width:12px;height:12px;border-radius:50%;background:#e0826f;"></span>
+      <span style="width:12px;height:12px;border-radius:50%;background:#e0bb6f;"></span>
+      <span style="width:12px;height:12px;border-radius:50%;background:#8fc69b;"></span>
+    </div>
+    <div style="position:absolute;left:0;right:0;text-align:center;font-size:13px;font-weight:500;color:#6e6354;pointer-events:none;">{{ titleText }}</div>
+    <button onClick="{{ toggleActivity }}" style="margin-left:auto;display:inline-flex;align-items:center;gap:7px;border:1px solid {{ activityBorder }};background:{{ activityBg }};border-radius:999px;padding:4px 11px;font-size:12px;font-weight:500;color:{{ activityColor }};cursor:pointer;z-index:2;">
+      <span style="{{ activitySpin }}display:inline-flex;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></span>{{ activityLabel }}
+    </button>
+  </div>
+
+  <div style="flex:1;display:flex;min-height:0;">
+
+    <!-- ===== LEFT NAV ===== -->
+    <nav style="width:236px;flex:none;background:#f7f3ea;border-right:1px solid #e5dfcc;display:flex;flex-direction:column;padding:16px 12px 12px;">
+      <div style="display:flex;align-items:center;gap:10px;padding:4px 8px 16px;">
+        <span style="width:30px;height:30px;border-radius:8px;background:#037b68;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.18);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h12M4 12h16M4 19h9"/></svg></span>
+        <span style="font-size:19px;font-weight:600;letter-spacing:-.01em;color:#1f1b16;">Ledga</span>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <button onClick="{{ goLedger }}" style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;text-align:left;background:{{ navLedgerBg }};color:{{ navLedgerColor }};">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h16M4 19h10"/></svg>Ledger
+        </button>
+        <button onClick="{{ goSettings }}" style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;text-align:left;background:{{ navSetBg }};color:{{ navSetColor }};">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2.2 2.2M16.8 16.8 19 19M19 5l-2.2 2.2M7.2 16.8 5 19"/></svg>Settings
+        </button>
+      </div>
+
+      <div style="height:1px;background:#ece5d3;margin:16px 8px;"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:0 10px 8px;">
+        <span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8e8270;">Chats</span>
+        <button onClick="{{ newChat }}" title="New chat" style="width:22px;height:22px;border-radius:8px;border:1px solid #ece5d3;background:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:#5c5246;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-height:0;overflow-y:auto;">
+        <sc-for list="{{ chats }}" as="c" hint-placeholder-count="4">
+          <button onClick="{{ c.onPick }}" style="{{ c.style }}">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;opacity:.7;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ c.title }}</span>
+            <span style="font-size:11px;color:#a89c87;flex:none;">{{ c.when }}</span>
+          </button>
+        </sc-for>
+      </div>
+
+      <div style="margin-top:auto;display:flex;align-items:center;gap:10px;padding:8px;border-top:1px solid #ece5d3;">
+        <span style="width:30px;height:30px;border-radius:50%;background:#d7ead9;color:#06554a;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;">AB</span>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:500;color:#1f1b16;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Avery Brooks</div>
+          <div style="font-size:11px;color:#8e8270;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">you<span>@</span>gmail.com</div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ===== MAIN ===== -->
+    <main style="flex:1;min-width:0;display:flex;flex-direction:column;background:#fcf9f1;">
+
+      <!-- ---------- LEDGER ---------- -->
+      <sc-if value="{{ isLedger }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:1;overflow-y:auto;">
+        <div style="max-width:920px;margin:0 auto;padding:30px 40px 56px;">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:24px;">
+            <div style="position:relative;">
+              <button onClick="{{ toggleRange }}" style="text-align:left;background:none;border:none;cursor:pointer;padding:0;display:block;">
+                <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8e8270;margin-bottom:4px;">Ledger</div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <h1 style="font-family:'Crimson Text',Georgia,serif;font-size:34px;font-weight:600;letter-spacing:-.01em;margin:0;color:#1f1b16;">{{ rangeTitle }}</h1>
+                  <span style="width:26px;height:26px;border-radius:6px;border:1px solid #e5dfcc;background:#fff;display:inline-flex;align-items:center;justify-content:center;color:#8e8270;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                </div>
+              </button>
+              <sc-if value="{{ rangeOpen }}" hint-placeholder-val="{{ false }}">
+                <div onClick="{{ closeRange }}" style="position:fixed;inset:0;z-index:30;"></div>
+                <div style="position:absolute;top:calc(100% + 8px);left:0;width:304px;background:#fff;border:1px solid #e5dfcc;border-radius:10px;box-shadow:0 14px 30px -10px rgba(63,56,47,.24),0 4px 10px -2px rgba(63,56,47,.1);z-index:40;padding:14px;animation:lg-pop .15s ease;">
+                  <div style="display:flex;gap:4px;background:#f7f3ea;border:1px solid #e5dfcc;border-radius:8px;padding:3px;margin-bottom:13px;">
+                    <button onClick="{{ modeMonth }}" style="{{ segMonth }}">Month</button>
+                    <button onClick="{{ modeYear }}" style="{{ segYear }}">Year</button>
+                    <button onClick="{{ modeCustom }}" style="{{ segCustom }}">Custom</button>
+                  </div>
+                  <sc-if value="{{ isMonthMode }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                      <button onClick="{{ yearMinus }}" style="width:28px;height:28px;border:1px solid #e5dfcc;border-radius:6px;background:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:#5c5246;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+                      <span style="font-size:15px;font-weight:600;color:#1f1b16;">{{ yearLabel }}</span>
+                      <button onClick="{{ yearPlus }}" style="width:28px;height:28px;border:1px solid #e5dfcc;border-radius:6px;background:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:#5c5246;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;">
+                      <sc-for list="{{ monthsList }}" as="mo" hint-placeholder-count="12"><button onClick="{{ mo.onPick }}" style="{{ mo.style }}">{{ mo.label }}</button></sc-for>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ isYearMode }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;">
+                      <sc-for list="{{ yearsList }}" as="yr" hint-placeholder-count="4"><button onClick="{{ yr.onPick }}" style="{{ yr.style }}">{{ yr.label }}</button></sc-for>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ isCustomMode }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;flex-direction:column;gap:9px;">
+                      <div><div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8e8270;margin-bottom:4px;">From</div><input type="date" value="{{ customFrom }}" onChange="{{ onCustomFrom }}" style="width:100%;border:1px solid #e5dfcc;border-radius:6px;padding:7px 9px;font-family:inherit;font-size:13px;color:#1f1b16;background:#fff;" /></div>
+                      <div><div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8e8270;margin-bottom:4px;">To</div><input type="date" value="{{ customTo }}" onChange="{{ onCustomTo }}" style="width:100%;border:1px solid #e5dfcc;border-radius:6px;padding:7px 9px;font-family:inherit;font-size:13px;color:#1f1b16;background:#fff;" /></div>
+                      <button onClick="{{ applyCustom }}" style="background:#037b68;color:#fff;border:none;border-radius:7px;padding:9px;font-size:13px;font-weight:500;cursor:pointer;">Apply range</button>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-if>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <div style="display:inline-flex;align-items:center;gap:7px;border:1px solid #e5dfcc;background:#fff;border-radius:6px;padding:7px 11px;font-size:13px;color:#5c5246;cursor:pointer;">All accounts<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8e8270" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+              <button onClick="{{ openImport }}" style="display:inline-flex;align-items:center;gap:7px;border:1px solid #e5dfcc;background:#fff;border-radius:6px;padding:7px 12px;font-size:13px;font-weight:500;color:#1f1b16;cursor:pointer;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Import</button>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px;">
+            <div style="background:#fff;border:1px solid #e5dfcc;border-radius:8px;padding:16px 18px;box-shadow:0 1px 2px rgba(63,56,47,.05);">
+              <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8e8270;">Balance</div>
+              <div style="font-family:'Crimson Text',Georgia,serif;font-size:30px;font-weight:600;color:#1f1b16;margin-top:6px;font-variant-numeric:tabular-nums;">$8,412.36</div>
+              <div style="font-size:12px;color:#6e6354;margin-top:2px;">across 2 sources</div>
+            </div>
+            <div style="background:#fff;border:1px solid #e5dfcc;border-radius:8px;padding:16px 18px;box-shadow:0 1px 2px rgba(63,56,47,.05);">
+              <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8e8270;">Money in</div>
+              <div style="font-family:'Crimson Text',Georgia,serif;font-size:30px;font-weight:600;color:#037b68;margin-top:6px;font-variant-numeric:tabular-nums;">+$4,260.00</div>
+              <div style="font-size:12px;color:#6e6354;margin-top:2px;">3 deposits</div>
+            </div>
+            <div style="background:#fff;border:1px solid #e5dfcc;border-radius:8px;padding:16px 18px;box-shadow:0 1px 2px rgba(63,56,47,.05);">
+              <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8e8270;">Money out</div>
+              <div style="font-family:'Crimson Text',Georgia,serif;font-size:30px;font-weight:600;color:#1f1b16;margin-top:6px;font-variant-numeric:tabular-nums;">−$3,118.42</div>
+              <div style="font-size:12px;color:#6e6354;margin-top:2px;">38 transactions</div>
+            </div>
+          </div>
+
+          <sc-if value="{{ hasReview }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:center;gap:11px;background:#fbf1da;border:1px solid #ecd9ab;border-radius:8px;padding:11px 14px;margin-bottom:18px;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#b07d22" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+            <div style="flex:1;font-size:13.5px;color:#5c5246;"><b style="color:#1f1b16;">2 transactions need a look</b> — parsed with low confidence and saved to your ledger.</div>
+            <button style="border:1px solid #d9a24c;background:#fff;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:500;color:#9a7a1a;cursor:pointer;">Review</button>
+          </div>
+          </sc-if>
+
+          <div style="background:#fff;border:1px solid #e5dfcc;border-radius:8px;box-shadow:0 1px 2px rgba(63,56,47,.05);overflow:hidden;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid #ece5d3;">
+              <div style="font-weight:600;font-size:15px;color:#1f1b16;">Transactions</div>
+              <div style="display:inline-flex;align-items:center;gap:8px;border:1px solid #e5dfcc;border-radius:6px;padding:5px 10px;color:#8e8270;font-size:13px;min-width:200px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Search transactions</div>
+            </div>
+            <div style="display:grid;grid-template-columns:78px 1fr 132px 96px 110px;gap:10px;padding:9px 16px;background:#faf6ed;border-bottom:1px solid #ece5d3;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8e8270;">
+              <span>Date</span><span>Merchant</span><span>Category</span><span>Source</span><span style="text-align:right;">Amount</span>
+            </div>
+            <sc-for list="{{ transactions }}" as="t" hint-placeholder-count="8">
+              <div style="{{ t.rowStyle }}">
+                <span style="font-size:13px;color:#6e6354;font-variant-numeric:tabular-nums;">{{ t.date }}</span>
+                <span style="min-width:0;overflow:hidden;"><span style="display:block;font-size:13.5px;color:#1f1b16;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ t.merchant }}</span><span style="display:block;font-size:11px;color:#8e8270;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ t.bank }}</span></span>
+                <span><button onClick="{{ t.onCat }}" style="{{ t.catStyle }}">{{ t.cat }}</button></span>
+                <span style="font-size:12px;color:#8e8270;">{{ t.source }}</span>
+                <span style="{{ t.amountStyle }}">{{ t.amount }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ---------- ASSISTANT ---------- -->
+      <sc-if value="{{ isAssistant }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:1;display:flex;flex-direction:column;min-height:0;">
+        <div style="flex:none;padding:16px 28px;border-bottom:1px solid #ece5d3;display:flex;align-items:center;justify-content:space-between;background:#fcf9f1;">
+          <div>
+            <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8e8270;">Assistant</div>
+            <div style="font-size:14px;color:#5c5246;margin-top:1px;">A general financial assistant — it reads, never moves money.</div>
+          </div>
+          <span style="display:inline-flex;align-items:center;gap:6px;border:1px solid #b8dcc6;background:#f4f8f1;border-radius:999px;padding:4px 11px;font-size:12px;color:#037b68;font-weight:500;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h16M4 19h10"/></svg>Using: all transactions</span>
+        </div>
+
+        <div style="flex:1;overflow-y:auto;padding:24px 28px;">
+          <div style="max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:16px;">
+            <sc-for list="{{ messages }}" as="m" hint-placeholder-count="3">
+              <div style="{{ m.wrapStyle }}">
+                <sc-if value="{{ m.isUser }}" hint-placeholder-val="{{ true }}">
+                  <div style="align-self:flex-end;background:#037b68;color:#fff;border-radius:14px 14px 4px 14px;padding:10px 14px;font-size:14px;line-height:1.55;max-width:84%;">{{ m.text }}</div>
+                </sc-if>
+                <sc-if value="{{ m.isAI }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start;max-width:92%;">
+                    <sc-if value="{{ m.thinking }}" hint-placeholder-val="{{ false }}">
+                      <div style="background:#fff;border:1px solid #e5dfcc;border-radius:14px 14px 14px 4px;padding:10px 14px;font-size:14px;color:#8e8270;">Thinking<span style="display:inline-block;width:2px;height:1em;background:#8e8270;margin-left:3px;vertical-align:text-bottom;animation:lg-blink .7s step-start infinite;"></span></div>
+                    </sc-if>
+                    <sc-if value="{{ m.hasTool }}" hint-placeholder-val="{{ false }}">
+                      <button onClick="{{ m.onToggle }}" style="display:inline-flex;align-items:center;gap:8px;border:1px solid #e5dfcc;background:#f7f3ea;border-radius:999px;padding:5px 12px;cursor:pointer;max-width:100%;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5c5246" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+                        <span style="font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#5c5246;">Used your ledger</span>
+                        <span style="font-size:12px;color:#8e8270;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ m.toolSummary }}</span>
+                        <span style="{{ m.chevStyle }}display:inline-flex;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8e8270" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                      </button>
+                      <sc-if value="{{ m.open }}" hint-placeholder-val="{{ false }}">
+                        <div style="border:1px solid #e5dfcc;border-left:2px solid #6db78c;background:#fff;border-radius:8px;padding:11px 13px;display:flex;flex-direction:column;gap:9px;animation:lg-fade .15s ease;">
+                          <sc-for list="{{ m.toolSteps }}" as="s" hint-placeholder-count="2">
+                            <div style="display:flex;flex-direction:column;gap:4px;">
+                              <div style="font-size:13px;color:#1f1b16;font-weight:500;">{{ s.name }}</div>
+                              <div style="font-size:12px;color:#5c5246;font-family:'SF Mono','JetBrains Mono',monospace;background:#faf6ed;border:1px solid #ece5d3;border-radius:5px;padding:4px 8px;">{{ s.detail }}</div>
+                              <div style="font-size:11.5px;color:#8e8270;">→ {{ s.result }}</div>
+                            </div>
+                          </sc-for>
+                        </div>
+                      </sc-if>
+                    </sc-if>
+                    <sc-if value="{{ m.hasText }}" hint-placeholder-val="{{ false }}">
+                      <div style="background:#fff;border:1px solid #e5dfcc;border-radius:14px 14px 14px 4px;padding:11px 14px;font-size:14px;line-height:1.6;color:#1f1b16;">{{ m.text }}</div>
+                    </sc-if>
+                    <sc-if value="{{ m.hasTable }}" hint-placeholder-val="{{ false }}">
+                      <div style="border:1px solid #e5dfcc;border-radius:8px;overflow:hidden;min-width:240px;">
+                        <sc-for list="{{ m.table }}" as="r" hint-placeholder-count="3">
+                          <div style="{{ r.rowStyle }}"><span style="font-size:13px;color:#5c5246;">{{ r.label }}</span><span style="font-size:13px;color:#1f1b16;font-weight:500;font-variant-numeric:tabular-nums;">{{ r.val }}</span></div>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+
+            <div style="display:flex;gap:8px;flex-wrap:wrap;padding-top:2px;">
+              <button onClick="{{ ask1 }}" style="border:1px solid #b8dcc6;background:#f4f8f1;color:#037b68;border-radius:999px;padding:6px 13px;font-size:12.5px;font-weight:500;cursor:pointer;">Biggest expense this month?</button>
+              <button onClick="{{ ask2 }}" style="border:1px solid #b8dcc6;background:#f4f8f1;color:#037b68;border-radius:999px;padding:6px 13px;font-size:12.5px;font-weight:500;cursor:pointer;">Compare to April</button>
+              <button onClick="{{ ask3 }}" style="border:1px solid #b8dcc6;background:#f4f8f1;color:#037b68;border-radius:999px;padding:6px 13px;font-size:12.5px;font-weight:500;cursor:pointer;">List my subscriptions</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:none;padding:14px 28px 18px;border-top:1px solid #ece5d3;background:#fcf9f1;">
+          <div style="max-width:720px;margin:0 auto;display:flex;align-items:flex-end;gap:10px;background:#fff;border:1px solid #e5dfcc;border-radius:12px;padding:8px 8px 8px 14px;box-shadow:0 1px 2px rgba(63,56,47,.05);">
+            <input value="{{ input }}" onChange="{{ onInput }}" onKeyDown="{{ onKey }}" placeholder="Ask about your money…" style="flex:1;border:none;outline:none;background:transparent;font-family:inherit;font-size:14px;color:#1f1b16;padding:8px 0;" />
+            <button onClick="{{ send }}" style="{{ sendStyle }}width:36px;height:36px;flex:none;display:inline-flex;align-items:center;justify-content:center;background:#037b68;color:#fff;border-radius:9px;cursor:pointer;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ---------- SETTINGS ---------- -->
+      <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:1;overflow-y:auto;">
+        <div style="max-width:760px;margin:0 auto;padding:30px 40px 56px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8e8270;margin-bottom:4px;">Settings</div>
+          <h1 style="font-family:'Crimson Text',Georgia,serif;font-size:32px;font-weight:600;letter-spacing:-.01em;margin:0 0 24px;color:#1f1b16;">Sources &amp; data</h1>
+
+          <div style="font-size:13px;font-weight:600;color:#5c5246;margin-bottom:10px;">Connected sources</div>
+          <div style="background:#fff;border:1px solid #e5dfcc;border-radius:8px;box-shadow:0 1px 2px rgba(63,56,47,.05);overflow:hidden;margin-bottom:14px;">
+            <div style="display:flex;align-items:center;gap:13px;padding:15px 16px;border-bottom:1px solid #ece5d3;">
+              <span style="width:36px;height:36px;border-radius:8px;background:#ebf3e9;display:flex;align-items:center;justify-content:center;flex:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#037b68" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:14px;font-weight:500;color:#1f1b16;">you<span>@</span>gmail.com</div>
+                <div style="font-size:12px;color:#037b68;">{{ gmailStatus }}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:12px;color:#6e6354;">Auto-sync</span>
+                <button onClick="{{ toggleAuto }}" style="{{ toggleTrackStyle }}width:42px;height:24px;border-radius:999px;position:relative;cursor:pointer;flex:none;transition:background .18s;"><span style="{{ toggleKnobStyle }}position:absolute;top:2px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:left .18s;"></span></button>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid #ece5d3;">
+              <button style="border:1px solid #b8dcc6;background:#fff;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:500;color:#037b68;cursor:pointer;">Sync now</button>
+              <button style="border:1px solid #e7c6b9;background:#fff;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:500;color:#b05a3c;cursor:pointer;">Disconnect</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:13px;padding:15px 16px;">
+              <span style="width:36px;height:36px;border-radius:8px;background:#f7f3ea;border:1px solid #e5dfcc;display:flex;align-items:center;justify-content:center;flex:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6e6354" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span>
+              <div style="flex:1;min-width:0;"><div style="font-size:14px;font-weight:500;color:#1f1b16;">statement-may.pdf</div><div style="font-size:12px;color:#8e8270;">139 transactions · imported May 31</div></div>
+            </div>
+          </div>
+          <button onClick="{{ openConnect }}" style="display:inline-flex;align-items:center;gap:7px;border:1px dashed #b9ad95;background:transparent;border-radius:6px;padding:8px 14px;font-size:13px;font-weight:500;color:#1f1b16;cursor:pointer;margin-bottom:30px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Add source</button>
+
+          <div style="font-size:13px;font-weight:600;color:#5c5246;margin-bottom:10px;">Data &amp; privacy</div>
+          <div style="background:#fff;border:1px solid #e5dfcc;border-radius:8px;box-shadow:0 1px 2px rgba(63,56,47,.05);overflow:hidden;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #ece5d3;">
+              <div><div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8e8270;">Database</div><div style="font-size:13.5px;color:#1f1b16;font-family:'SF Mono','JetBrains Mono',monospace;margin-top:3px;">~/Ledga/ledger.db</div></div>
+              <button style="border:1px solid #e5dfcc;background:#fff;border-radius:6px;padding:6px 12px;font-size:13px;color:#1f1b16;cursor:pointer;">Reveal</button>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #ece5d3;">
+              <div style="font-size:14px;color:#1f1b16;">Sync frequency</div>
+              <div style="display:inline-flex;align-items:center;gap:7px;border:1px solid #e5dfcc;border-radius:999px;padding:5px 12px;font-size:13px;color:#5c5246;cursor:pointer;">Real-time (watch)<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8e8270" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #ece5d3;">
+              <div><div style="font-size:14px;color:#1f1b16;">Export everything</div><div style="font-size:12px;color:#8e8270;">All transactions as CSV.</div></div>
+              <button style="display:inline-flex;align-items:center;gap:6px;border:1px solid #b8dcc6;background:#fff;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:500;color:#037b68;cursor:pointer;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Export CSV</button>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;">
+              <div><div style="font-size:14px;color:#b05a3c;font-weight:500;">Clear all data</div><div style="font-size:12px;color:#8e8270;">Deletes the local ledger. Cannot be undone.</div></div>
+              <button style="border:1px solid #e7c6b9;background:#fff;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:500;color:#b05a3c;cursor:pointer;">Clear</button>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:14px;color:#8e8270;font-size:12.5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>No cloud — everything lives in one file on this device.</div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ---------- CATEGORY REVIEW ---------- -->
+      <sc-if value="{{ isCategory }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Category review" style="flex:1;overflow-y:auto;position:relative;">
+        <sc-if value="{{ rowMenuOpen }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ closeRowMenu }}" style="position:fixed;inset:0;z-index:20;"></div>
+        </sc-if>
+        <div style="max-width:920px;margin:0 auto;padding:24px 40px 56px;">
+          <button onClick="{{ goLedger }}" style="display:inline-flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;color:#8e8270;font-size:13px;font-weight:500;font-family:inherit;padding:0;margin-bottom:16px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>Ledger</button>
+
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px;">
+            <div>
+              <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8e8270;margin-bottom:6px;">Category review</div>
+              <div style="display:flex;align-items:center;gap:11px;">
+                <span style="width:13px;height:13px;border-radius:50%;flex:none;background:{{ catColor }};"></span>
+                <h1 style="font-family:'Crimson Text',Georgia,serif;font-size:34px;font-weight:600;letter-spacing:-.01em;margin:0;color:#1f1b16;">{{ catName }}</h1>
+              </div>
+              <div style="font-size:14px;color:#5c5246;margin-top:7px;">{{ catSubtitle }}</div>
+            </div>
+            <div style="display:inline-flex;align-items:center;gap:7px;border:1px solid #e5dfcc;background:#fff;border-radius:6px;padding:7px 11px;font-size:13px;color:#5c5246;margin-top:24px;flex:none;">May 2026<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8e8270" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px;">
+            <div style="background:#fff;border:1px solid #e5dfcc;border-radius:8px;padding:16px 18px;box-shadow:0 1px 2px rgba(63,56,47,.05);">
+              <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8e8270;">Total spent</div>
+              <div style="font-family:'Crimson Text',Georgia,serif;font-size:30px;font-weight:600;color:#1f1b16;margin-top:6px;font-variant-numeric:tabular-nums;">{{ catTotalStr }}</div>
+              <div style="font-size:12px;color:#6e6354;margin-top:2px;">{{ catShareLine }}</div>
+            </div>
+            <div style="background:#fff;border:1px solid #e5dfcc;border-radius:8px;padding:16px 18px;box-shadow:0 1px 2px rgba(63,56,47,.05);">
+              <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8e8270;">Transactions</div>
+              <div style="font-family:'Crimson Text',Georgia,serif;font-size:30px;font-weight:600;color:#1f1b16;margin-top:6px;font-variant-numeric:tabular-nums;">{{ catCount }}</div>
+              <div style="font-size:12px;color:#6e6354;margin-top:2px;">{{ catMerchLine }}</div>
+            </div>
+            <div style="background:#fff;border:1px solid #e5dfcc;border-radius:8px;padding:14px 18px;box-shadow:0 1px 2px rgba(63,56,47,.05);">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+                <div>
+                  <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8e8270;">vs April</div>
+                  <div style="font-family:'Crimson Text',Georgia,serif;font-size:30px;font-weight:600;margin-top:6px;font-variant-numeric:tabular-nums;color:{{ catTrendColor }};">{{ catTrendStr }}</div>
+                  <div style="font-size:12px;color:#6e6354;margin-top:2px;">{{ catTrendSub }}</div>
+                </div>
+                <div style="display:flex;align-items:flex-end;gap:4px;height:38px;flex:none;">
+                  <sc-for list="{{ trendBars }}" as="b" hint-placeholder-count="6"><div style="{{ b.style }}"></div></sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <sc-if value="{{ hasFlags }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-bottom:20px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b07d22" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+              <span style="font-size:13px;font-weight:600;color:#1f1b16;">{{ flagHeadline }}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <sc-for list="{{ flags }}" as="f" hint-placeholder-count="2">
+                <div style="display:flex;align-items:center;gap:14px;background:#fdf6e7;border:1px solid #ecd9ab;border-radius:9px;padding:12px 14px;">
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-size:14px;font-weight:500;color:#1f1b16;">{{ f.merchant }}</div>
+                    <div style="font-size:12px;color:#8e8270;">{{ f.date }} · {{ f.bank }}</div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:#5c5246;flex:none;">
+                    <span style="border:1px solid #e5dfcc;background:#fff;border-radius:999px;padding:2px 9px;">{{ f.current }}</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b07d22" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                    <span style="border:1px solid #b8dcc6;background:#f4f8f1;color:#037b68;border-radius:999px;padding:2px 9px;font-weight:500;">{{ f.suggest }}</span>
+                  </div>
+                  <span style="font-size:13.5px;font-weight:600;color:#1f1b16;font-variant-numeric:tabular-nums;flex:none;width:64px;text-align:right;">{{ f.amount }}</span>
+                  <div style="display:flex;gap:7px;flex:none;">
+                    <button onClick="{{ f.onKeep }}" style="border:1px solid #e5dfcc;background:#fff;border-radius:6px;padding:6px 11px;font-size:13px;font-weight:500;color:#5c5246;cursor:pointer;font-family:inherit;">Keep</button>
+                    <button onClick="{{ f.onMove }}" style="border:none;background:#037b68;color:#fff;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;">{{ f.moveLabel }}</button>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          </sc-if>
+          <sc-if value="{{ allClear }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:center;gap:9px;background:#f4f8f1;border:1px solid #b8dcc6;border-radius:9px;padding:11px 14px;margin-bottom:20px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#037b68" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            <span style="font-size:13.5px;color:#5c5246;">Everything here looks correctly categorized.</span>
+          </div>
+          </sc-if>
+
+          <div style="background:#fff;border:1px solid #e5dfcc;border-radius:8px;box-shadow:0 1px 2px rgba(63,56,47,.05);">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid #ece5d3;">
+              <div style="font-weight:600;font-size:15px;color:#1f1b16;">Transactions in {{ catName }}</div>
+              <span style="font-size:12px;color:#8e8270;">{{ catCount }} total</span>
+            </div>
+            <div style="display:grid;grid-template-columns:78px 1fr 150px 110px;gap:10px;padding:9px 16px;background:#faf6ed;border-bottom:1px solid #ece5d3;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8e8270;">
+              <span>Date</span><span>Merchant</span><span>Category</span><span style="text-align:right;">Amount</span>
+            </div>
+            <sc-for list="{{ catTx }}" as="t" hint-placeholder-count="6">
+              <div style="{{ t.rowStyle }}">
+                <span style="font-size:13px;color:#6e6354;font-variant-numeric:tabular-nums;">{{ t.date }}</span>
+                <span style="min-width:0;overflow:hidden;"><span style="display:block;font-size:13.5px;color:#1f1b16;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ t.merchant }}</span><span style="display:block;font-size:11px;color:#8e8270;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ t.bank }}</span></span>
+                <span style="position:relative;">
+                  <button onClick="{{ t.onMenu }}" style="display:inline-flex;align-items:center;gap:6px;border:1px solid #e5dfcc;background:#fff;border-radius:999px;padding:3px 7px 3px 11px;font-size:12px;font-weight:500;color:#5c5246;cursor:pointer;font-family:inherit;max-width:100%;">
+                    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ t.cat }}</span>
+                    <span style="{{ t.chevStyle }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8e8270" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                  </button>
+                  <sc-if value="{{ t.menuOpen }}" hint-placeholder-val="{{ false }}">
+                    <div style="position:absolute;top:calc(100% + 5px);left:0;width:182px;background:#fff;border:1px solid #e5dfcc;border-radius:9px;box-shadow:0 14px 30px -10px rgba(63,56,47,.26),0 4px 10px -2px rgba(63,56,47,.1);z-index:30;padding:5px;animation:lg-pop .14s ease;">
+                      <div style="font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#a89c87;padding:5px 8px 4px;">Move to</div>
+                      <sc-for list="{{ t.menuItems }}" as="mi" hint-placeholder-count="6">
+                        <button onClick="{{ mi.onPick }}" style="{{ mi.style }}border-radius:6px;">
+                          <span>{{ mi.label }}</span>
+                          <sc-if value="{{ mi.showCheck }}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#037b68" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></sc-if>
+                        </button>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </span>
+                <span style="font-size:13.5px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;color:#1f1b16;">{{ t.amount }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+    </main>
+  </div>
+
+  <!-- ===== ACTIVITY TRAY ===== -->
+  <sc-if value="{{ showActivity }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;top:46px;right:14px;width:320px;background:#fff;border:1px solid #e5dfcc;border-radius:10px;box-shadow:0 14px 30px -10px rgba(63,56,47,.28),0 4px 10px -2px rgba(63,56,47,.12);overflow:hidden;z-index:40;animation:lg-pop .16s ease;">
+    <div style="padding:11px 14px;border-bottom:1px solid #ece5d3;font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8e8270;">Activity</div>
+    <sc-if value="{{ jobRunning }}" hint-placeholder-val="{{ true }}">
+    <div style="padding:13px 14px;border-bottom:1px solid #f1ead9;display:flex;flex-direction:column;gap:7px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;font-weight:500;color:#1f1b16;">Parsing statement-may.pdf</span><span style="font-size:12px;color:#037b68;font-variant-numeric:tabular-nums;">64%</span></div>
+      <div style="height:6px;border-radius:4px;background:#ede6d6;overflow:hidden;"><div style="height:100%;width:64%;background:#037b68;border-radius:4px;"></div></div>
+      <span style="font-size:11.5px;color:#8e8270;">88 added · 2 to review · runs in the background</span>
+    </div>
+    </sc-if>
+    <div style="padding:13px 14px;border-bottom:1px solid #f1ead9;display:flex;flex-direction:column;gap:5px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;font-weight:500;color:#1f1b16;">Gmail sync</span><span style="display:inline-flex;color:#037b68;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></span></div>
+      <span style="font-size:11.5px;color:#8e8270;">{{ syncTrayLine }}</span>
+    </div>
+    <div style="padding:13px 14px;display:flex;align-items:center;gap:9px;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#037b68" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      <span style="font-size:12.5px;color:#5c5246;">Imported april.csv — done</span>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===== CONNECT GMAIL MODAL ===== -->
+  <sc-if value="{{ showConnect }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;background:rgba(31,27,22,.34);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:50;animation:lg-fade .18s ease;">
+    <div style="width:440px;background:#fff;border:1px solid #e5dfcc;border-radius:14px;box-shadow:0 24px 50px -12px rgba(63,56,47,.4);overflow:hidden;animation:lg-pop .2s ease;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #ece5d3;">
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:#5c5246;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#037b68" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Connect Gmail</div>
+        <button onClick="{{ closeOverlay }}" style="color:#8e8270;cursor:pointer;display:inline-flex;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div style="height:3px;background:#f1ead9;"><div style="{{ connectBarStyle }}height:100%;background:#037b68;transition:width .25s;"></div></div>
+
+      <div style="padding:24px 22px;">
+        <!-- step 0 -->
+        <sc-if value="{{ cs0 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <h2 style="font-family:'Crimson Text',Georgia,serif;font-size:24px;font-weight:600;margin:0;color:#1f1b16;">Read only your bank emails</h2>
+          <div style="display:flex;flex-direction:column;gap:11px;">
+            <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:#037b68;margin-top:1px;display:inline-flex;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span style="font-size:14px;color:#5c5246;line-height:1.5;">Ledga only opens emails from known bank senders.</span></div>
+            <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:#037b68;margin-top:1px;display:inline-flex;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span style="font-size:14px;color:#5c5246;line-height:1.5;">It pulls out the amount, date and merchant — nothing else.</span></div>
+            <div style="display:flex;gap:10px;align-items:flex-start;"><span style="color:#037b68;margin-top:1px;display:inline-flex;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span style="font-size:14px;color:#5c5246;line-height:1.5;">Everything is stored on this device only.</span></div>
+          </div>
+          <button onClick="{{ connectNext }}" style="margin-top:4px;align-self:flex-start;background:#037b68;color:#fff;border-radius:7px;padding:10px 18px;font-size:14px;font-weight:500;cursor:pointer;">Continue</button>
+        </div>
+        </sc-if>
+        <!-- step 1 email -->
+        <sc-if value="{{ cs1 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:13px;">
+          <h2 style="font-family:'Crimson Text',Georgia,serif;font-size:24px;font-weight:600;margin:0;color:#1f1b16;">Which mailbox?</h2>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8e8270;">Gmail address</div>
+          <div style="border:1px solid #037b68;border-radius:7px;padding:11px 13px;font-size:14px;color:#1f1b16;box-shadow:0 0 0 3px rgba(3,123,104,.18);">you<span>@</span>gmail.com</div>
+          <div style="font-size:13px;color:#8e8270;">We'll ask Google to authorize Ledga in the next step.</div>
+          <button onClick="{{ connectNext }}" style="align-self:flex-start;background:#037b68;color:#fff;border-radius:7px;padding:10px 18px;font-size:14px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:8px;"><span style="width:15px;height:15px;border:2px solid #fff;border-radius:50%;display:inline-block;"></span>Connect with Google</button>
+        </div>
+        </sc-if>
+        <!-- step 2 oauth -->
+        <sc-if value="{{ cs2 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:13px;">
+          <div style="display:flex;gap:6px;align-items:center;"><span style="width:11px;height:11px;border-radius:50%;background:#4285F4;"></span><span style="width:11px;height:11px;border-radius:50%;background:#EA4335;"></span><span style="width:11px;height:11px;border-radius:50%;background:#FBBC05;"></span><span style="font-size:13px;font-weight:600;color:#5f6368;margin-left:4px;">Sign in with Google</span></div>
+          <div style="font-size:17px;font-weight:600;color:#1f1b16;">Ledga wants access to your Google account</div>
+          <div style="display:flex;align-items:center;gap:9px;border:1px solid #e5dfcc;border-radius:7px;padding:9px 11px;"><span style="width:24px;height:24px;border-radius:50%;background:#ebf3e9;"></span><span style="font-size:13px;color:#5c5246;">you<span>@</span>gmail.com</span></div>
+          <div style="display:flex;gap:9px;align-items:flex-start;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5f6368" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="margin-top:2px;flex:none;"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span style="font-size:13px;color:#5c5246;line-height:1.5;">View your email messages and settings</span></div>
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px;"><button onClick="{{ closeOverlay }}" style="color:#1a73e8;font-size:14px;font-weight:600;cursor:pointer;padding:8px 10px;">Cancel</button><button onClick="{{ connectNext }}" style="background:#1a73e8;color:#fff;border-radius:6px;padding:9px 18px;font-size:14px;font-weight:600;cursor:pointer;">Allow</button></div>
+        </div>
+        </sc-if>
+        <!-- step 3 autosync -->
+        <sc-if value="{{ cs3 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:13px;">
+          <h2 style="font-family:'Crimson Text',Georgia,serif;font-size:24px;font-weight:600;margin:0;color:#1f1b16;">Keep Ledga up to date?</h2>
+          <button onClick="{{ pickAuto }}" style="{{ optAutoStyle }}text-align:left;border-radius:9px;padding:13px;display:flex;gap:11px;align-items:flex-start;cursor:pointer;">
+            <span style="{{ radioAutoStyle }}width:18px;height:18px;border-radius:50%;flex:none;margin-top:2px;display:inline-flex;align-items:center;justify-content:center;">{{ radioAutoDot }}</span>
+            <span><span style="display:block;font-size:14px;font-weight:600;color:#1f1b16;">Automatic sync</span><span style="display:block;font-size:13px;color:#5c5246;margin-top:2px;line-height:1.5;">Ledga is notified the moment a bank email arrives — no polling.</span></span>
+          </button>
+          <button onClick="{{ pickManual }}" style="{{ optManualStyle }}text-align:left;border-radius:9px;padding:13px;display:flex;gap:11px;align-items:flex-start;cursor:pointer;">
+            <span style="{{ radioManualStyle }}width:18px;height:18px;border-radius:50%;flex:none;margin-top:2px;display:inline-flex;align-items:center;justify-content:center;">{{ radioManualDot }}</span>
+            <span><span style="display:block;font-size:14px;font-weight:600;color:#1f1b16;">Manual only</span><span style="display:block;font-size:13px;color:#5c5246;margin-top:2px;line-height:1.5;">Sync when you click the button.</span></span>
+          </button>
+          <button onClick="{{ connectNext }}" style="align-self:flex-start;background:#037b68;color:#fff;border-radius:7px;padding:10px 18px;font-size:14px;font-weight:500;cursor:pointer;">{{ autoCtaLabel }}</button>
+        </div>
+        </sc-if>
+        <!-- step 4 done -->
+        <sc-if value="{{ cs4 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:13px;align-items:center;text-align:center;padding:6px 0;">
+          <span style="width:54px;height:54px;border-radius:50%;background:#ebf3e9;border:1px solid #b8dcc6;display:flex;align-items:center;justify-content:center;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#037b68" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+          <h2 style="font-family:'Crimson Text',Georgia,serif;font-size:24px;font-weight:600;margin:0;color:#1f1b16;">Gmail connected</h2>
+          <div style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#037b68;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>{{ doneStatus }}</div>
+          <div style="font-size:13px;color:#5c5246;line-height:1.5;">Found 3 transactions just now — they're already in your ledger. Parsing keeps running in the background.</div>
+          <button onClick="{{ finishConnect }}" style="background:#037b68;color:#fff;border-radius:7px;padding:10px 20px;font-size:14px;font-weight:500;cursor:pointer;margin-top:4px;">Go to ledger</button>
+        </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===== IMPORT MODAL ===== -->
+  <sc-if value="{{ showImport }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;background:rgba(31,27,22,.34);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:50;animation:lg-fade .18s ease;">
+    <div style="width:460px;background:#fff;border:1px solid #e5dfcc;border-radius:14px;box-shadow:0 24px 50px -12px rgba(63,56,47,.4);overflow:hidden;animation:lg-pop .2s ease;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #ece5d3;">
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:#5c5246;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6e6354" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Import a statement</div>
+        <button onClick="{{ closeOverlay }}" style="color:#8e8270;cursor:pointer;display:inline-flex;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div style="padding:22px;">
+        <sc-if value="{{ is0 }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="border:2px dashed #b9ad95;border-radius:11px;background:#faf6ed;padding:30px 20px;display:flex;flex-direction:column;align-items:center;gap:11px;text-align:center;">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#8e8270" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 20h14"/></svg>
+            <div style="font-size:15px;font-weight:600;color:#1f1b16;">Drop a PDF or CSV here</div>
+            <div style="font-size:12px;color:#8e8270;">Most banks supported · PDF, CSV, OFX</div>
+          </div>
+          <button onClick="{{ startImport }}" style="align-self:flex-start;background:#037b68;color:#fff;border-radius:7px;padding:10px 18px;font-size:14px;font-weight:500;cursor:pointer;">Choose statement-may.pdf</button>
+        </div>
+        </sc-if>
+        <sc-if value="{{ is1 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;align-items:center;gap:10px;border:1px solid #e5dfcc;border-radius:7px;padding:9px 11px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6e6354" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><span style="font-size:13.5px;color:#1f1b16;">statement-may.pdf</span><span style="margin-left:auto;font-size:11px;color:#037b68;">First National · PDF</span></div>
+          <div style="font-size:18px;font-weight:600;font-family:'Crimson Text',Georgia,serif;color:#1f1b16;">Importing in the background</div>
+          <div style="height:8px;border-radius:5px;background:#ede6d6;overflow:hidden;"><div style="height:100%;width:64%;background:#037b68;border-radius:5px;"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#5c5246;"><span>91 / 142 rows parsed</span><span>added so far: 88</span></div>
+          <div style="font-size:13px;color:#5c5246;line-height:1.5;">You can keep working — transactions appear in your ledger as they're parsed. Low-confidence rows get flagged for review.</div>
+          <div style="display:flex;gap:9px;">
+            <button onClick="{{ finishImport }}" style="background:#037b68;color:#fff;border-radius:7px;padding:10px 18px;font-size:14px;font-weight:500;cursor:pointer;">Go to ledger</button>
+            <button onClick="{{ openActivityFromImport }}" style="border:1px solid #e5dfcc;background:#fff;border-radius:7px;padding:9px 16px;font-size:14px;font-weight:500;color:#1f1b16;cursor:pointer;">View status</button>
+          </div>
+        </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1340,&quot;height&quot;:880},&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ledger&quot;,&quot;assistant&quot;,&quot;settings&quot;],&quot;default&quot;:&quot;ledger&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;autoSync&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;jobRunning&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = {
+    screen: this.props.startScreen || 'ledger',
+    overlay: null,
+    connectStep: 0,
+    autoPick: 'auto',
+    importStep: 0,
+    jobOverride: null,
+    rangeOpen: false, rangeMode: 'month', rangeYear: 2026, rangeMonth: 4,
+    customFrom: '2026-05-01', customTo: '2026-05-31',
+    expanded: { m3: false },
+    input: '',
+    thinking: false,
+    reviewCat: 'Groceries', catOverrides: {}, dismissedFlags: {}, openRowMenu: null,
+    activeChat: 'c1',
+    chats: [
+      { id: 'c1', title: 'Food spending last month', when: 'now' },
+      { id: 'c2', title: 'Subscriptions audit', when: '2d' },
+      { id: 'c3', title: 'April vs May overview', when: 'May 30' },
+      { id: 'c4', title: 'Unrecognized charges', when: 'May 22' }
+    ],
+    messages: [
+      { id: 'm1', role: 'assistant', text: 'Ask anything about your money — I can see your whole ledger.' },
+      { id: 'm2', role: 'user', text: 'How much did I spend on food last month?' },
+      { id: 'm3', role: 'assistant',
+        tool: { summary: 'First National · Food · May → 11 txns', steps: [
+          { name: 'search_transactions', detail: 'account: First National · category: Food · May 1–31', result: '11 matching transactions' },
+          { name: 'aggregate', detail: 'sum amount, group by merchant', result: '$418.00 total' } ] },
+        text: 'You spent $418 on food in May — 11 transactions at First National. Most of it was groceries.',
+        table: [ { label: 'Whole Foods', val: '$262' }, { label: 'Restaurants', val: '$118' }, { label: 'Coffee', val: '$38' } ] }
+    ]
+  };
+
+  go(s) { this.setState({ screen: s }); }
+  toggleTool(id) { this.setState(st => ({ expanded: { ...st.expanded, [id]: !st.expanded[id] } })); }
+
+  ask(text) {
+    if (this.state.thinking) return;
+    const uid = 'u' + Date.now(), aid = 'a' + Date.now();
+    this.setState(st => ({
+      messages: [...st.messages, { id: uid, role: 'user', text }, { id: aid, role: 'assistant', thinking: true }],
+      input: '', thinking: true
+    }));
+    setTimeout(() => {
+      this.setState(st => ({
+        thinking: false,
+        expanded: { ...st.expanded, [aid]: false },
+        messages: st.messages.map(m => m.id === aid ? {
+          id: aid, role: 'assistant',
+          tool: { summary: 'All accounts · May 2026 → 38 txns', steps: [
+            { name: 'search_transactions', detail: 'accounts: all · May 1–31', result: '38 transactions' },
+            { name: 'aggregate', detail: 'sum, group by category', result: '$3,118.42 spent' } ] },
+          text: this.canned(text)
+        } : m)
+      }));
+    }, 900);
+  }
+  canned(q) {
+    return 'Here\u2019s what I found in your ledger for that. Your largest category in May was housing ($1,650), followed by food ($418). Want me to break any of these down further?';
+  }
+  send() { const t = this.state.input.trim(); if (t) this.ask(t); }
+  openCategory(c) { if (c === 'Income' || c === 'Review') return; this.setState({ screen: 'category', reviewCat: c, openRowMenu: null }); }
+  moveTx(id, c) { this.setState(st => ({ catOverrides: { ...st.catOverrides, [id]: c }, openRowMenu: null })); }
+  keepTx(id) { this.setState(st => ({ dismissedFlags: { ...st.dismissedFlags, [id]: true } })); }
+  toggleRowMenu(id) { this.setState(st => ({ openRowMenu: st.openRowMenu === id ? null : id })); }
+
+  renderVals() {
+    const s = this.state.screen;
+    const ov = this.state.overlay;
+    const auto = this.state.autoOverride != null ? this.state.autoOverride : (this.props.autoSync ?? true);
+    const job = this.state.jobOverride != null ? this.state.jobOverride : (this.props.jobRunning ?? true);
+    const navOn = { background: '#ebf3e9', color: '#037b68' };
+    const navOff = { background: 'transparent', color: '#5c5246' };
+    const titleMap = { ledger: 'Ledger', assistant: 'Assistant', settings: 'Settings' };
+
+    const cat = (label, flagged, clickable) => ({
+      fontSize: '11px', fontWeight: flagged ? 600 : 500,
+      color: flagged ? '#9a7a1a' : '#037b68',
+      border: '1px solid ' + (flagged ? '#d9a24c' : '#b8dcc6'),
+      background: flagged ? '#faf0d8' : '#f4f8f1',
+      borderRadius: '999px', padding: '2px 9px', whiteSpace: 'nowrap',
+      fontFamily: 'inherit', cursor: clickable ? 'pointer' : 'default'
+    });
+    const rowBase = (flagged) => ({ display: 'grid', gridTemplateColumns: '78px 1fr 132px 96px 110px', gap: '10px', padding: '11px 16px', alignItems: 'center', borderBottom: '1px solid #f1ead9', background: flagged ? '#fdf6e7' : 'transparent' });
+    const amt = (income) => ({ fontSize: '13.5px', fontWeight: 600, textAlign: 'right', fontVariantNumeric: 'tabular-nums', color: income ? '#037b68' : '#1f1b16' });
+
+    const txRaw = [
+      ['May 07', 'Amazon', 'Review', 'Gmail', '−$31.99', false, true, 'First National'],
+      ['May 06', 'Payroll deposit', 'Income', 'Gmail', '+$2,140.00', true, false, 'First National'],
+      ['May 05', 'Shell', 'Fuel', 'Statement', '−$44.10', false, false, 'Chase'],
+      ['May 04', 'SQ *Unknown 1142', 'Review', 'Gmail', '−$18.00', false, true, 'First National'],
+      ['May 03', 'Whole Foods', 'Groceries', 'Statement', '−$62.40', false, false, 'Chase'],
+      ['May 02', 'Spotify', 'Subscriptions', 'Gmail', '−$10.99', false, false, 'First National'],
+      ['May 01', 'Rent transfer', 'Housing', 'Statement', '−$1,650.00', false, false, 'Chase'],
+      ['Apr 30', 'Blue Bottle', 'Dining', 'Gmail', '−$5.50', false, false, 'First National']
+    ];
+    const transactions = txRaw.map((r, i) => ({
+      id: 'tx' + i, date: r[0], merchant: r[1], cat: r[2], source: r[3], amount: r[4], bank: r[7],
+      rowStyle: rowBase(r[6]), catStyle: cat(r[2], r[6], r[2] !== 'Income' && r[2] !== 'Review'),
+      onCat: () => this.openCategory(r[2]), amountStyle: amt(r[5])
+    }));
+
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const rMode = this.state.rangeMode, rYear = this.state.rangeYear, rMonth = this.state.rangeMonth;
+    const segBase = 'flex:1;padding:6px 0;border-radius:6px;font-size:12.5px;cursor:pointer;text-align:center;border:none;';
+    const segOn = 'background:#fff;color:#037b68;font-weight:600;box-shadow:0 1px 2px rgba(63,56,47,.08);';
+    const segOff = 'background:transparent;color:#5c5246;font-weight:500;';
+    const chipBase = 'padding:7px 0;border-radius:6px;font-size:12.5px;cursor:pointer;text-align:center;border:1px solid transparent;background:transparent;';
+    const chipOn = 'background:#ebf3e9;color:#037b68;border-color:#b8dcc6;font-weight:600;';
+    const chipOff = 'color:#5c5246;';
+    const monthsList = MONTHS.map((mo, i) => ({ label: mo, style: chipBase + (rMode === 'month' && i === rMonth ? chipOn : chipOff), onPick: () => this.setState({ rangeMode: 'month', rangeMonth: i, rangeOpen: false }) }));
+    const yearsList = [2023, 2024, 2025, 2026].map(y => ({ label: String(y), style: chipBase + (rMode === 'year' && y === rYear ? chipOn : chipOff), onPick: () => this.setState({ rangeMode: 'year', rangeYear: y, rangeOpen: false }) }));
+    const rangeTitle = rMode === 'month' ? (MONTHS[rMonth] + ' ' + rYear) : rMode === 'year' ? String(rYear) : ((this.state.customFrom && this.state.customTo) ? (this.state.customFrom + ' → ' + this.state.customTo) : 'Custom range');
+
+    const messages = this.state.messages.map(m => {
+      const isAI = m.role === 'assistant';
+      const open = !!this.state.expanded[m.id];
+      return {
+        ...m, isUser: m.role === 'user', isAI,
+        thinking: !!m.thinking,
+        hasTool: isAI && !!m.tool, toolSummary: m.tool ? m.tool.summary : '', toolSteps: m.tool ? m.tool.steps : [],
+        open, chevStyle: open ? 'transform:rotate(180deg);transition:transform .15s;' : 'transition:transform .15s;',
+        hasText: isAI && !!m.text && !m.thinking, hasTable: isAI && !!m.table,
+        table: (m.table || []).map((row, i) => ({ ...row, rowStyle: 'display:flex;justify-content:space-between;gap:24px;padding:7px 11px;' + (i < (m.table.length - 1) ? 'border-bottom:1px solid #f1ead9;' : '') })),
+        onToggle: () => this.toggleTool(m.id),
+        wrapStyle: { display: 'flex', flexDirection: 'column' }
+      };
+    });
+
+    // ---- category review ----
+    const CATS = ['Groceries','Dining','Subscriptions','Housing','Fuel','Transport','Health','Shopping'];
+    const catColorMap = { Groceries:'#6db78c', Dining:'#c97b5c', Subscriptions:'#037b68', Housing:'#d9a24c', Fuel:'#b05a3c', Transport:'#8e8270', Health:'#6db78c', Shopping:'#c97b5c' };
+    const aprMap = { Groceries:372.20, Dining:84.60, Subscriptions:86.71, Housing:1650.00, Fuel:71.40 };
+    const seriesMap = { Groceries:[281,334,309,358,372], Dining:[64,71,88,79,84.6], Subscriptions:[71,71,77,82,86.71], Housing:[1650,1650,1650,1650,1650], Fuel:[58,69,52,77,71.4] };
+    const master = [
+      {id:'g1',date:'May 28',merchant:'Whole Foods',bank:'Chase \u00b7 Statement',amount:-62.40,category:'Groceries'},
+      {id:'g2',date:'May 24',merchant:'Trader Joe\u2019s',bank:'Chase \u00b7 Statement',amount:-48.10,category:'Groceries'},
+      {id:'g3',date:'May 18',merchant:'Whole Foods',bank:'Chase \u00b7 Statement',amount:-54.20,category:'Groceries'},
+      {id:'g4',date:'May 12',merchant:'Safeway',bank:'First National \u00b7 Gmail',amount:-37.65,category:'Groceries'},
+      {id:'g5',date:'May 09',merchant:'Costco',bank:'Chase \u00b7 Statement',amount:-128.40,category:'Groceries'},
+      {id:'g6',date:'May 22',merchant:'Blue Bottle',bank:'First National \u00b7 Gmail',amount:-5.50,category:'Groceries',suggest:'Dining'},
+      {id:'g7',date:'May 15',merchant:'DoorDash',bank:'First National \u00b7 Gmail',amount:-32.80,category:'Groceries',suggest:'Dining'},
+      {id:'d1',date:'May 20',merchant:'Sweetgreen',bank:'First National \u00b7 Gmail',amount:-16.20,category:'Dining'},
+      {id:'d2',date:'May 11',merchant:'Local Thai',bank:'Chase \u00b7 Statement',amount:-42.00,category:'Dining'},
+      {id:'d3',date:'May 06',merchant:'Starbucks',bank:'First National \u00b7 Gmail',amount:-6.75,category:'Dining'},
+      {id:'d4',date:'Apr 30',merchant:'Blue Bottle',bank:'First National \u00b7 Gmail',amount:-5.50,category:'Dining'},
+      {id:'s1',date:'May 03',merchant:'Netflix',bank:'Chase \u00b7 Statement',amount:-15.49,category:'Subscriptions'},
+      {id:'s2',date:'May 09',merchant:'Adobe CC',bank:'Chase \u00b7 Statement',amount:-52.99,category:'Subscriptions',suggest:'Shopping'},
+      {id:'s3',date:'May 02',merchant:'Spotify',bank:'First National \u00b7 Gmail',amount:-10.99,category:'Subscriptions'},
+      {id:'s4',date:'May 01',merchant:'iCloud+',bank:'First National \u00b7 Gmail',amount:-2.99,category:'Subscriptions'},
+      {id:'s5',date:'May 14',merchant:'NYT',bank:'Chase \u00b7 Statement',amount:-4.25,category:'Subscriptions'},
+      {id:'h1',date:'May 01',merchant:'Rent transfer',bank:'Chase \u00b7 Statement',amount:-1650.00,category:'Housing'},
+      {id:'f1',date:'May 05',merchant:'Shell',bank:'Chase \u00b7 Statement',amount:-44.10,category:'Fuel'},
+      {id:'f2',date:'May 19',merchant:'Chevron',bank:'Chase \u00b7 Statement',amount:-39.20,category:'Fuel'}
+    ];
+    const reviewCat = this.state.reviewCat || 'Groceries';
+    const ovr = this.state.catOverrides || {}, dism = this.state.dismissedFlags || {};
+    const effCat = (t) => ovr[t.id] || t.category;
+    const inCat = master.filter(t => effCat(t) === reviewCat);
+    const fmt = (n) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const catSpend = inCat.reduce((a, t) => a + (t.amount < 0 ? -t.amount : 0), 0);
+    const moneyOut = 3118.42;
+    const share = moneyOut ? Math.round(catSpend / moneyOut * 100) : 0;
+    const merch = new Set(inCat.map(t => t.merchant)).size;
+    const apr = aprMap[reviewCat] || 0;
+    const delta = +(catSpend - apr).toFixed(2);
+    const pct = apr ? Math.round(Math.abs(delta) / apr * 100) : 0;
+    const series = (seriesMap[reviewCat] || [0,0,0,0,0]).slice(0,5).concat([catSpend]);
+    const smax = Math.max.apply(null, series.concat([1]));
+    const trendBars = series.map((v, i) => ({ style: 'width:9px;border-radius:2px;height:' + Math.max(3, Math.round(v / smax * 38)) + 'px;background:' + (i === series.length - 1 ? '#037b68' : '#e3dac6') + ';' }));
+    const flagged = inCat.filter(t => t.suggest && t.suggest !== reviewCat && !dism[t.id]);
+    const flags = flagged.map(t => ({ id: t.id, merchant: t.merchant, date: t.date, bank: t.bank, amount: '\u2212$' + fmt(-t.amount), current: reviewCat, suggest: t.suggest, moveLabel: 'Move to ' + t.suggest, onKeep: () => this.keepTx(t.id), onMove: () => this.moveTx(t.id, t.suggest) }));
+    const catTx = inCat.map(t => {
+      const open = this.state.openRowMenu === t.id;
+      const c = effCat(t);
+      return {
+        id: t.id, date: t.date, merchant: t.merchant, bank: t.bank, cat: c, amount: '\u2212$' + fmt(-t.amount),
+        menuOpen: open,
+        chevStyle: 'display:inline-flex;transition:transform .15s;' + (open ? 'transform:rotate(180deg);' : ''),
+        onMenu: () => this.toggleRowMenu(t.id),
+        rowStyle: 'display:grid;grid-template-columns:78px 1fr 150px 110px;gap:10px;padding:11px 16px;align-items:center;border-bottom:1px solid #f1ead9;',
+        menuItems: CATS.map(mc => ({ label: mc, showCheck: mc === c, onPick: () => this.moveTx(t.id, mc),
+          style: 'display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;border:none;font-family:inherit;font-size:13px;padding:7px 9px;cursor:pointer;background:' + (mc === c ? '#ebf3e9' : 'transparent') + ';color:' + (mc === c ? '#037b68' : '#5c5246') + ';font-weight:' + (mc === c ? '600' : '400') + ';' }))
+      };
+    });
+
+    const cstep = this.state.connectStep;
+    const pickAuto = this.state.autoPick === 'auto';
+    const radioOn = { border: '5px solid #037b68', background: '#fff' };
+    const radioOff = { border: '2px solid #b9ad95', background: '#fff' };
+    const optOn = { border: '2px solid #037b68', background: '#f4f8f1' };
+    const optOff = { border: '1px solid #e5dfcc', background: '#fff' };
+
+    return {
+      titleText: 'Ledga — ' + (s === 'category' ? reviewCat : titleMap[s]),
+      isLedger: s === 'ledger', isAssistant: s === 'assistant', isSettings: s === 'settings', isCategory: s === 'category',
+      goLedger: () => this.go('ledger'), goAssistant: () => this.go('assistant'), goSettings: () => this.go('settings'),
+      navLedgerBg: ((s === 'ledger' || s === 'category') ? navOn : navOff).background, navLedgerColor: ((s === 'ledger' || s === 'category') ? navOn : navOff).color,
+      navAssistBg: (s === 'assistant' ? navOn : navOff).background, navAssistColor: (s === 'assistant' ? navOn : navOff).color,
+      navSetBg: (s === 'settings' ? navOn : navOff).background, navSetColor: (s === 'settings' ? navOn : navOff).color,
+
+      // activity pill
+      jobRunning: job,
+      activityLabel: job ? 'Parsing 64%' : 'Synced 2m ago',
+      activityColor: '#037b68',
+      activityBg: job ? '#f4f8f1' : '#f7f3ea',
+      activityBorder: job ? '#b8dcc6' : '#e5dfcc',
+      activitySpin: job ? 'animation:lg-spin 1.6s linear infinite;' : '',
+      syncTrayLine: auto ? 'watching · 3 new transactions added' : 'manual · last synced 2m ago',
+      showActivity: ov === 'activity',
+      toggleActivity: () => this.setState(st => ({ overlay: st.overlay === 'activity' ? null : 'activity' })),
+
+      // ledger
+      hasReview: true,
+      transactions,
+      openImport: () => this.setState({ overlay: 'import', importStep: 0 }),
+      rangeOpen: this.state.rangeOpen, rangeTitle,
+      toggleRange: () => this.setState(st => ({ rangeOpen: !st.rangeOpen })),
+      closeRange: () => this.setState({ rangeOpen: false }),
+      isMonthMode: rMode === 'month', isYearMode: rMode === 'year', isCustomMode: rMode === 'custom',
+      segMonth: segBase + (rMode === 'month' ? segOn : segOff),
+      segYear: segBase + (rMode === 'year' ? segOn : segOff),
+      segCustom: segBase + (rMode === 'custom' ? segOn : segOff),
+      modeMonth: () => this.setState({ rangeMode: 'month' }),
+      modeYear: () => this.setState({ rangeMode: 'year' }),
+      modeCustom: () => this.setState({ rangeMode: 'custom' }),
+      yearLabel: String(rYear),
+      yearMinus: () => this.setState(st => ({ rangeYear: st.rangeYear - 1 })),
+      yearPlus: () => this.setState(st => ({ rangeYear: st.rangeYear + 1 })),
+      monthsList, yearsList,
+      customFrom: this.state.customFrom, customTo: this.state.customTo,
+      onCustomFrom: (e) => this.setState({ customFrom: e.target.value }),
+      onCustomTo: (e) => this.setState({ customTo: e.target.value }),
+      applyCustom: () => this.setState({ rangeMode: 'custom', rangeOpen: false }),
+
+      // chats
+      chats: this.state.chats.map(c => ({
+        ...c,
+        style: 'display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:10px;font-size:13px;cursor:pointer;text-align:left;border:none;width:100%;'
+          + (s === 'assistant' && c.id === this.state.activeChat ? 'background:#ebf3e9;color:#037b68;font-weight:500;' : 'background:transparent;color:#5c5246;'),
+        onPick: () => this.setState({ screen: 'assistant', activeChat: c.id })
+      })),
+      newChat: () => {
+        const id = 'c' + Date.now();
+        this.setState(st => ({ screen: 'assistant', activeChat: id, chats: [{ id, title: 'New chat', when: 'now' }, ...st.chats] }));
+      },
+
+      // category review
+      catName: reviewCat, catColor: catColorMap[reviewCat] || '#8e8270',
+      catSubtitle: 'Across May 2026 \u00b7 ' + inCat.length + (inCat.length === 1 ? ' transaction' : ' transactions'),
+      catTotalStr: '$' + fmt(catSpend),
+      catShareLine: share + '% of money out',
+      catCount: inCat.length,
+      catMerchLine: merch + (merch === 1 ? ' merchant' : ' merchants'),
+      catTrendStr: delta === 0 ? '$0.00' : ((delta > 0 ? '+$' : '\u2212$') + fmt(Math.abs(delta))),
+      catTrendColor: delta === 0 ? '#8e8270' : (delta > 0 ? '#b05a3c' : '#037b68'),
+      catTrendSub: delta === 0 ? 'same as April' : ((delta > 0 ? 'up ' : 'down ') + pct + '% from April'),
+      trendBars,
+      hasFlags: flagged.length > 0, allClear: flagged.length === 0,
+      flagHeadline: flagged.length === 1 ? '1 transaction may belong in another category' : flagged.length + ' transactions may belong in another category',
+      flags, catTx,
+      rowMenuOpen: this.state.openRowMenu != null,
+      closeRowMenu: () => this.setState({ openRowMenu: null }),
+
+      // assistant
+      messages,
+      input: this.state.input,
+      onInput: (e) => this.setState({ input: e.target.value }),
+      onKey: (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.send(); } },
+      send: () => this.send(),
+      sendStyle: (this.state.input.trim() && !this.state.thinking) ? '' : 'opacity:.4;cursor:not-allowed;',
+      ask1: () => this.ask('What was my biggest expense this month?'),
+      ask2: () => this.ask('How does May compare to April?'),
+      ask3: () => this.ask('List my subscriptions.'),
+
+      // settings
+      gmailStatus: auto ? 'auto-sync on · last sync 2m ago' : 'manual sync · last sync 2m ago',
+      toggleAuto: () => this.setState(st => ({ autoOverride: !(st.autoOverride != null ? st.autoOverride : (this.props.autoSync ?? true)) })),
+      toggleTrackStyle: 'background:' + (auto ? '#037b68' : '#cabfa6') + ';',
+      toggleKnobStyle: 'left:' + (auto ? '20px' : '2px') + ';',
+      openConnect: () => this.setState({ overlay: 'connect', connectStep: 0 }),
+
+      // connect modal
+      showConnect: ov === 'connect',
+      cs0: cstep === 0, cs1: cstep === 1, cs2: cstep === 2, cs3: cstep === 3, cs4: cstep === 4,
+      connectBarStyle: 'width:' + ((cstep / 4) * 100) + '%;',
+      connectNext: () => this.setState(st => ({ connectStep: Math.min(4, st.connectStep + 1) })),
+      pickAuto: () => this.setState({ autoPick: 'auto' }),
+      pickManual: () => this.setState({ autoPick: 'manual' }),
+      optAutoStyle: pickAuto ? optOn : optOff, optManualStyle: !pickAuto ? optOn : optOff,
+      radioAutoStyle: pickAuto ? radioOn : radioOff, radioManualStyle: !pickAuto ? radioOn : radioOff,
+      radioAutoDot: '', radioManualDot: '',
+      autoCtaLabel: pickAuto ? 'Enable auto-sync' : 'Use manual sync',
+      doneStatus: pickAuto ? 'Watching for bank emails' : 'Manual sync ready',
+      finishConnect: () => this.setState({ overlay: null, jobOverride: true }),
+
+      // import modal
+      showImport: ov === 'import',
+      is0: this.state.importStep === 0, is1: this.state.importStep === 1,
+      startImport: () => this.setState({ importStep: 1, jobOverride: true }),
+      finishImport: () => this.setState({ overlay: null, screen: 'ledger', jobOverride: true }),
+      openActivityFromImport: () => this.setState({ overlay: 'activity' }),
+
+      closeOverlay: () => this.setState({ overlay: null })
+    };
+  }
+}
+</script>
+</body>
+</html>
