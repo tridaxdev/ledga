@@ -52,7 +52,7 @@ export interface AIResponse<T = unknown> {
     error?: string
 }
 
-export const WorkerTaskTypeSchema = z.enum(["db_query"])
+export const WorkerTaskTypeSchema = z.enum(["db_query", "email_processing", "email_metadata"])
 export type WorkerTaskType = z.infer<typeof WorkerTaskTypeSchema>
 
 export interface WorkerTaskMessage<TPayload = unknown> {
