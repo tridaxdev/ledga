@@ -1,5 +1,6 @@
 import { useState, type MouseEvent } from "react"
 import { useTranslation } from "react-i18next"
+import { Calendar, type DateRangeValue } from "./Calendar"
 
 type Preset = "this_month" | "one_month" | "three_months" | "one_year" | "custom"
 
@@ -25,7 +26,7 @@ function yearsAgo(date: Date, years: number): Date {
     return result
 }
 
-function resolveRange(preset: Preset, customFrom: string, customTo: string): { from: Date; to: Date } | null {
+function resolveRange(preset: Preset, custom: DateRangeValue): { from: Date; to: Date } | null {
     const now = new Date()
     switch (preset) {
         case "this_month":
@@ -37,9 +38,9 @@ function resolveRange(preset: Preset, customFrom: string, customTo: string): { f
         case "one_year":
             return { from: yearsAgo(now, 1), to: now }
         case "custom": {
-            if (!customFrom || !customTo) return null
-            const from = new Date(`${customFrom}T00:00:00`)
-            const to = new Date(`${customTo}T23:59:59`)
+            if (!custom.start || !custom.end) return null
+            const from = new Date(custom.start.getFullYear(), custom.start.getMonth(), custom.start.getDate(), 0, 0, 0)
+            const to = new Date(custom.end.getFullYear(), custom.end.getMonth(), custom.end.getDate(), 23, 59, 59)
             if (from > to) return null
             return { from, to }
         }
@@ -55,12 +56,11 @@ function formatPreviewDate(date: Date): string {
 export function SyncPeriodModal({ isOpen, onClose, onConfirm }: Props) {
     const { t } = useTranslation()
     const [preset, setPreset] = useState<Preset>("one_month")
-    const [customFrom, setCustomFrom] = useState("")
-    const [customTo, setCustomTo] = useState("")
+    const [customRange, setCustomRange] = useState<DateRangeValue>({ start: null, end: null })
 
     if (!isOpen) return null
 
-    const range = resolveRange(preset, customFrom, customTo)
+    const range = resolveRange(preset, customRange)
 
     function handleConfirm() {
         if (!range) return
@@ -133,12 +133,7 @@ export function SyncPeriodModal({ isOpen, onClose, onConfirm }: Props) {
                         </PresetPill>
                     </div>
 
-                    {preset === "custom" && (
-                        <div style={{ display: "flex", gap: 10 }}>
-                            <DateField label={t("sync_period_modal.from_label")} value={customFrom} onChange={setCustomFrom} />
-                            <DateField label={t("sync_period_modal.to_label")} value={customTo} onChange={setCustomTo} />
-                        </div>
-                    )}
+                    {preset === "custom" && <Calendar value={customRange} onChange={setCustomRange} />}
 
                     <div style={{ fontSize: "12.5px", color: "var(--color-ledga-text-muted)", minHeight: "1.4em" }}>
                         {range ? t("sync_period_modal.range_preview", { from: formatPreviewDate(range.from), to: formatPreviewDate(range.to) }) : t("sync_period_modal.range_incomplete")}
@@ -185,30 +180,6 @@ function PresetPill({ selected, onClick, children }: { selected: boolean; onClic
         >
             {children}
         </button>
-    )
-}
-
-function DateField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
-    return (
-        <label style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
-            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-ledga-text-muted)" }}>{label}</span>
-            <input
-                type="date"
-                value={value}
-                onChange={e => onChange(e.target.value)}
-                style={{
-                    width: "100%",
-                    border: "1px solid var(--color-ledga-border)",
-                    borderRadius: 6,
-                    padding: "7px 9px",
-                    fontFamily: "inherit",
-                    fontSize: 13,
-                    color: "var(--color-ledga-text)",
-                    background: "#fff",
-                    boxSizing: "border-box"
-                }}
-            />
-        </label>
     )
 }
 

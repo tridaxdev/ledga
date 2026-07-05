@@ -3,6 +3,8 @@ import { AllowedChannelIpc } from "@/common/types/AllowedChannelIpc"
 import type { LedgaAPI } from "@/common/types/LedgaAPI"
 import type { Connection } from "@/common/types/Connection"
 import type { CategoryQueryParams, TransactionQueryParams } from "@/common/types/Transaction"
+import type { CategoryInput } from "@/common/types/Category"
+import type { AnalyticsQueryParams } from "@/common/types/Analytics"
 import type { RuleInput } from "@/common/types/Rule"
 import type { CsvImportProgressEvent } from "@/common/types/CsvImportTypes"
 import type { AssistantStreamChunkEvent, AssistantStreamDoneEvent, AssistantStreamErrorEvent } from "@/common/types/ChatTypes"
@@ -54,6 +56,7 @@ const ledgaAPI: LedgaAPI = {
     transactions: {
         query: (params: TransactionQueryParams) => ipcRenderer.invoke(AllowedChannelIpc.TransactionsQuery, params),
         queryByCategory: (params: CategoryQueryParams) => ipcRenderer.invoke(AllowedChannelIpc.TransactionsQueryByCategory, params),
+        listAccounts: () => ipcRenderer.invoke(AllowedChannelIpc.TransactionsListAccounts),
         updateCategory: (id: string, categoryId: string | null) => ipcRenderer.invoke(AllowedChannelIpc.TransactionsUpdateCategory, id, categoryId),
         updateMerchant: (id: string, merchant: string) => ipcRenderer.invoke(AllowedChannelIpc.TransactionsUpdateMerchant, id, merchant),
         markReviewed: (id: string) => ipcRenderer.invoke(AllowedChannelIpc.TransactionsMarkReviewed, id),
@@ -64,7 +67,16 @@ const ledgaAPI: LedgaAPI = {
         }
     },
     categories: {
-        getAll: () => ipcRenderer.invoke(AllowedChannelIpc.CategoriesGetAll)
+        getAll: () => ipcRenderer.invoke(AllowedChannelIpc.CategoriesGetAll),
+        create: (input: CategoryInput) => ipcRenderer.invoke(AllowedChannelIpc.CategoriesCreate, input),
+        update: (id: string, patch: Partial<CategoryInput>) => ipcRenderer.invoke(AllowedChannelIpc.CategoriesUpdate, id, patch),
+        delete: (id: string) => ipcRenderer.invoke(AllowedChannelIpc.CategoriesDelete, id)
+    },
+    analytics: {
+        getMonthlyTotals: (params: AnalyticsQueryParams) => ipcRenderer.invoke(AllowedChannelIpc.AnalyticsGetMonthlyTotals, params),
+        getCategoryTotals: (params: AnalyticsQueryParams) => ipcRenderer.invoke(AllowedChannelIpc.AnalyticsGetCategoryTotals, params),
+        getNetWorthHistory: (params: AnalyticsQueryParams) => ipcRenderer.invoke(AllowedChannelIpc.AnalyticsGetNetWorthHistory, params),
+        listCurrencies: () => ipcRenderer.invoke(AllowedChannelIpc.AnalyticsListCurrencies)
     },
     rules: {
         getAll: () => ipcRenderer.invoke(AllowedChannelIpc.RulesGetAll),

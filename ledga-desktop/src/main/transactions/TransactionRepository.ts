@@ -85,7 +85,7 @@ export class TransactionRepository {
         return list[0] ?? null
     }
 
-    findAll(opts?: { categoryId?: string; search?: string; limit?: number; offset?: number; from?: number; to?: number }): TransactionRow[] {
+    findAll(opts?: { categoryId?: string; search?: string; accountNumber?: string; limit?: number; offset?: number; from?: number; to?: number }): TransactionRow[] {
         const { where, params } = this.buildFilter(opts)
         const limitClause = opts?.limit !== undefined ? `LIMIT ${opts.limit}` : ""
         const offsetClause = opts?.offset !== undefined ? `OFFSET ${opts.offset}` : ""
@@ -95,13 +95,48 @@ export class TransactionRepository {
         return Array.isArray(rows) ? rows : []
     }
 
-    private buildFilter(opts?: { categoryId?: string; search?: string; from?: number; to?: number }): { where: string; params: unknown[] } {
+    listAccounts(): { bank: string; account_number: string }[] {
+        const rows = this.db.executeQuery("SELECT DISTINCT bank, account_number FROM transactions ORDER BY bank, account_number") as { bank: string; account_number: string }[] | unknown
+        return Array.isArray(rows) ? rows : []
+    }
+
+    countAll(opts?: { categoryId?: string; search?: string; accountNumber?: string; from?: number; to?: number }): number {
+        const { where, params } = this.buildFilter(opts)
+        const rows = this.db.executeQuery(`SELECT COUNT(*) AS count FROM transactions ${where}`.trimEnd(), params) as unknown
+        const list = Array.isArray(rows) ? rows : []
+        return (list[0] as { count: number } | undefined)?.count ?? 0
+    }
+
+    // Scoped to the same filters as the visible page (date range/search/account) so the "N need a
+    // look" banner reflects the whole filtered range, not just whichever 25-row page happens to be
+    // on screen. firstCategoryId picks the most recent flagged transaction that already has a
+    // category assigned, matching the "jump to that category's review page" button's needs.
+    getFlaggedSummary(opts?: { search?: string; accountNumber?: string; from?: number; to?: number }): { count: number; firstCategoryId: string | null } {
+        const { where, params } = this.buildFilter(opts)
+        const flaggedWhere = where ? `${where} AND needs_review = 1` : "WHERE needs_review = 1"
+
+        const countRows = this.db.executeQuery(`SELECT COUNT(*) AS count FROM transactions ${flaggedWhere}`, params) as unknown
+        const countList = Array.isArray(countRows) ? countRows : []
+        const count = (countList[0] as { count: number } | undefined)?.count ?? 0
+
+        const firstRows = this.db.executeQuery(`SELECT category_id FROM transactions ${flaggedWhere} AND category_id IS NOT NULL ORDER BY timestamp DESC LIMIT 1`, params) as unknown
+        const firstList = Array.isArray(firstRows) ? firstRows : []
+        const firstCategoryId = (firstList[0] as { category_id: string | null } | undefined)?.category_id ?? null
+
+        return { count, firstCategoryId }
+    }
+
+    private buildFilter(opts?: { categoryId?: string; search?: string; accountNumber?: string; from?: number; to?: number }): { where: string; params: unknown[] } {
         const conditions: string[] = []
         const params: unknown[] = []
 
         if (opts?.categoryId !== undefined) {
             conditions.push("category_id = ?")
             params.push(opts.categoryId)
+        }
+        if (opts?.accountNumber !== undefined) {
+            conditions.push("account_number = ?")
+            params.push(opts.accountNumber)
         }
         if (opts?.from !== undefined) {
             conditions.push("timestamp >= ?")
@@ -121,19 +156,19 @@ export class TransactionRepository {
         return { where, params }
     }
 
-    // Money in/out are scoped to the selected date range only -- deliberately NOT to search/category,
-    // so the stat cards don't silently shift when the user types into the search box. Balance is the
-    // running total across all transactions ever recorded (not just the period), matching how a ledger
-    // balance behaves. Takes its own {from, to}-only options (rather than the shared buildFilter) so a
-    // caller can't accidentally widen this to search/category by passing the full query params through.
-    getSummaryForPeriod(opts?: { from?: number; to?: number }): {
+    // Money in/out are scoped to the selected date range (and account, if one is picked) --
+    // deliberately NOT to search/category, so the stat cards don't silently shift when the user
+    // types into the search box. Balance is the running total across all transactions ever recorded
+    // (not just the period), matching how a ledger balance behaves, but IS scoped to the selected
+    // account since switching accounts is a real change of ledger, not a transient search state.
+    getSummaryForPeriod(opts?: { from?: number; to?: number; accountNumber?: string }): {
         balance: number
         moneyIn: number
         moneyOut: number
         incomeCount: number
         expenseCount: number
     } {
-        const { where, params } = this.buildFilter({ from: opts?.from, to: opts?.to })
+        const { where, params } = this.buildFilter({ from: opts?.from, to: opts?.to, accountNumber: opts?.accountNumber })
         const sql = `SELECT
                 COALESCE(SUM(CASE WHEN type = 'credit' THEN amount ELSE 0 END), 0) AS moneyIn,
                 COALESCE(SUM(CASE WHEN type = 'debit' THEN amount ELSE 0 END), 0) AS moneyOut,
@@ -144,7 +179,7 @@ export class TransactionRepository {
         const list = Array.isArray(rows) ? rows : []
         const row = list[0] as { moneyIn: number; moneyOut: number; incomeCount: number; expenseCount: number } | undefined
         return {
-            balance: this.getOverallBalance(),
+            balance: this.getOverallBalance(opts?.accountNumber),
             moneyIn: row?.moneyIn ?? 0,
             moneyOut: row?.moneyOut ?? 0,
             incomeCount: row?.incomeCount ?? 0,
@@ -152,10 +187,12 @@ export class TransactionRepository {
         }
     }
 
-    private getOverallBalance(): number {
+    private getOverallBalance(accountNumber?: string): number {
+        const { where, params } = this.buildFilter({ accountNumber })
         const rows = this.db.executeQuery(
             `SELECT COALESCE(SUM(CASE WHEN type = 'credit' THEN amount ELSE -amount END), 0) AS balance
-             FROM transactions`
+             FROM transactions ${where}`.trimEnd(),
+            params
         ) as unknown
         const list = Array.isArray(rows) ? rows : []
         const row = list[0] as { balance: number } | undefined
@@ -235,5 +272,67 @@ export class TransactionRepository {
 
     delete(id: string): void {
         this.db.executeQuery("DELETE FROM transactions WHERE id = ?", [id])
+    }
+
+    // Grouped by calendar month for the Analytics page's trend/cash-flow charts. Scoped to a single
+    // currency since amounts aren't normalized across currencies anywhere in this app.
+    getMonthlyTotals(opts: { from: number; to: number; currency: string }): { month: string; income: number; expense: number }[] {
+        const sql = `SELECT
+                strftime('%Y-%m', datetime(timestamp, 'unixepoch')) AS month,
+                COALESCE(SUM(CASE WHEN type = 'credit' THEN amount ELSE 0 END), 0) AS income,
+                COALESCE(SUM(CASE WHEN type = 'debit' THEN amount ELSE 0 END), 0) AS expense
+             FROM transactions
+             WHERE currency = ? AND timestamp >= ? AND timestamp <= ?
+             GROUP BY month
+             ORDER BY month ASC`
+        const rows = this.db.executeQuery(sql, [opts.currency, opts.from, opts.to]) as unknown
+        return Array.isArray(rows) ? (rows as { month: string; income: number; expense: number }[]) : []
+    }
+
+    // Spend-only (debit) totals per category for the period, feeding the Analytics page's category
+    // breakdown. Category name/color are joined in the IPC handler, which already has the small
+    // categories table loaded, rather than joining here.
+    getCategoryExpenseTotals(opts: { from: number; to: number; currency: string }): { categoryId: string | null; total: number }[] {
+        const sql = `SELECT category_id AS categoryId, COALESCE(SUM(amount), 0) AS total
+             FROM transactions
+             WHERE currency = ? AND timestamp >= ? AND timestamp <= ? AND type = 'debit'
+             GROUP BY category_id
+             ORDER BY total DESC`
+        const rows = this.db.executeQuery(sql, [opts.currency, opts.from, opts.to]) as unknown
+        return Array.isArray(rows) ? (rows as { categoryId: string | null; total: number }[]) : []
+    }
+
+    // Running balance per transaction (chronological) for the Analytics page's net-worth chart.
+    // startingBalance carries forward everything before `from` so the line reflects true net worth,
+    // not a cumulative sum that resets to zero at the start of the selected range.
+    getNetWorthHistory(opts: { from: number; to: number; currency: string }): { timestamp: number; balance: number }[] {
+        const startingBalanceRows = this.db.executeQuery(
+            `SELECT COALESCE(SUM(CASE WHEN type = 'credit' THEN amount ELSE -amount END), 0) AS balance
+             FROM transactions WHERE currency = ? AND timestamp < ?`,
+            [opts.currency, opts.from]
+        ) as unknown
+        const startingBalanceList = Array.isArray(startingBalanceRows) ? startingBalanceRows : []
+        const startingBalance = (startingBalanceList[0] as { balance: number } | undefined)?.balance ?? 0
+
+        const rows = this.db.executeQuery(
+            `SELECT timestamp, type, amount FROM transactions
+             WHERE currency = ? AND timestamp >= ? AND timestamp <= ?
+             ORDER BY timestamp ASC`,
+            [opts.currency, opts.from, opts.to]
+        ) as unknown
+        const list = Array.isArray(rows) ? (rows as { timestamp: number; type: "credit" | "debit"; amount: number }[]) : []
+
+        let running = startingBalance
+        return list.map(row => {
+            running += row.type === "credit" ? row.amount : -row.amount
+            return { timestamp: row.timestamp, balance: running }
+        })
+    }
+
+    // Distinct currencies present in the ledger, ordered by frequency so the Analytics page can
+    // default its currency selector to whichever currency the user actually transacts in most.
+    listCurrencies(): { currency: string; count: number }[] {
+        const rows = this.db.executeQuery("SELECT currency, COUNT(*) AS count FROM transactions GROUP BY currency ORDER BY count DESC") as unknown
+        return Array.isArray(rows) ? (rows as { currency: string; count: number }[]) : []
     }
 }

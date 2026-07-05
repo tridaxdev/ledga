@@ -177,4 +177,17 @@ export class RulesService {
     delete(id: string): void {
         this.db.executeQuery("DELETE FROM rules WHERE id = ?", [id])
     }
+
+    countByCategoryName(name: string): number {
+        const rows = this.db.executeQuery("SELECT COUNT(*) AS count FROM rules WHERE category_name = ?", [name]) as unknown
+        const list = Array.isArray(rows) ? rows : []
+        return (list[0] as { count: number } | undefined)?.count ?? 0
+    }
+
+    // Rules match categories by name, not id (see category_name on RuleRow), so renaming a category
+    // needs to update every rule that pointed at its old name -- otherwise they'd silently stop
+    // resolving to any category the next time applyRules() runs.
+    renameCategoryReferences(oldName: string, newName: string): void {
+        this.db.executeQuery("UPDATE rules SET category_name = ? WHERE category_name = ?", [newName, oldName])
+    }
 }

@@ -7,19 +7,25 @@ const EMPTY_SUMMARY: TransactionSummary = { balance: 0, moneyIn: 0, moneyOut: 0,
 export function useTransactions(params: TransactionQueryParams) {
     const [transactions, setTransactions] = useState<Transaction[]>([])
     const [summary, setSummary] = useState<TransactionSummary>(EMPTY_SUMMARY)
+    const [totalCount, setTotalCount] = useState(0)
+    const [flaggedCount, setFlaggedCount] = useState(0)
+    const [firstFlaggedCategoryId, setFirstFlaggedCategoryId] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(true)
 
-    const { from, to, categoryId, search } = params
+    const { from, to, categoryId, search, accountNumber, limit, offset } = params
 
     const refetch = useCallback(async () => {
         setIsLoading(true)
-        const result = await getLedgaAPI().transactions.query({ from, to, categoryId, search })
+        const result = await getLedgaAPI().transactions.query({ from, to, categoryId, search, accountNumber, limit, offset })
         if (result.kind === "success") {
             setTransactions(result.value.transactions)
             setSummary(result.value.summary)
+            setTotalCount(result.value.totalCount)
+            setFlaggedCount(result.value.flaggedCount)
+            setFirstFlaggedCategoryId(result.value.firstFlaggedCategoryId)
         }
         setIsLoading(false)
-    }, [from, to, categoryId, search])
+    }, [from, to, categoryId, search, accountNumber, limit, offset])
 
     useEffect(() => {
         refetch()
@@ -40,5 +46,5 @@ export function useTransactions(params: TransactionQueryParams) {
         return result
     }, [])
 
-    return { transactions, summary, isLoading, refetch, updateCategory }
+    return { transactions, summary, totalCount, flaggedCount, firstFlaggedCategoryId, isLoading, refetch, updateCategory }
 }

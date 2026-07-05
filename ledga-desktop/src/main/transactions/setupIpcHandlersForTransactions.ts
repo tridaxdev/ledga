@@ -15,11 +15,25 @@ export function setupIpcHandlersForTransactions(transactionRepository: Transacti
     registerIpcHandler(AllowedChannelIpc.TransactionsQuery, (_, ...args) => {
         const params = (args[0] ?? {}) as TransactionQueryParams
         const rows = transactionRepository.findAll(params)
-        const summary: TransactionSummary = transactionRepository.getSummaryForPeriod({ from: params.from, to: params.to })
+        const summary: TransactionSummary = transactionRepository.getSummaryForPeriod({ from: params.from, to: params.to, accountNumber: params.accountNumber })
+        const totalCount = transactionRepository.countAll(params)
+        const { count: flaggedCount, firstCategoryId: firstFlaggedCategoryId } = transactionRepository.getFlaggedSummary({
+            from: params.from,
+            to: params.to,
+            search: params.search,
+            accountNumber: params.accountNumber
+        })
         return ResultFactory.success({
             transactions: rows.map(toTransaction),
-            summary
+            summary,
+            totalCount,
+            flaggedCount,
+            firstFlaggedCategoryId
         })
+    })
+
+    registerIpcHandler(AllowedChannelIpc.TransactionsListAccounts, () => {
+        return ResultFactory.success(transactionRepository.listAccounts())
     })
 
     registerIpcHandler(AllowedChannelIpc.TransactionsQueryByCategory, (_, ...args) => {

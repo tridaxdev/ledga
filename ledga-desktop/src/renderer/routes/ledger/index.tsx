@@ -1,17 +1,21 @@
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useTranslation } from "react-i18next"
 import { useDateRange, dateRangeToBounds } from "../../hooks/useDateRange"
 import { useTransactions } from "../../hooks/useTransactions"
 import { useCategories } from "../../hooks/useCategories"
 import { useConnections } from "../../hooks/useConnections"
+import { useAccounts } from "../../hooks/useAccounts"
 import { DateRangePicker } from "../../components/DateRangePicker"
 import { CategoryBadge } from "../../components/CategoryBadge"
 import { ImportCsvModal } from "../../components/ImportCsvModal"
 import { formatCurrency, formatSignedAmount, formatDate } from "../../utils/formatCurrency"
 import { openActivityTray } from "../../utils/activityTrayBus"
+import type { TransactionAccount } from "@/common/types/Transaction"
 
 export const Route = createFileRoute("/ledger/")({ component: LedgerScreen })
+
+const PAGE_SIZE = 10
 
 function useDebouncedValue<T>(value: T, delayMs: number): T {
     const [debounced, setDebounced] = useState(value)
@@ -29,15 +33,37 @@ function LedgerScreen() {
     const { from, to } = useMemo(() => dateRangeToBounds(rangeState), [rangeState])
     const { categories } = useCategories()
     const { connections } = useConnections()
+    const { accounts } = useAccounts()
     const [searchInput, setSearchInput] = useState("")
     const search = useDebouncedValue(searchInput, 250)
     const [importOpen, setImportOpen] = useState(false)
+    const [selectedAccount, setSelectedAccount] = useState<string | null>(null)
+    const [page, setPage] = useState(1)
 
-    const { transactions, summary, updateCategory } = useTransactions({ from, to, search: search || undefined })
+    const { transactions, summary, totalCount, flaggedCount, firstFlaggedCategoryId, updateCategory } = useTransactions({
+        from,
+        to,
+        search: search || undefined,
+        accountNumber: selectedAccount ?? undefined,
+        limit: PAGE_SIZE,
+        offset: (page - 1) * PAGE_SIZE
+    })
+
+    // Changing a filter starts the user back at the top of a different result set.
+    useEffect(() => {
+        setPage(1)
+    }, [from, to, search, selectedAccount])
+
+    // A background sync/import (or a category edit elsewhere) can shrink the filtered set out from
+    // under the page the user is sitting on -- clamp down rather than leaving them on an empty page.
+    // Deliberately does NOT reset to page 1: filters already do that above, so this only fires for
+    // invalidation-driven shrinkage while filters stay put.
+    const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE))
+    useEffect(() => {
+        setPage(current => Math.min(current, totalPages))
+    }, [totalPages])
 
     const categoryById = useMemo(() => new Map(categories.map(c => [c.id, c])), [categories])
-    const flagged = transactions.filter(t => t.needs_review)
-    const firstFlaggedCategoryId = flagged.find(t => t.category_id)?.category_id ?? null
     const summaryCurrency = transactions[0]?.currency ?? "NGN"
 
     return (
@@ -46,10 +72,7 @@ function LedgerScreen() {
                 <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, marginBottom: 24 }}>
                     <DateRangePicker />
                     <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                        <div style={filterPillStyle}>
-                            {t("ledger.all_accounts")}
-                            <ChevronDown />
-                        </div>
+                        <AccountFilterDropdown accounts={accounts} selected={selectedAccount} onSelect={setSelectedAccount} />
                         <button onClick={() => setImportOpen(true)} style={{ ...filterPillStyle, cursor: "pointer", fontWeight: 500, color: "var(--color-ledga-text)" }}>
                             <ImportIcon />
                             {t("ledger.import_button")}
@@ -68,7 +91,7 @@ function LedgerScreen() {
                     <StatCard label="Money out" value={`−${formatCurrency(summary.moneyOut, summaryCurrency)}`} sub={`${summary.expenseCount} transaction${summary.expenseCount === 1 ? "" : "s"}`} />
                 </div>
 
-                {flagged.length > 0 && (
+                {flaggedCount > 0 && (
                     <div
                         style={{
                             display: "flex",
@@ -83,7 +106,7 @@ function LedgerScreen() {
                     >
                         <WarningIcon />
                         <div style={{ flex: 1, fontSize: 13.5, color: "var(--color-ledga-text-secondary)" }}>
-                            <b style={{ color: "var(--color-ledga-text)" }}>{t("ledger.transactions_need_a_look", { count: flagged.length })}</b> {t("ledger.low_confidence_notice")}
+                            <b style={{ color: "var(--color-ledga-text)" }}>{t("ledger.transactions_need_a_look", { count: flaggedCount })}</b> {t("ledger.low_confidence_notice")}
                         </div>
                         <button
                             onClick={() => firstFlaggedCategoryId && navigate({ to: "/ledger/$categoryId", params: { categoryId: firstFlaggedCategoryId } })}
@@ -164,7 +187,7 @@ function LedgerScreen() {
                                             {t.merchant}
                                         </span>
                                         <span style={{ display: "block", fontSize: 11, color: "var(--color-ledga-text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                            {t.bank}
+                                            {t.bank} · {t.account_number}
                                         </span>
                                     </span>
                                     <span>
@@ -192,12 +215,50 @@ function LedgerScreen() {
                             )
                         })
                     )}
+                    {totalCount > 0 && (
+                        <div
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                padding: "10px 16px",
+                                borderTop: "1px solid var(--color-ledga-border-subtle)"
+                            }}
+                        >
+                            <span style={{ fontSize: 12.5, color: "var(--color-ledga-text-muted)" }}>
+                                {t("ledger.pagination_showing", { from: (page - 1) * PAGE_SIZE + 1, to: Math.min(page * PAGE_SIZE, totalCount), total: totalCount })}
+                            </span>
+                            <div style={{ display: "flex", gap: 7 }}>
+                                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} style={paginationButtonStyle(page <= 1)}>
+                                    {t("ledger.pagination_prev")}
+                                </button>
+                                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages} style={paginationButtonStyle(page >= totalPages)}>
+                                    {t("ledger.pagination_next")}
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
             <ImportCsvModal isOpen={importOpen} onClose={() => setImportOpen(false)} onViewStatus={openActivityTray} />
         </div>
     )
+}
+
+function paginationButtonStyle(disabled: boolean): React.CSSProperties {
+    return {
+        border: "1px solid var(--color-ledga-border)",
+        background: "#fff",
+        borderRadius: 6,
+        padding: "5px 11px",
+        fontSize: 12.5,
+        fontWeight: 500,
+        color: disabled ? "var(--color-ledga-text-muted)" : "var(--color-ledga-text-secondary)",
+        cursor: disabled ? "default" : "pointer",
+        fontFamily: "inherit",
+        opacity: disabled ? 0.55 : 1
+    }
 }
 
 const filterPillStyle: React.CSSProperties = {
@@ -210,6 +271,106 @@ const filterPillStyle: React.CSSProperties = {
     padding: "7px 11px",
     fontSize: 13,
     color: "var(--color-ledga-text-secondary)"
+}
+
+function AccountFilterDropdown({ accounts, selected, onSelect }: { accounts: TransactionAccount[]; selected: string | null; onSelect: (accountNumber: string | null) => void }) {
+    const { t } = useTranslation()
+    const [open, setOpen] = useState(false)
+    const ref = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        if (!open) return
+        function handleClickOutside(event: MouseEvent) {
+            if (ref.current && !ref.current.contains(event.target as Node)) setOpen(false)
+        }
+        document.addEventListener("mousedown", handleClickOutside)
+        return () => document.removeEventListener("mousedown", handleClickOutside)
+    }, [open])
+
+    const selectedAccount = accounts.find(a => a.account_number === selected)
+    const label = selectedAccount ? `${selectedAccount.bank} · ${selectedAccount.account_number}` : t("ledger.all_accounts")
+
+    return (
+        <div ref={ref} style={{ position: "relative" }}>
+            <button
+                onClick={() => setOpen(prev => !prev)}
+                style={{ ...filterPillStyle, cursor: "pointer", fontFamily: "inherit", maxWidth: 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+            >
+                {label}
+                <ChevronDown />
+            </button>
+            {open && (
+                <div
+                    style={{
+                        position: "absolute",
+                        top: "calc(100% + 5px)",
+                        left: 0,
+                        minWidth: 220,
+                        maxWidth: 320,
+                        maxHeight: 280,
+                        overflowY: "auto",
+                        backgroundColor: "#fff",
+                        border: "1px solid var(--color-ledga-border)",
+                        borderRadius: 9,
+                        boxShadow: "0 14px 30px -10px rgba(63,56,47,.26), 0 4px 10px -2px rgba(63,56,47,.1)",
+                        zIndex: 30,
+                        padding: 5
+                    }}
+                >
+                    <AccountOption
+                        label={t("ledger.all_accounts")}
+                        selected={selected === null}
+                        onClick={() => {
+                            onSelect(null)
+                            setOpen(false)
+                        }}
+                    />
+                    {accounts.map(account => (
+                        <AccountOption
+                            key={account.account_number}
+                            label={`${account.bank} · ${account.account_number}`}
+                            selected={selected === account.account_number}
+                            onClick={() => {
+                                onSelect(account.account_number)
+                                setOpen(false)
+                            }}
+                        />
+                    ))}
+                </div>
+            )}
+        </div>
+    )
+}
+
+function AccountOption({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
+    return (
+        <button
+            onClick={onClick}
+            style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 8,
+                width: "100%",
+                textAlign: "left",
+                padding: "7px 8px",
+                borderRadius: 6,
+                border: "none",
+                background: selected ? "var(--color-ledga-sidebar)" : "transparent",
+                fontSize: 13,
+                color: "var(--color-ledga-text)",
+                cursor: "pointer",
+                fontFamily: "inherit"
+            }}
+        >
+            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</span>
+            {selected && (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-ledga-brand)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <path d="M20 6 9 17l-5-5" />
+                </svg>
+            )}
+        </button>
+    )
 }
 
 function StatCard({ label, value, sub, valueColor }: { label: string; value: string; sub: string; valueColor?: string }) {

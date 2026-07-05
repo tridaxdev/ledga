@@ -23,6 +23,7 @@ import { BillPaymentService } from "./billPayments/BillPaymentService"
 import { EmailService } from "./email/emailService"
 import { setupIpcHandlersForEmail } from "./email/setupIpcHandlersForEmail"
 import { setupIpcHandlersForTransactions } from "./transactions/setupIpcHandlersForTransactions"
+import { setupIpcHandlersForAnalytics } from "./analytics/setupIpcHandlersForAnalytics"
 import { setupIpcHandlersForCategories } from "./categories/setupIpcHandlersForCategories"
 import { setupIpcHandlersForRules } from "./rules/setupIpcHandlersForRules"
 import { CsvImportService } from "./csvImport/CsvImportService"
@@ -113,7 +114,8 @@ if (!isSingleInstance) {
 
             setupIpcHandlersForEmail(emailService, logger)
             setupIpcHandlersForTransactions(transactionRepository, categoryRepository)
-            setupIpcHandlersForCategories(categoryRepository)
+            setupIpcHandlersForAnalytics(transactionRepository, categoryRepository)
+            setupIpcHandlersForCategories(categoryRepository, transactionRepository, rulesService)
             setupIpcHandlersForRules(rulesService, notificationService)
 
             const csvImportService = new CsvImportService(transactionRepository, categoryRepository, rulesService, billPaymentService, backgroundWorkerManager, notificationService, logger)

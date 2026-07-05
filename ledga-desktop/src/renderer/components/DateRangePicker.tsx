@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { useDateRange, dateRangeToBounds, type RangeMode } from "../hooks/useDateRange"
+import { Calendar, formatInputValue, parseInputValue } from "./Calendar"
 
 const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
@@ -134,8 +135,10 @@ export function DateRangePicker() {
 
                     {state.mode === "custom" && (
                         <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-                            <DateField label="From" value={state.customFrom} onChange={v => update({ customFrom: v })} />
-                            <DateField label="To" value={state.customTo} onChange={v => update({ customTo: v })} />
+                            <Calendar
+                                value={{ start: parseInputValue(state.customFrom), end: parseInputValue(state.customTo) }}
+                                onChange={range => update({ customFrom: formatInputValue(range.start), customTo: formatInputValue(range.end) })}
+                            />
                             <button
                                 onClick={() => setOpen(false)}
                                 style={{ background: "var(--color-ledga-brand)", color: "#fff", border: "none", borderRadius: 7, padding: 9, fontSize: 13, fontWeight: 500, cursor: "pointer" }}
@@ -184,28 +187,5 @@ function IconButton({ onClick, path }: { onClick: () => void; path: string }) {
                 <path d={path} />
             </svg>
         </button>
-    )
-}
-
-function DateField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
-    return (
-        <div>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-ledga-text-muted)", marginBottom: 4 }}>{label}</div>
-            <input
-                type="date"
-                value={value}
-                onChange={e => onChange(e.target.value)}
-                style={{
-                    width: "100%",
-                    border: "1px solid var(--color-ledga-border)",
-                    borderRadius: 6,
-                    padding: "7px 9px",
-                    fontFamily: "inherit",
-                    fontSize: 13,
-                    color: "var(--color-ledga-text)",
-                    background: "#fff"
-                }}
-            />
-        </div>
     )
 }

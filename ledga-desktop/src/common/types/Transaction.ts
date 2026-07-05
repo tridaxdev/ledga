@@ -43,8 +43,14 @@ export interface TransactionQueryParams {
     to?: number
     categoryId?: string
     search?: string
+    accountNumber?: string
     limit?: number
     offset?: number
+}
+
+export interface TransactionAccount {
+    bank: string
+    account_number: string
 }
 
 export interface CategoryAggregate {

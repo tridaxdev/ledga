@@ -1,8 +1,9 @@
 import type { AppInstallation, UpdateCheckResult, UpdateProgressCallback } from "./AppTypes"
 import type { Result } from "./Result"
 import type { Connection } from "./Connection"
-import type { CategoryAggregate, CategoryQueryParams, FlaggedTransaction, Transaction, TransactionQueryParams, TransactionSummary } from "./Transaction"
-import type { Category } from "./Category"
+import type { CategoryAggregate, CategoryQueryParams, FlaggedTransaction, Transaction, TransactionAccount, TransactionQueryParams, TransactionSummary } from "./Transaction"
+import type { Category, CategoryInput } from "./Category"
+import type { AnalyticsQueryParams, CategoryTotal, CurrencyCount, MonthlyTotal, NetWorthPoint } from "./Analytics"
 import type { Rule, RuleInput } from "./Rule"
 import type { CsvImportProgressEvent } from "./CsvImportTypes"
 import type { Chat, ChatMessage, AssistantStreamChunkEvent, AssistantStreamDoneEvent, AssistantStreamErrorEvent } from "./ChatTypes"
@@ -125,8 +126,11 @@ export interface LedgaAPI {
         readonly onPulled: (callback: (event: { connectionId: string; newCount: number }) => void) => () => void
     }
     readonly transactions: {
-        readonly query: (params: TransactionQueryParams) => Promise<Result<{ transactions: Transaction[]; summary: TransactionSummary }, Error>>
+        readonly query: (
+            params: TransactionQueryParams
+        ) => Promise<Result<{ transactions: Transaction[]; summary: TransactionSummary; totalCount: number; flaggedCount: number; firstFlaggedCategoryId: string | null }, Error>>
         readonly queryByCategory: (params: CategoryQueryParams) => Promise<Result<{ transactions: Transaction[]; aggregate: CategoryAggregate; flagged: FlaggedTransaction[] }, Error>>
+        readonly listAccounts: () => Promise<Result<TransactionAccount[], Error>>
         readonly updateCategory: (id: string, categoryId: string | null) => Promise<Result<void, Error>>
         readonly updateMerchant: (id: string, merchant: string) => Promise<Result<void, Error>>
         readonly markReviewed: (id: string) => Promise<Result<void, Error>>
@@ -134,6 +138,15 @@ export interface LedgaAPI {
     }
     readonly categories: {
         readonly getAll: () => Promise<Result<Category[], Error>>
+        readonly create: (input: CategoryInput) => Promise<Result<Category, Error>>
+        readonly update: (id: string, patch: Partial<CategoryInput>) => Promise<Result<void, Error>>
+        readonly delete: (id: string) => Promise<Result<void, Error>>
+    }
+    readonly analytics: {
+        readonly getMonthlyTotals: (params: AnalyticsQueryParams) => Promise<Result<MonthlyTotal[], Error>>
+        readonly getCategoryTotals: (params: AnalyticsQueryParams) => Promise<Result<CategoryTotal[], Error>>
+        readonly getNetWorthHistory: (params: AnalyticsQueryParams) => Promise<Result<NetWorthPoint[], Error>>
+        readonly listCurrencies: () => Promise<Result<CurrencyCount[], Error>>
     }
     readonly rules: {
         readonly getAll: () => Promise<Result<Rule[], Error>>

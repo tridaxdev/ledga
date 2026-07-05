@@ -33,7 +33,7 @@ export function RulesSection() {
     }
 
     return (
-        <section style={{ marginTop: 32 }}>
+        <section>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
                 <h2 style={{ fontSize: 15, fontWeight: 600, color: "var(--color-ledga-text)", margin: 0 }}>{t("rules_section.title")}</h2>
                 {!formOpen && (

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as LedgerIndexRouteImport } from './routes/ledger/index'
+import { Route as AnalyticsIndexRouteImport } from './routes/analytics/index'
 import { Route as LedgerCategoryIdRouteImport } from './routes/ledger/$categoryId'
 import { Route as AssistantChatIdRouteImport } from './routes/assistant/$chatId'
 
@@ -30,6 +31,11 @@ const LedgerIndexRoute = LedgerIndexRouteImport.update({
   path: '/ledger/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AnalyticsIndexRoute = AnalyticsIndexRouteImport.update({
+  id: '/analytics/',
+  path: '/analytics/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LedgerCategoryIdRoute = LedgerCategoryIdRouteImport.update({
   id: '/ledger/$categoryId',
   path: '/ledger/$categoryId',
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/assistant/$chatId': typeof AssistantChatIdRoute
   '/ledger/$categoryId': typeof LedgerCategoryIdRoute
+  '/analytics/': typeof AnalyticsIndexRoute
   '/ledger/': typeof LedgerIndexRoute
   '/settings/': typeof SettingsIndexRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/assistant/$chatId': typeof AssistantChatIdRoute
   '/ledger/$categoryId': typeof LedgerCategoryIdRoute
+  '/analytics': typeof AnalyticsIndexRoute
   '/ledger': typeof LedgerIndexRoute
   '/settings': typeof SettingsIndexRoute
 }
@@ -60,6 +68,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/assistant/$chatId': typeof AssistantChatIdRoute
   '/ledger/$categoryId': typeof LedgerCategoryIdRoute
+  '/analytics/': typeof AnalyticsIndexRoute
   '/ledger/': typeof LedgerIndexRoute
   '/settings/': typeof SettingsIndexRoute
 }
@@ -69,6 +78,7 @@ export interface FileRouteTypes {
     | '/'
     | '/assistant/$chatId'
     | '/ledger/$categoryId'
+    | '/analytics/'
     | '/ledger/'
     | '/settings/'
   fileRoutesByTo: FileRoutesByTo
@@ -76,6 +86,7 @@ export interface FileRouteTypes {
     | '/'
     | '/assistant/$chatId'
     | '/ledger/$categoryId'
+    | '/analytics'
     | '/ledger'
     | '/settings'
   id:
@@ -83,6 +94,7 @@ export interface FileRouteTypes {
     | '/'
     | '/assistant/$chatId'
     | '/ledger/$categoryId'
+    | '/analytics/'
     | '/ledger/'
     | '/settings/'
   fileRoutesById: FileRoutesById
@@ -91,6 +103,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AssistantChatIdRoute: typeof AssistantChatIdRoute
   LedgerCategoryIdRoute: typeof LedgerCategoryIdRoute
+  AnalyticsIndexRoute: typeof AnalyticsIndexRoute
   LedgerIndexRoute: typeof LedgerIndexRoute
   SettingsIndexRoute: typeof SettingsIndexRoute
 }
@@ -118,6 +131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LedgerIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/analytics/': {
+      id: '/analytics/'
+      path: '/analytics'
+      fullPath: '/analytics/'
+      preLoaderRoute: typeof AnalyticsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ledger/$categoryId': {
       id: '/ledger/$categoryId'
       path: '/ledger/$categoryId'
@@ -139,6 +159,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AssistantChatIdRoute: AssistantChatIdRoute,
   LedgerCategoryIdRoute: LedgerCategoryIdRoute,
+  AnalyticsIndexRoute: AnalyticsIndexRoute,
   LedgerIndexRoute: LedgerIndexRoute,
   SettingsIndexRoute: SettingsIndexRoute,
 }

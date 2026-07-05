@@ -14,6 +14,7 @@ export const Route = createRootRoute({
 function getPageTitle(pathname: string): string {
     if (pathname === "/ledger" || pathname.startsWith("/ledger/")) return "Ledger"
     if (pathname.startsWith("/assistant/")) return "Assistant"
+    if (pathname === "/analytics") return "Analytics"
     if (pathname === "/settings") return "Settings"
     return "Ledga"
 }
@@ -26,6 +27,7 @@ function RootLayout() {
     const title = getPageTitle(pathname)
 
     const isLedgerActive = pathname === "/ledger" || pathname.startsWith("/ledger/")
+    const isAnalyticsActive = pathname === "/analytics"
     const isSettingsActive = pathname === "/settings"
 
     const { chats, createChat } = useChats()
@@ -212,6 +214,29 @@ function RootLayout() {
                                 <path d="M4 5h16M4 12h16M4 19h10" />
                             </svg>
                             {t("root.nav_ledger")}
+                        </button>
+                        <button
+                            onClick={() => navigate({ to: "/analytics" })}
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                                padding: "9px 10px",
+                                borderRadius: 10,
+                                fontSize: 14,
+                                fontWeight: 500,
+                                width: "100%",
+                                textAlign: "left",
+                                cursor: "pointer",
+                                border: "none",
+                                background: isAnalyticsActive ? "#ebe3d0" : "transparent",
+                                color: "#1f1b16"
+                            }}
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M3 3v18h18M7 15l4-5 3 3 5-7" />
+                            </svg>
+                            {t("root.nav_analytics")}
                         </button>
                         <button
                             onClick={() => navigate({ to: "/settings" })}
